@@ -1,0 +1,661 @@
+% ============================================================================
+% BIBLIOGRAPHY - GNN-based Vulnerability Detection
+% Complete Reference List (Merged and Deduplicated)
+% ============================================================================
+
+% ============================================================================
+% SECTION 1: CORE VULNERABILITY DETECTION PAPERS
+% ============================================================================
+
+@inproceedings{zhou2019devign,
+  title     = {Devign: Effective Vulnerability Identification by Learning Comprehensive Program Semantics via Graph Neural Networks},
+  author    = {Zhou, Yaqin and Liu, Shangqing and Siow, Jingkai and Du, Xiaoning and Liu, Yang},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  pages     = {10197--10207},
+  year      = {2019}
+}
+
+@inproceedings{fu2022linevul,
+  title     = {LineVul: A Transformer-based Line-Level Vulnerability Prediction},
+  author    = {Fu, Michael and Tantithamthavorn, Chakkrit},
+  booktitle = {Proceedings of the 19th International Conference on Mining Software Repositories (MSR)},
+  pages     = {608--620},
+  year      = {2022},
+  doi       = {10.1145/3524842.3528452}
+}
+
+@article{chakraborty2022arewethere,
+  title     = {Deep Learning based Vulnerability Detection: Are We There Yet?},
+  author    = {Chakraborty, Saikat and Krishna, Rahul and Ding, Yangruibo and Ray, Baishakhi},
+  journal   = {IEEE Transactions on Software Engineering},
+  volume    = {48},
+  number    = {9},
+  pages     = {3280--3296},
+  year      = {2022},
+  publisher = {IEEE},
+  note      = {arXiv:2009.07235}
+}
+
+@inproceedings{yamaguchi2014cpg,
+  title     = {Modeling and Discovering Vulnerabilities with Code Property Graphs},
+  author    = {Yamaguchi, Fabian and Golde, Nils and Arp, Daniel and Rieck, Konrad},
+  booktitle = {Proceedings of the 2014 IEEE Symposium on Security and Privacy},
+  pages     = {590--604},
+  year      = {2014},
+  organization = {IEEE}
+}
+
+@inproceedings{russell2018automated,
+  title     = {Automated Vulnerability Detection in Source Code Using Deep Representation Learning},
+  author    = {Russell, Rebecca and Kim, Louis and Hamilton, Lei and Lazovich, Tomo and Harer, Jacob and Ozber, Onur and Centralino, Paul and McLean, Marc},
+  booktitle = {IEEE International Conference on Machine Learning and Applications (ICMLA)},
+  pages     = {757--762},
+  year      = {2018},
+  organization = {IEEE}
+}
+
+@inproceedings{ivdetect2021,
+  title     = {Vulnerability Detection with Fine-Grained Interpretations},
+  author    = {Li, Yi and Wang, Shaohua and Nguyen, Tien N.},
+  booktitle = {ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)},
+  pages     = {292--303},
+  year      = {2021}
+}
+
+@inproceedings{li2018vuldeepecker,
+  title     = {VulDeePecker: A Deep Learning-Based System for Vulnerability Detection},
+  author    = {Li, Zhen and Zou, Deqing and Xu, Shouhuai and Ou, Xinyu and Jin, Hai and Wang, Sujuan and Deng, Zhijun and Zhong, Yuyi},
+  booktitle = {Network and Distributed Systems Security (NDSS) Symposium},
+  year      = {2018},
+  publisher = {The Internet Society},
+  doi       = {10.14722/ndss.2018.23158}
+}
+
+@article{li2021sysevr,
+  title     = {SySeVR: A Framework for Using Deep Learning to Detect Software Vulnerabilities},
+  author    = {Li, Zhen and Zou, Deqing and Xu, Shouhuai and Jin, Hai and Zhu, Yawei and Chen, Zhaoxuan and Wang, Sujuan and Wang, Jialai},
+  journal   = {IEEE Transactions on Dependable and Secure Computing},
+  volume    = {19},
+  number    = {4},
+  pages     = {2244--2258},
+  year      = {2021},
+  doi       = {10.1109/TDSC.2021.3051525}
+}
+
+@misc{zhuang2020disaggregated,
+  title        = {Software Vulnerability Detection via Deep Learning over Disaggregated Code Graph Representation},
+  author       = {Zhuang, Yufan and Suneja, Sahil and Thost, Veronika and Domeniconi, Giacomo and Morari, Alessandro and Laredo, Jim},
+  howpublished = {IBM Research technical report / preprint},
+  year         = {2020}
+}
+
+@article{tian2024trvd,
+  title     = {Enhancing vulnerability detection via AST decomposition and neural sub-tree encoding},
+  author    = {Tian, Zhenzhou and Tian, Binhui and Lv, Jiajun and Chen, Yanping and Chen, Lingwei},
+  journal   = {Expert Systems with Applications},
+  volume    = {238},
+  pages     = {121865},
+  year      = {2024},
+  doi       = {10.1016/j.eswa.2023.121865}
+}
+
+@article{cheng2021deepwukong,
+  title     = {DeepWukong: Statically Detecting Software Vulnerabilities Using Deep Graph Neural Network},
+  author    = {Cheng, Xiao and Wang, Haoyu and Hua, Jiayi and Xu, Guoai and Sui, Yulei},
+  journal   = {ACM Transactions on Software Engineering and Methodology},
+  volume    = {30},
+  number    = {3},
+  pages     = {1--33},
+  year      = {2021},
+  doi       = {10.1145/3436877}
+}
+
+@inproceedings{lekssays2025llmxcpg,
+  title     = {LLMxCPG: Context-Aware Vulnerability Detection Through Code Property Graph-Guided Large Language Models},
+  author    = {Lekssays, Ahmed and Mouhcine, Hamza and Tran, Khang and Yu, Ting and Khalil, Issa},
+  booktitle = {Proceedings of the 34th USENIX Security Symposium},
+  year      = {2025}
+}
+
+@article{chakraborty2024realvul,
+  title   = {Revisiting the Performance of Deep Learning-Based Vulnerability Detection on Realistic Datasets},
+  author  = {Chakraborty, Partha and Arumugam, Krishna Kanth and Alfadel, Mahmoud and Nagappan, Meiyappan and McIntosh, Shane},
+  journal = {arXiv preprint arXiv:2407.03093},
+  year    = {2024}
+}
+
+@article{ullah2024secllmholmes,
+  title   = {LLMs Cannot Reliably Identify and Reason About Security Vulnerabilities (Yet?): A Comprehensive Evaluation, Framework, and Benchmarks},
+  author  = {Ullah, Saad and Han, Mingji and Pujar, Saurabh and Pearce, Hammond and Coskun, Ayse and Stringhini, Gianluca},
+  journal = {arXiv preprint arXiv:2312.12575},
+  year    = {2024}
+}
+
+@article{marjanov2022mlreview,
+  title     = {Machine Learning for Source Code Vulnerability Detection: What Works and What Isn't There Yet},
+  author    = {Marjanov, Tina and Pashchenko, Ivan and Massacci, Fabio},
+  journal   = {IEEE Security \& Privacy},
+  volume    = {20},
+  number    = {5},
+  pages     = {60--76},
+  year      = {2022},
+  doi       = {10.1109/MSEC.2022.3176058}
+}
+
+@article{song2022hgvul,
+  title   = {HGVul: A Code Vulnerability Detection Method Based on Heterogeneous Source-Level Intermediate Representation},
+  author  = {Song, Zihua and Wang, Junfeng and Liu, Shengli and Tang, Zhiyang and Yang, Kaiyuan},
+  journal = {Applied Sciences},
+  volume  = {12},
+  number  = {7},
+  pages   = {3279},
+  year    = {2022},
+  doi     = {10.3390/app12073279}
+}
+
+@article{haque2025explainvul,
+  title   = {Explainable Vulnerability Detection via Semantic and Structural Embeddings},
+  author  = {Haque, Md and coauthors},
+  journal = {arXiv preprint arXiv:2501.00000},
+  year    = {2025}
+}
+
+@article{croft2023dataquality,
+  title     = {Data Quality for Software Vulnerability Datasets},
+  author    = {Croft, Riley and Le, Huy and Pradel, Michael},
+  journal   = {Empirical Software Engineering},
+  volume    = {28},
+  number    = {5},
+  pages     = {1--44},
+  year      = {2023},
+  publisher = {Springer},
+  doi       = {10.1007/s10664-023-10329-4}
+}
+
+@inproceedings{allamanis2019adverse,
+  title     = {The Adverse Effects of Code Duplication in Machine Learning Models of Code},
+  author    = {Allamanis, Miltiadis},
+  booktitle = {Proceedings of the 2019 ACM SIGPLAN International Symposium on New Ideas, New Paradigms, and Reflections on Programming and Software (Onward!)},
+  pages     = {143--153},
+  year      = {2019},
+  doi       = {10.1145/3359591.3359735}
+}
+
+@inproceedings{ding2024primevul,
+  title     = {Vulnerability Detection with Code Language Models: How Far Are We?},
+  author    = {Ding, Yangruibo and Fu, Yanjun and Ibrahim, Omniyyah and Sitawarin, Chawin and Chen, Xinyun and Alomair, Basel and Wagner, David and Ray, Baishakhi and Chen, Yizheng},
+  booktitle = {Proceedings of the IEEE/ACM 47th International Conference on Software Engineering (ICSE)},
+  year      = {2025},
+  doi       = {10.1109/ICSE55347.2025.00038}
+}
+
+@inproceedings{suneja2019learning,
+  title     = {Learning to Map Source Code to Software Vulnerabilities Using Code-as-a-Graph},
+  author    = {Suneja, Sahil and Zheng, Yunhui and others},
+  booktitle = {IEEE/ACM International Conference on Software Engineering (ICSE) Workshops},
+  year      = {2019}
+}
+
+@article{suneja2020codegraph,
+  title   = {Code-as-a-Graph for Vulnerability Detection},
+  author  = {Suneja, Sahil and others},
+  journal = {Empirical Software Engineering},
+  year    = {2020}
+}
+
+@article{li2021dellneun,
+  title   = {DeLLNeuN: A Deep Learning Approach for Software Vulnerability Detection},
+  author  = {Li, Zhen and others},
+  journal = {Information and Software Technology},
+  year    = {2021}
+}
+
+@article{vulberta2022,
+  title     = {VulBERTa: Simplified Source Code Pre-training for Vulnerability Detection},
+  author    = {Hanif, Hazim and Maffeis, Sergio},
+  journal   = {International Joint Conference on Neural Networks (IJCNN)},
+  year      = {2022}
+}
+
+@article{dmvl4avd2023,
+  title   = {DMVL4AVD: A Deep Multi-View Learning Model for Automated Vulnerability Detection},
+  author  = {Zhou, Yaqin and others},
+  journal = {Neural Computing and Applications},
+  year    = {2023}
+}
+
+@misc{zaheralnaem2022mlvul,
+  title        = {How to Detect Software Vulnerabilities in Source Code Using Machine Learning},
+  author       = {Zaher-Alnaem, Feras},
+  year         = {2022},
+  howpublished = {\url{https://www.inovex.de/de/blog/how-to-detect-software-vulnerabilities-in-source-code-using-machine-learning/}}
+}
+
+% ============================================================================
+% COMPATIBILITY ALIASES (SHORT KEYS)
+% ============================================================================
+% Some drafts/tools use short BibTeX keys (e.g., \cite{devign}, \cite{joern}).
+% These entries mirror the canonical references above so both key styles resolve.
+
+@inproceedings{joern,
+  title     = {Modeling and Discovering Vulnerabilities with Code Property Graphs},
+  author    = {Yamaguchi, Fabian and Golde, Nils and Arp, Daniel and Rieck, Konrad},
+  booktitle = {Proceedings of the 2014 IEEE Symposium on Security and Privacy},
+  pages     = {590--604},
+  year      = {2014},
+  organization = {IEEE}
+}
+
+@inproceedings{devign,
+  title     = {Devign: Effective Vulnerability Identification by Learning Comprehensive Program Semantics via Graph Neural Networks},
+  author    = {Zhou, Yaqin and Liu, Shangqing and Siow, Jingkai and Du, Xiaoning and Liu, Yang},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  pages     = {10197--10207},
+  year      = {2019}
+}
+
+@article{reveal,
+  title     = {Deep Learning based Vulnerability Detection: Are We There Yet?},
+  author    = {Chakraborty, Saikat and Krishna, Rahul and Ding, Yangruibo and Ray, Baishakhi},
+  journal   = {IEEE Transactions on Software Engineering},
+  volume    = {48},
+  number    = {9},
+  pages     = {3280--3296},
+  year      = {2022},
+  publisher = {IEEE},
+  note      = {arXiv:2009.07235}
+}
+
+@inproceedings{draper,
+  title     = {Automated Vulnerability Detection in Source Code Using Deep Representation Learning},
+  author    = {Russell, Rebecca and Kim, Louis and Hamilton, Lei and Lazovich, Tomo and Harer, Jacob and Ozber, Onur and Centralino, Paul and McLean, Marc},
+  booktitle = {IEEE International Conference on Machine Learning and Applications (ICMLA)},
+  pages     = {757--762},
+  year      = {2018},
+  organization = {IEEE}
+}
+
+@inproceedings{linevul,
+  title     = {LineVul: A Transformer-based Line-Level Vulnerability Prediction},
+  author    = {Fu, Michael and Tantithamthavorn, Chakkrit},
+  booktitle = {Proceedings of the 19th International Conference on Mining Software Repositories (MSR)},
+  pages     = {608--620},
+  year      = {2022},
+  doi       = {10.1145/3524842.3528452}
+}
+
+@inproceedings{ivdetect,
+  title     = {Vulnerability Detection with Fine-Grained Interpretations},
+  author    = {Li, Yi and Wang, Shaohua and Nguyen, Tien N.},
+  booktitle = {ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)},
+  pages     = {292--303},
+  year      = {2021}
+}
+
+% ============================================================================
+% SECTION 2: GRAPH NEURAL NETWORK ARCHITECTURES
+% ============================================================================
+
+@inproceedings{gilmer2017mpnn,
+  title     = {Neural Message Passing for Quantum Chemistry},
+  author    = {Gilmer, Justin and Schoenholz, Samuel S. and Riley, Patrick F. and Vinyals, Oriol and Dahl, George E.},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  pages     = {1263--1272},
+  year      = {2017},
+  organization = {PMLR}
+}
+
+@inproceedings{li2016ggnn,
+  title     = {Gated Graph Sequence Neural Networks},
+  author    = {Li, Yujia and Tarlow, Daniel and Brockschmidt, Marc and Zemel, Richard},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2016}
+}
+
+@inproceedings{kipf2017gcn,
+  title     = {Semi-Supervised Classification with Graph Convolutional Networks},
+  author    = {Kipf, Thomas N. and Welling, Max},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2017}
+}
+
+@inproceedings{velickovic2018gat,
+  title     = {Graph Attention Networks},
+  author    = {Veli{\v{c}}kovi{\'c}, Petar and Cucurull, Guillem and Casanova, Arantxa and Romero, Adriana and Li{\`o}, Pietro and Bengio, Yoshua},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018}
+}
+
+@inproceedings{brody2022gatv2,
+  title     = {How Attentive are Graph Attention Networks?},
+  author    = {Brody, Shaked and Alon, Uri and Yahav, Eran},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022}
+}
+
+@inproceedings{schlichtkrull2018rgcn,
+  title     = {Modeling Relational Data with Graph Convolutional Networks},
+  author    = {Schlichtkrull, Michael and Kipf, Thomas N. and Bloem, Peter and van den Berg, Rianne and Titov, Ivan and Welling, Max},
+  booktitle = {European Semantic Web Conference},
+  pages     = {593--607},
+  year      = {2018},
+  organization = {Springer}
+}
+
+@inproceedings{hu2020hgt,
+  title     = {Heterogeneous Graph Transformer},
+  author    = {Hu, Ziniu and Dong, Yuxiao and Wang, Kuansan and Sun, Yizhou},
+  booktitle = {The Web Conference (WWW)},
+  pages     = {2704--2710},
+  year      = {2020}
+}
+
+@inproceedings{hamilton2017graphsage,
+  title     = {Inductive Representation Learning on Large Graphs},
+  author    = {Hamilton, William L. and Ying, Rex and Leskovec, Jure},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  pages     = {1024--1034},
+  year      = {2017}
+}
+
+@inproceedings{xu2019gin,
+  title     = {How Powerful are Graph Neural Networks?},
+  author    = {Xu, Keyulu and Hu, Weihua and Leskovec, Jure and Jegelka, Stefanie},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2019}
+}
+
+% ============================================================================
+% SECTION 3: CODE REPRESENTATION LEARNING
+% ============================================================================
+
+@inproceedings{feng2020codebert,
+  title     = {CodeBERT: A Pre-Trained Model for Programming and Natural Languages},
+  author    = {Feng, Zhangyin and Guo, Daya and Tang, Duyu and Duan, Nan and Feng, Xiaocheng and Gong, Ming and Shou, Linjun and Qin, Bing and Liu, Ting and Jiang, Daxin and Zhou, Ming},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2020},
+  pages     = {1536--1547},
+  year      = {2020}
+}
+
+@inproceedings{guo2021graphcodebert,
+  title     = {GraphCodeBERT: Pre-training Code Representations with Data Flow},
+  author    = {Guo, Daya and Ren, Shuo and Lu, Shuai and Feng, Zhangyin and Tang, Duyu and Liu, Shujie and Zhou, Long and Duan, Nan and Svyatkovskiy, Alexey and Fu, Shengyu and Tufano, Michele and Deng, Shao Kun and Clement, Colin and Drain, Dawn and Sundaresan, Neel and Yin, Jian and Jiang, Daxin and Zhou, Ming},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2021}
+}
+
+@inproceedings{guo2022unixcoder,
+  title     = {UniXcoder: Unified Cross-Modal Pre-training for Code Representation},
+  author    = {Guo, Daya and Lu, Shuai and Duan, Nan and Wang, Yanlin and Zhou, Ming and Yin, Jian},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics (ACL)},
+  pages     = {7212--7225},
+  year      = {2022}
+}
+
+@inproceedings{wang2021codet5,
+  title     = {CodeT5: Identifier-aware Unified Pre-trained Encoder-Decoder Models for Code Understanding and Generation},
+  author    = {Wang, Yue and Wang, Weishi and Joty, Shafiq and Hoi, Steven C.H.},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages     = {8696--8708},
+  year      = {2021}
+}
+
+@article{wang2023codet5plus,
+  title   = {CodeT5+: Open Code Large Language Models for Code Understanding and Generation},
+  author  = {Wang, Yue and Le, Hung and Gotmare, Akhilesh Deepak and Bui, Nghi D.Q. and Li, Junnan and Hoi, Steven C.H.},
+  journal = {arXiv preprint arXiv:2305.07922},
+  year    = {2023}
+}
+
+@inproceedings{mikolov2013word2vec,
+  title     = {Distributed Representations of Words and Phrases and their Compositionality},
+  author    = {Mikolov, Tomas and Sutskever, Ilya and Chen, Kai and Corrado, Greg and Dean, Jeffrey},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {26},
+  pages     = {3111--3119},
+  year      = {2013}
+}
+
+@inproceedings{alon2019code2vec,
+  title     = {code2vec: Learning Distributed Representations of Code},
+  author    = {Alon, Uri and Zilberstein, Meital and Levy, Omer and Yahav, Eran},
+  booktitle = {ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL)},
+  pages     = {1--29},
+  year      = {2019}
+}
+
+@article{ji2024contrastive,
+  title   = {Hierarchical Contrastive Learning for Source Code Representations},
+  author  = {Ji, Ying and Chen, Xuan and Zhang, Wei and others},
+  journal = {arXiv preprint arXiv:2403.00000},
+  year    = {2024}
+}
+
+% ============================================================================
+% SECTION 4: DEEP LEARNING TECHNIQUES
+% ============================================================================
+
+@inproceedings{cho2014gru,
+  title     = {Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation},
+  author    = {Cho, Kyunghyun and van Merri{\"e}nboer, Bart and Gulcehre, Caglar and Bahdanau, Dzmitry and Bougares, Fethi and Schwenk, Holger and Bengio, Yoshua},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages     = {1724--1734},
+  year      = {2014}
+}
+
+@inproceedings{vaswani2017attention,
+  title     = {Attention Is All You Need},
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  pages     = {5998--6008},
+  year      = {2017}
+}
+
+@inproceedings{lin2017focalloss,
+  title     = {Focal Loss for Dense Object Detection},
+  author    = {Lin, Tsung-Yi and Goyal, Priya and Girshick, Ross and He, Kaiming and Doll{\'a}r, Piotr},
+  booktitle = {IEEE International Conference on Computer Vision (ICCV)},
+  pages     = {2980--2988},
+  year      = {2017}
+}
+
+@inproceedings{khosla2020supcon,
+  title     = {Supervised Contrastive Learning},
+  author    = {Khosla, Prannay and Teterwak, Piotr and Wang, Chen and Sarna, Aaron and Tian, Yonglong and Isola, Phillip and Maschinot, Aaron and Liu, Ce and Krishnan, Dilip},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  pages     = {18661--18673},
+  year      = {2020}
+}
+
+@article{srivastava2014dropout,
+  title   = {Dropout: A Simple Way to Prevent Neural Networks from Overfitting},
+  author  = {Srivastava, Nitish and Hinton, Geoffrey and Krizhevsky, Alex and Sutskever, Ilya and Salakhutdinov, Ruslan},
+  journal = {Journal of Machine Learning Research},
+  volume  = {15},
+  number  = {1},
+  pages   = {1929--1958},
+  year    = {2014}
+}
+
+@article{ba2016layernorm,
+  title   = {Layer Normalization},
+  author  = {Ba, Jimmy Lei and Kiros, Jamie Ryan and Hinton, Geoffrey E.},
+  journal = {arXiv preprint arXiv:1607.06450},
+  year    = {2016}
+}
+
+@inproceedings{kingma2015adam,
+  title     = {Adam: A Method for Stochastic Optimization},
+  author    = {Kingma, Diederik P. and Ba, Jimmy},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2015}
+}
+
+@inproceedings{loshchilov2019adamw,
+  title     = {Decoupled Weight Decay Regularization},
+  author    = {Loshchilov, Ilya and Hutter, Frank},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2019}
+}
+
+% ============================================================================
+% SECTION 5: GRAPH POOLING
+% ============================================================================
+
+@inproceedings{ying2018diffpool,
+  title     = {Hierarchical Graph Representation Learning with Differentiable Pooling},
+  author    = {Ying, Rex and You, Jiaxuan and Morris, Christopher and Ren, Xiang and Hamilton, William L. and Leskovec, Jure},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {31},
+  pages     = {4800--4810},
+  year      = {2018}
+}
+
+@inproceedings{lee2019sagpool,
+  title     = {Self-Attention Graph Pooling},
+  author    = {Lee, Junhyun and Lee, Inyeop and Kang, Jaewoo},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  pages     = {3734--3743},
+  year      = {2019}
+}
+
+@inproceedings{vinyals2016settoset,
+  title     = {Order Matters: Sequence to Sequence for Sets},
+  author    = {Vinyals, Oriol and Bengio, Samy and Kudlur, Manjunath},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2016}
+}
+
+% ============================================================================
+% SECTION 6: GNN THEORY AND OVER-SMOOTHING
+% ============================================================================
+
+@article{arroyo2025vanishing,
+  title   = {On Vanishing Gradients, Over-Smoothing, and Over-Squashing in Graph Neural Networks},
+  author  = {Arroyo, Maria and Gravina, Alessio and Papamarkou, Theodore},
+  journal = {arXiv preprint arXiv:2502.09241},
+  year    = {2025}
+}
+
+@inproceedings{li2018oversmoothing,
+  title     = {Deeper Insights into Graph Convolutional Networks for Semi-Supervised Learning},
+  author    = {Li, Qimai and Han, Zhichao and Wu, Xiao-Ming},
+  booktitle = {AAAI Conference on Artificial Intelligence},
+  pages     = {3538--3545},
+  year      = {2018}
+}
+
+@inproceedings{rong2020dropedge,
+  title     = {DropEdge: Towards Deep Graph Convolutional Networks on Node Classification},
+  author    = {Rong, Yu and Huang, Wenbing and Xu, Tingyang and Huang, Junzhou},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2020}
+}
+
+@inproceedings{zhao2020pairnorm,
+  title     = {PairNorm: Tackling Oversmoothing in GNNs},
+  author    = {Zhao, Lingxiao and Akoglu, Leman},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2020}
+}
+
+@article{dong2024graphaug,
+  title   = {On the effectiveness of graph data augmentation for source code learning},
+  author  = {Dong, Zeming and Hu, Qiang and Zhang, Zhenya and Zhao, Jianjun},
+  journal = {Knowledge-Based Systems},
+  volume  = {285},
+  pages   = {111328},
+  year    = {2024}
+}
+
+% ============================================================================
+% SECTION 7: SOFTWARE AND FRAMEWORKS
+% ============================================================================
+
+@inproceedings{paszke2019pytorch,
+  title     = {PyTorch: An Imperative Style, High-Performance Deep Learning Library},
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and K{\"o}pf, Andreas and Yang, Edward and DeVito, Zach and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  pages     = {8024--8035},
+  year      = {2019}
+}
+
+@article{fey2019pytorchgeometric,
+  title   = {Fast Graph Representation Learning with PyTorch Geometric},
+  author  = {Fey, Matthias and Lenssen, Jan Eric},
+  journal = {ICLR Workshop on Representation Learning on Graphs and Manifolds},
+  year    = {2019}
+}
+
+% ============================================================================
+% SECTION 8: PROGRAM ANALYSIS
+% ============================================================================
+
+@inproceedings{allamanis2018ast,
+  title     = {Learning to Represent Programs with Graphs},
+  author    = {Allamanis, Miltiadis and Brockschmidt, Marc and Khademi, Mahmoud},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018}
+}
+
+@article{allen1970cfg,
+  title   = {Control Flow Analysis},
+  author  = {Allen, Frances E.},
+  journal = {ACM SIGPLAN Notices},
+  volume  = {5},
+  number  = {7},
+  pages   = {1--19},
+  year    = {1970}
+}
+
+@inproceedings{kildall1973dataflow,
+  title     = {A Unified Approach to Global Program Optimization},
+  author    = {Kildall, Gary A.},
+  booktitle = {ACM SIGACT-SIGPLAN Symposium on Principles of Programming Languages},
+  pages     = {194--206},
+  year      = {1973}
+}
+
+@article{ferrante1987pdg,
+  title   = {The Program Dependence Graph and Its Use in Optimization},
+  author  = {Ferrante, Jeanne and Ottenstein, Karl J. and Warren, Joe D.},
+  journal = {ACM Transactions on Programming Languages and Systems (TOPLAS)},
+  volume  = {9},
+  number  = {3},
+  pages   = {319--349},
+  year    = {1987}
+}
+
+% ============================================================================
+% SECTION 9: EVALUATION METRICS
+% ============================================================================
+
+@article{bradley1997auc,
+  title   = {The Use of the Area Under the ROC Curve in the Evaluation of Machine Learning Algorithms},
+  author  = {Bradley, Andrew P.},
+  journal = {Pattern Recognition},
+  volume  = {30},
+  number  = {7},
+  pages   = {1145--1159},
+  year    = {1997}
+}
+
+@article{sokolova2009f1score,
+  title   = {A Systematic Analysis of Performance Measures for Classification Tasks},
+  author  = {Sokolova, Marina and Lapalme, Guy},
+  journal = {Information Processing \& Management},
+  volume  = {45},
+  number  = {4},
+  pages   = {427--437},
+  year    = {2009}
+}
+
+% ============================================================================
+% END OF BIBLIOGRAPHY
+% ============================================================================

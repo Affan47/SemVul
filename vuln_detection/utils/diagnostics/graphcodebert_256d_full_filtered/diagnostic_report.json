@@ -1,0 +1,51 @@
+{
+  "num_graphs": 2000,
+  "vuln_count": 906,
+  "safe_count": 1094,
+  "separability": {
+    "vuln_count": 906,
+    "safe_count": 1094,
+    "feature_dim": 140,
+    "discriminative_features": 0,
+    "cosine_similarity": 0.9998189210891724,
+    "silhouette_score": -0.0012109441449865699
+  },
+  "structure": {
+    "vuln": {
+      "num_nodes": {
+        "mean": 239.0916114790287,
+        "std": 321.4929841348875
+      },
+      "num_edges": {
+        "mean": 1571.1203090507727,
+        "std": 3357.1025586476344
+      },
+      "unique_edge_types": {
+        "mean": 9.112582781456954,
+        "std": 2.121714849642001
+      }
+    },
+    "safe": {
+      "num_nodes": {
+        "mean": 226.46617915904935,
+        "std": 315.54468772749584
+      },
+      "num_edges": {
+        "mean": 1423.8574040219378,
+        "std": 2653.9089709523737
+      },
+      "unique_edge_types": {
+        "mean": 9.089579524680072,
+        "std": 2.122229607495367
+      }
+    },
+    "differences": {},
+    "interpretation": "\u26a0\ufe0f No significant structural differences"
+  },
+  "embedding": {
+    "total_features": 140,
+    "zero_variance": 0,
+    "vuln_magnitude": 5.919785499572754,
+    "safe_magnitude": 5.981107234954834
+  }
+}

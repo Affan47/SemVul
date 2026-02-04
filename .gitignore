@@ -1,0 +1,32 @@
+# Artifacts and caches
+/results/
+/checkpoints/
+/checkpoints_advanced/
+/Clean_exports/cache*/
+/Clean_exports/word2vec*/
+/Clean_exports/word2vec/
+/Clean_exports/analysis_output/
+/workspace/verify_reports/
+/workspace/Scripts_and_saved_Models/Saved_Models/
+/workspace/Scripts_and_saved_Models/Models/
+/workspace/03_PerFunction_datasets/
+
+# Model and cache files
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.model
+*.h5
+*.pkl
+*.sqlite
+
+# Logs
+*.log
+
+# Python caches
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store

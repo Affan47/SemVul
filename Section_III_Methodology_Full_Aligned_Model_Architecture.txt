@@ -1,0 +1,679 @@
+Section III: Methodology (End-to-End Pipeline and Model Architecture)
+
+This section provides a complete, implementation-aligned description of our methodology, spanning (i) dataset hygiene and deterministic preprocessing, (ii) Code Property Graph (CPG) extraction and GraphSON schema validation, (iii) vocabulary and embedding construction for both node and edge content, (iv) PyTorch Geometric (PyG) cache construction with stable signatures, and (v) the full model architectures and training procedures implemented in our system. The intent is reviewer-friendly reproducibility: each stage is described as a deterministic transformation with explicit artifacts, and each model component is tied directly to the way data is represented on disk and consumed by the training code.
+
+III-A. Why Methodology Must Explicitly Address Prior Limitations
+
+After establishing background and positioning against related work, the natural next section for an IEEE-style paper is Methodology. In this project, the Methodology section must do more than describe a neural network: it must motivate and document an end-to-end pipeline that eliminates common failure modes that materially affect vulnerability detection results.
+
+We observed the following limitations and gaps in prior work and in common benchmark usage.
+
+(1) Sensitivity to extraction settings and schema drift.
+
+Graph-based vulnerability detection depends on the exact program analysis representation used as input. Two runs over the same dataset can produce different graphs if the extraction tool version changes, if different overlays are enabled, or if the mapping from raw export labels to edge-type IDs changes. These changes are often not visible in high-level experiment descriptions, yet they directly affect the edge distribution, node distribution, and therefore the learned message passing behavior.
+
+To address this, our pipeline includes explicit schema discovery and vocabulary building from the exported GraphSON data, plus configuration artifacts that record the discovered node and edge types. These artifacts are coupled to stable cache signatures so that changes in schema or embedding caches force regeneration instead of silently reusing stale tensors.
+
+(2) Degradation across datasets and weak generalization.
+
+Models that perform well on Devign-like benchmarks frequently degrade when evaluated on other datasets (e.g., Reveal, Draper) or even on differently processed versions of the same dataset. While domain shift is real, a large part of observed degradation in practice is attributable to representation shift: inconsistent preprocessing, inconsistent edge/node filtering, or incompatible embedding caches.
+
+Our methodology reduces representation shift by enforcing a consistent pipeline across datasets: identical per-function materialization, identical CPG extraction and export structure, identical schema analysis and vocabulary building, and identical cache construction logic.
+
+(3) Dataset inconsistencies: incomplete functions, parsing failures, and label noise.
+
+Function-level datasets often contain code fragments that are not valid standalone translation units, because the extraction process strips includes and type context. Parsing failures can bias the dataset if failures correlate with certain labels or projects. Label noise and inconsistent function boundaries are also common (e.g., partially extracted functions, truncated bodies, or mislabeled samples). These issues can degrade training stability and inflate or deflate reported metrics.
+
+Our preprocessing explicitly tracks failures, produces per-function artifacts that can be inspected, and uses lightweight normalization and header stubs to increase parse success. We also preserve traceability through manifests (orig_index, project, hash) so that questionable samples can be audited.
+
+(4) Leakage from duplicates across splits.
+
+Duplicate or near-duplicate functions across splits can produce unrealistic validation and test performance. This is particularly harmful in vulnerability detection, where the model can memorize patterns and appear to generalize. Split-aware deduplication must therefore be based on the actual function source content, not on file names or metadata.
+
+Our pipeline computes SHA-256 hashes over normalized function code, performs split-aware deduplication, and records a report describing removed items. For our extended datasets (Reveal and Draper), we explicitly treat split leakage as a first-class issue and remove duplicates accordingly.
+
+These limitations motivate the design choices in the remainder of this section: deterministic transformations, schema alignment, and stable signatures that bind together data extraction, vocabularies, embedding caches, and training configurations.
+
+III-B. End-to-End Pipeline Overview (Deterministic Transformations and Artifacts)
+
+We standardize each dataset into the same representation before modeling. The full preprocessing pipeline is:
+
+1) Split-aware deduplication using SHA-256 of normalized function code.
+2) Function completeness checks and normalization (whitespace trimming, optional comment removal).
+3) Per-function .c file generation and manifest creation.
+4) Joern parsing and GraphSON export (per-function CPGs).
+5) GraphSON schema analysis to validate node/edge label sets and property keys.
+6) Vocabulary building for node types, edge types, node content strings, and edge content strings.
+7) Embedding generation using multiple code embedders (UniXcoder, GraphCodeBERT, CodeT5+, word2vec), stored in SQLite caches.
+8) Cache construction: convert GraphSON + vocab + embedding caches into PyG-ready tensors and zip archives, with stable cache signatures.
+9) Training and evaluation using the modular architectures in train.py and train_advanced.py.
+
+In our implementation, the major pipeline stages correspond to the following scripts and artifact directories:
+
+- Per-function split materialization:
+  - Devign: workspace/A_Preprocessing_scripts/01c_split_per_function_devign.py
+  - Reveal: workspace/A_Preprocessing_scripts/01d_split_per_function_reveal.py
+  - Draper: workspace/A_Preprocessing_scripts/01e_split_per_function_draper.py
+
+- Joern CPG generation and GraphSON exports:
+  - Devign: workspace/B_Joern_graphs_generation_scripts/generate_cpg_devign_final.py
+  - Reveal: workspace/B_Joern_graphs_generation_scripts/generate_cpg_reveal_final.py
+  - Draper: workspace/B_Joern_graphs_generation_scripts/generate_cpg_draper_final.py
+
+- Schema discovery and parsing utilities:
+  - Clean_exports/graphson_parser.py
+  - Clean_exports/cpg_config.py
+
+- Vocabulary building and text corpus extraction:
+  - Clean_exports/vocab_builder.py
+  - Clean_exports/<dataset>_vocab_full/{node_type_vocab.json,edge_type_vocab.json,node_content_vocab.json,edge_content_vocab.json,strings_to_embed.csv,build_summary.txt}
+
+- Embedding generation:
+  - vuln_detection/multi_extractor.py
+  - vuln_detection/scripts/train_word2vec.py
+  - Embedding SQLite outputs under Clean_exports/cache_devign_v2/*.sqlite and Clean_exports/cache_reveal_v2/*.sqlite
+
+- Cache construction (PyG-ready datasets):
+  - Clean_exports/cache_manager.py
+  - Output datasets under Clean_exports/cache_devign_v2/<dataset_name>/<signature>/{train,valid,test}/cache_*.zip
+  - Output datasets under Clean_exports/cache_reveal_v2/<dataset_name>/<signature>/{train,valid,test}/cache_*.zip
+
+- Training scripts (model architectures and optimization loops):
+  - vuln_detection/train.py
+  - vuln_detection/train_advanced.py
+
+III-C. Stage 1: Split-Aware Deduplication via SHA-256 of Function Code
+
+The primary objective of deduplication is to eliminate cross-split leakage. We compute SHA-256 hashes over the actual function source after applying normalization. The normalization step is critical: two functions that differ only in whitespace or comments should be treated as duplicates in the context of leakage prevention.
+
+Normalization applied before hashing includes:
+
+- Canonical line endings (CRLF and CR -> LF).
+- Trailing whitespace trimming.
+- Collapsing excessive blank lines.
+- Optional removal of C/C++ comments while preserving string and character literals.
+
+The hash is computed over the normalized functionSource text, not over file paths or project identifiers. This ensures that deduplication reflects code content. For split-aware deduplication, duplicates are removed from later splits (validation/test) to preserve a realistic evaluation regime.
+
+This logic is implemented for our extended datasets (Reveal and Draper) using dataset-specific scripts in their source directories, producing reports that document how many rows were removed and from which splits.
+
+III-D. Stage 2: Function Completeness Checks and Text Cleaning
+
+Function-level datasets contain fragments of varying quality. To avoid wasting compute on empty or trivially malformed samples, we apply simple completeness checks:
+
+- Reject empty functionSource fields.
+- Normalize line endings.
+- Optionally remove comments and clean whitespace.
+- Ensure output ends with a newline.
+
+We treat completeness pragmatically: per-function code does not need to compile as a complete program, but it must be parseable enough for Joern to construct a meaningful CPG. Samples that consistently fail parsing are logged for inspection.
+
+III-E. Stage 3: Per-Function .c Materialization and Manifests
+
+We convert each dataset split into a directory of per-function C files plus a manifest CSV. This step creates a deterministic and auditable boundary between raw dataset rows and program analysis inputs.
+
+(1) Per-function files.
+
+For each split, we create a directory:
+
+- <perfunc_base>/train/
+- <perfunc_base>/validation/
+- <perfunc_base>/test/
+
+Files are named deterministically:
+
+- train_func_0000001.c, train_func_0000002.c, ...
+- validation_func_0000001.c, ...
+- test_func_0000001.c, ...
+
+(2) Manifest schema.
+
+Each split has a manifest_<split>.csv. For Devign/Reveal-style binary labeling, common columns include:
+
+- function_id: filename of the per-function .c file.
+- label: 0/1 vulnerability label.
+- project: optional provenance string.
+- orig_index: original row index from the source CSV.
+- hash: SHA-256 of normalized function code.
+- size: length statistic (characters).
+
+For Draper, we preserve the richer CWE columns (e.g., CWE-119, CWE-120, etc.) and include a combined binary label column (combine) used for training.
+
+The manifest is the authoritative index linking function identifiers to labels and provenance. It is also used to create labels.json/projects.json for training downstream.
+
+III-F. Stage 4: Joern CPG Generation and GraphSON Exports
+
+We generate CPGs and GraphSON exports for each per-function file using Joern. Because per-function code lacks build context, we parse each function in isolation, but stabilize parsing using header stubs.
+
+(1) Isolated per-function parsing.
+
+For each function, the Joern pipeline:
+
+- Writes the function code into an isolated temporary directory.
+- Generates minimal header stubs when needed (stddef.h, stdint.h, stdio.h, string.h, NULL_macro.h).
+- Runs joern-parse to generate a <function>.cpg.bin.
+- Runs joern-export to produce GraphSON exports in exports/<function>/export_all/export.json.
+
+(2) Worker parallelism and stability.
+
+Parsing and exporting are executed via a ProcessPoolExecutor for isolation. Each task has a timeout and can be retried. Worker counts are capped for stability based on CPU count. We increased caps for the Draper generator to use more cores on large machines.
+
+(3) Output hierarchy.
+
+For each split, outputs are stored as:
+
+- <OUT_BASE>/<split>/labels.json
+- <OUT_BASE>/<split>/projects.json
+- <OUT_BASE>/<split>/<function>.cpg.bin (optional; can be deleted after export)
+- <OUT_BASE>/<split>/exports/<function>/export_all/export.json
+
+This hierarchy is uniform across datasets (Devign, Reveal, Draper), which simplifies downstream parsers.
+
+III-G. Stage 5: GraphSON Schema Analysis and Alignment
+
+GraphSON exports contain nodes and edges with labels and properties. Different datasets (and Joern versions) may introduce additional labels (e.g., CAPTURE edges for Reveal). To prevent schema drift, we explicitly discover and validate schemas.
+
+Our schema alignment strategy has three parts:
+
+1) Discover unique node labels and edge labels from GraphSON exports.
+2) Validate expected property keys for extracting text (node and edge content).
+3) Update a shared configuration layer (Clean_exports/cpg_config.py) so that parsing and filtering rules are consistent.
+
+This step ensures that subsequent vocabulary building and cache construction operate over the same semantic types that the model expects.
+
+III-H. Stage 6: Vocabulary Building (Node Types, Edge Types, Node Content, Edge Content)
+
+Vocabulary construction is where we formalize the mapping from GraphSON symbols to numeric IDs and text corpora. We produce:
+
+- node_type_vocab.json: maps node labels to integer IDs.
+- edge_type_vocab.json: maps edge labels to integer IDs.
+- node_content_vocab.json: large set of unique node content strings.
+- edge_content_vocab.json: large set of unique edge content strings.
+- strings_to_embed.csv: a unified corpus of strings to embed, keyed by hash and kind.
+
+The key design requirement is synchronization: when we later convert graphs to PyG tensors, each node and edge must be able to retrieve its type ID and content embedding consistently.
+
+III-H.1. Unique node and edge types (Devign vocab)
+
+Devign full-edge-mode vocabulary (Clean_exports/devign_vocab_full) contains:
+
+Node types (15):
+  0 CALL
+  1 IDENTIFIER
+  2 BLOCK
+  3 METHOD
+  4 LITERAL
+  5 FIELD_IDENTIFIER
+  6 TYPE_DECL
+  7 LOCAL
+  8 CONTROL_STRUCTURE
+  9 JUMP_TARGET
+  10 RETURN
+  11 METHOD_REF
+  12 UNKNOWN
+  13 DEPENDENCY
+  14 IMPORT
+
+Edge types (18):
+  0 REACHING_DEF
+  1 AST
+  2 EVAL_TYPE
+  3 CFG
+  4 POST_DOMINATE
+  5 DOMINATE
+  6 CDG
+  7 ARGUMENT
+  8 REF
+  9 CALL
+  10 PARAMETER_LINK
+  11 CONDITION
+  12 ALIAS_OF
+  13 BINDS
+  14 RECEIVER
+  15 IMPORTS
+  16 CONTAINS
+  17 SOURCE_FILE
+
+These types are used in two ways:
+
+- Node types are encoded into one-hot vectors of dimension num_node_types (15 for Devign).
+- Edge types are encoded as integer edge_type values per edge, used for relational message passing.
+
+III-H.2. Unique node and edge types (Reveal vocab)
+
+Reveal full-edge-mode vocabulary (Clean_exports/reveal_vocab_full) contains:
+
+Node types (16):
+  0 CALL
+  1 IDENTIFIER
+  2 BLOCK
+  3 METHOD
+  4 LITERAL
+  5 TYPE_DECL
+  6 FIELD_IDENTIFIER
+  7 LOCAL
+  8 CONTROL_STRUCTURE
+  9 RETURN
+  10 METHOD_REF
+  11 JUMP_TARGET
+  12 UNKNOWN
+  13 MEMBER
+  14 DEPENDENCY
+  15 IMPORT
+
+Edge types (19):
+  0 REACHING_DEF
+  1 AST
+  2 EVAL_TYPE
+  3 CFG
+  4 POST_DOMINATE
+  5 DOMINATE
+  6 CDG
+  7 ARGUMENT
+  8 REF
+  9 CALL
+  10 PARAMETER_LINK
+  11 CONDITION
+  12 ALIAS_OF
+  13 BINDS
+  14 CAPTURE
+  15 RECEIVER
+  16 IMPORTS
+  17 CONTAINS
+  18 SOURCE_FILE
+
+Relative to Devign, Reveal introduces CAPTURE edges and MEMBER nodes. These are retained in the full-edge-mode vocabulary.
+
+III-H.3. Node content and edge content corpora
+
+Beyond discrete node/edge types, we build large corpora of text strings extracted from GraphSON properties.
+
+- Node content strings capture semantically meaningful tokens such as API names, identifiers, literals, and method signatures.
+- Edge content strings capture edge-associated metadata (when present), enabling edge-text-aware message passing.
+
+To ensure determinism and scalability, each string is normalized and hashed. The corpus file strings_to_embed.csv provides a stable set of unique strings to embed and their hashes. Hashing also helps avoid CSV quoting pitfalls and ensures that a string can be referenced unambiguously across pipeline stages.
+
+III-I. Stage 7: Code Embedding Generation (Multiple Embedders and SQLite Caches)
+
+We support multiple embedding sources to study the trade-off between semantic richness and computational cost.
+
+Embedding sources used in our pipeline include:
+
+- UniXcoder (768 dimensions)
+- GraphCodeBERT (768 dimensions) and compressed variants (e.g., 128)
+- CodeT5+ embedding models (e.g., 256 dimensions)
+- Locally trained word2vec (e.g., 100 or 200 dimensions)
+
+Embeddings are generated by vuln_detection/multi_extractor.py. The extractor reads strings_to_embed.csv and writes embeddings to an SQLite cache keyed by (kind, text_hash). Both node_content and edge_content embeddings are stored, enabling edge-text-aware models.
+
+We also provide vuln_detection/scripts/train_word2vec.py to train a single word2vec model over the combined corpus of node and edge content strings. Training a single model ensures that both node and edge strings lie in the same vector space and can be compared or fused.
+
+III-J. Stage 8: Cache Construction (GraphSON to PyG with Stable Signatures)
+
+The cache manager (Clean_exports/cache_manager.py) converts GraphSON exports into PyG Data objects and packages them into zip archives. This is the stage that ensures strict synchronization between vocabularies, embedding caches, and the tensors used by the model.
+
+III-J.1. Graph tensorization
+
+For each function graph, the cache manager constructs:
+
+- data.x: node feature matrix [N, x_dim]
+- data.edge_index: edge list [2, E]
+- data.edge_type: integer edge types [E]
+- data.edge_text_emb: optional edge embedding matrix [E, edge_emb_dim]
+- data.y: label tensor
+
+Node inclusion is controlled by cpg_config.should_include_node_type(label), which filters out purely structural or metadata node types when configured.
+
+III-J.2. Feature fusion: concatenation of one-hot and code embeddings
+
+The central node feature design in our pipeline is early concatenation (fusion_mode = early_concat). For each node:
+
+x_node = concat(one_hot(node_type), embed(node_content))
+
+Where:
+
+- one_hot(node_type) has dimension one_hot_dim = num_node_types.
+- embed(node_content) has dimension embedding_dim (e.g., 100, 200, 256, 768).
+
+This produces:
+
+x_dim = one_hot_dim + embedding_dim (+ vuln_feature_dim if enabled)
+
+In our current caches, vuln features are disabled (vuln_feature_dim = 0), so x_dim equals the sum of one_hot_dim and embedding_dim.
+
+Edge content is not concatenated into data.x. Instead, when edge content integration is enabled, the cache manager produces data.edge_text_emb as a separate edge-level feature tensor. This design supports edge-text-aware message passing layers without forcing edge features into node features.
+
+III-J.3. Stable cache signatures
+
+Each cache dataset is stored under a signature directory computed from:
+
+- edge_mode and the ordered list of edge types
+- ordered list of node types
+- one-hot dimension and embedding dimension
+- embedding cache fingerprint (including embedding cache signature)
+- whether edge content embeddings are enabled and their cache fingerprints
+- normalization version
+- feature toggles (one-hot, embeddings, vuln features)
+
+This signature ensures that when any upstream artifact changes (e.g., embedding caches change), the signature changes and a new dataset directory is created, preventing accidental reuse of stale or incompatible caches.
+
+III-J.4. Cache datasets and dimensions (Devign and Reveal)
+
+The current on-disk cache datasets include the following (dataset_name -> signature -> x_dim):
+
+Devign cache root: Clean_exports/cache_devign_v2
+
+- word2vec_100d_full  (sig 0b2074fbdf9296d6): one_hot_dim=15, embedding_dim=100, x_dim=115
+- word2vec_200d_full  (sig 86c56b1755c532ee): one_hot_dim=15, embedding_dim=200, x_dim=215
+- codet5p_256d_full   (sig c60b3d632feea19c): one_hot_dim=15, embedding_dim=256, x_dim=271
+- graphcodebert_128d_full (sig 1c3949dcf68534a6): one_hot_dim=15, embedding_dim=128, x_dim=143
+- graphcodebert_768d_full (sig d253d91f25af3d71): one_hot_dim=15, embedding_dim=768, x_dim=783
+- unixcoder_768d_full (sig f6f464798e030305): one_hot_dim=15, embedding_dim=768, x_dim=783
+
+Reveal cache root: Clean_exports/cache_reveal_v2
+
+- word2vec_100d_reveal_full (sig 7c1030041c027a9f): one_hot_dim=16, embedding_dim=100, x_dim=116
+- word2vec_200d_reveal_full (sig 907c2c5a79ce186e): one_hot_dim=16, embedding_dim=200, x_dim=216
+- codet5p_256d_reveal_full  (sig 924793d828204559): one_hot_dim=16, embedding_dim=256, x_dim=272
+- graphcodebert_768d_reveal_full (sig b5d56d026d3be520): one_hot_dim=16, embedding_dim=768, x_dim=784
+- unixcoder_768d_reveal_full (sig da4ba2df98d97bc8): one_hot_dim=16, embedding_dim=768, x_dim=784
+
+All of these caches currently have edge_mode=full and use_edge_content=true, meaning edge_text_emb is available with dimension equal to the node embedding dimension for that dataset.
+
+III-K. Graph Size Statistics (Nodes and Edges)
+
+We report graph size statistics directly from the cache indices (index.csv in each split). These are the actual sizes the model trains on before optional truncation.
+
+Devign (cache_devign_v2; graph structure identical across embedding variants):
+
+- Train: 21,854 functions; 10,018 vulnerable (45.8%); avg_nodes=243.0; avg_edges=1799.0; max_nodes=12,294; max_edges=109,293
+- Validation: 2,732 functions; 1,187 vulnerable (43.4%); avg_nodes=238.8; avg_edges=1797.7; max_nodes=4,210; max_edges=75,362
+- Test: 2,732 functions; 1,255 vulnerable (45.9%); avg_nodes=242.3; avg_edges=1735.6; max_nodes=12,175; max_edges=79,779
+
+Reveal (cache_reveal_v2; graph structure identical across embedding variants):
+
+- Train: 17,974 functions; 1,697 vulnerable (9.4%); avg_nodes=167.9; avg_edges=1165.5; max_nodes=18,682; max_edges=124,621
+- Validation: 2,200 functions; 175 vulnerable (8.0%); avg_nodes=160.4; avg_edges=1107.0; max_nodes=4,280; max_edges=61,417
+- Test: 2,209 functions; 196 vulnerable (8.9%); avg_nodes=180.9; avg_edges=1239.3; max_nodes=18,691; max_edges=124,707
+
+These statistics motivate two methodological components:
+
+- Graph truncation for extremely large graphs (to stabilize training time and memory).
+- Loss functions and class weighting for imbalance (especially in Reveal).
+
+III-L. Model Architecture: Modular Base (train.py)
+
+Our main training script (vuln_detection/train.py) trains models defined in vuln_detection/models/vuln_detector.py. The core abstraction is a modular Vulnerability Detector (VulnDetector) with the following pipeline:
+
+Input Data (PyG)
+  - data.x [N, x_dim]
+  - data.edge_index [2, E]
+  - data.edge_type [E]
+  - data.edge_text_emb [E, edge_emb_dim] (optional)
+  - data.batch [N]
+
+Forward Pass (VulnDetector)
+  1) Embedder: h = embedder(data.x, data)
+  2) Optional structural augmentation: concat(h, degree_features) -> projection
+  3) Optional GNN message passing: h = gnn(h, edge_index, edge_type[, edge_text_emb])
+  4) Pooling: graph_emb = pooling(h, batch)
+  5) Classifier: logits = MLP(graph_emb)
+
+III-L.1. Embedding module (embedder)
+
+The embedder stage converts the raw node feature matrix x into a hidden representation of dimension hidden_dim. The embedder type is configurable:
+
+- word2vec: if x is continuous, it acts as a learned projection to output_dim.
+- codebert/graphcodebert/codet5/unixcoder: split x into one-hot portion and embedding portion and apply a projection/compression plus a learned node-type embedding.
+- learned: embed only node types and optionally structural features.
+
+Important implementation detail:
+
+Our cache_manager already materializes code embeddings in data.x. Therefore, in most experiments the embedder is used primarily as a compression/projection stage into a stable hidden_dim for downstream GNN layers, rather than as an online transformer encoder.
+
+III-L.2. Structural features
+
+When enabled (use_structural_features), the model computes degree-derived features on the fly:
+
+- in-degree normalized
+- out-degree normalized
+- total degree normalized
+- leaf indicator (out-degree == 0)
+- root indicator (in-degree == 0)
+
+These 5 features are concatenated with the embedded node representation and projected back to hidden_dim. This ensures that the GNN receives a stable hidden dimension while benefiting from structural statistics.
+
+III-L.3. Message passing (GNN backbones)
+
+Our base models support multiple GNN types. In all cases, the GNN operates over the per-function graph with edge_index and (optionally) edge_type and edge_text_emb.
+
+(a) GGNN (Devign-style message passing)
+
+The GGNNLayer implements a recurrent message passing step:
+
+- For each node v, aggregate messages from neighbors u by summing edge-type-specific linear transforms W_e h_u.
+- Update node state via a GRUCell: h_v' = GRU(m_v, h_v).
+
+The GGNN module unrolls this step for num_steps (configured via gnn_layers when gnn_type=ggnn and num_layers>2).
+
+(b) EdgeTypeGNN (edge-type-aware MLP message passing)
+
+EdgeTypeGNN uses an embedding e_r for each edge type r and computes messages via an MLP over concatenated (x_i, x_j, e_r). The aggregated messages are then combined with the current node state via an update MLP, followed by residual connection and normalization.
+
+(c) EdgeTypeTextGNN (edge type + edge content)
+
+EdgeTypeTextGNN extends EdgeTypeGNN by projecting edge_text_emb to hidden_dim and adding it to the edge type embedding before message computation. This is the primary mechanism by which edge content embeddings influence message passing.
+
+(d) ShallowGNN wrapper
+
+For shallow networks (1-2 layers), we use a standard residual block wrapper that applies a layer, activation, residual connection, layer normalization, and dropout. This reduces oversmoothing and stabilizes training.
+
+(e) CallAwareGNN (CALL-node focused)
+
+CallAwareGNN (vuln_detection/models/call_aware.py) implements a two-path architecture:
+
+- Path 1: Standard GAT-based structural message passing (multiple layers with residuals).
+- Path 2: CALL-focused context encoding using REACHING_DEF edges to model data-flow into and out of CALL nodes.
+
+CALL nodes are identified via the node type one-hot prefix in data.x. The call_node_idx parameter must match the node_type_vocab mapping for the dataset (CALL is index 0 in both the Devign and Reveal full vocabularies shown above). The reaching_def_edge_type parameter must match the edge_type_vocab mapping (REACHING_DEF is index 0 in both devign/reveal full vocabularies).
+
+III-L.4. Pooling (graph-level readout)
+
+We implement multiple pooling strategies:
+
+- mean, max, mean_max
+- multi_stat: concatenation of mean, max, and std (vectorized)
+- attention: learned attention weights over nodes
+- combined: concatenation of multiple pooling strategies followed by projection
+- devign: DevignConvHead (Conv1D-based readout)
+
+Pooling is critical because vulnerability is a graph-level label. Our default for improved_devign is multi_stat pooling with optional projection.
+
+III-L.5. Classifier
+
+The classifier is a small MLP that maps graph_emb to a single logit for binary classification. The training scripts apply sigmoid for probability and compute AUC/F1-based metrics.
+
+III-M. Model Variants in train.py
+
+train.py exposes several model types (model_type argument) that configure the modular architecture.
+
+(1) devign (DevignModel)
+
+- Embedder: word2vec (or learned)
+- GNN: deep GGNN with gnn_layers steps (default 4)
+- Pooling: DevignConvHead
+- Hidden dimension: default 200 (configurable)
+
+(2) improved_devign (ImprovedDevign)
+
+- Embedder: word2vec (default)
+- Structural features: enabled by default
+- GNN: shallow (default 1 layer) GGNN or edge_type variants
+- Pooling: multi_stat with projection
+
+This configuration was motivated by stability: shallow message passing reduces oversmoothing on large graphs, while multi_stat pooling captures global graph statistics.
+
+(3) call_aware (CallAwareDevign)
+
+- Embedder: word2vec (projection)
+- GNN: call_aware
+- Pooling: multi_stat (with projection)
+
+(4) graph_level_mlp
+
+- No GNN message passing
+- Uses pooled statistics of node features
+
+(5) attention
+
+- Edge-type-aware GNN optionally enabled
+- Combined pooling strategies
+
+(6) custom
+
+- Fully configurable VulnDetector, enabling explicit embedder_kwargs and custom settings.
+
+III-N. Advanced Architectures (train_advanced.py)
+
+Our advanced training script (vuln_detection/train_advanced.py) supports architectures designed to better exploit edge types and attention mechanisms. These models use the same cached graph inputs (data.x, data.edge_index, data.edge_type), but implement different message passing mechanisms.
+
+train_advanced.py supports:
+
+- rgat: Relational Graph Attention Network (MemoryEfficientRGATConv)
+- multiview: Multi-view GGNN (AST/CFG/DFG view separation + attention fusion)
+- hgt: Heterogeneous Graph Transformer
+- hypergraph: Dual-attention model (GATv2 + TransformerConv) with gated fusion
+- call_aware: CALL-focused architecture
+
+All advanced models follow a shared high-level template:
+
+Input -> Linear Projection -> [MessagePassing Block x num_layers] -> DevignConvHead -> MLP Classifier
+
+III-N.1. RGATDevignModel (Relational Graph Attention)
+
+RGAT is implemented in vuln_detection/models/advanced/rgat.py. The core convolution (MemoryEfficientRGATConv) combines:
+
+- Relation-specific transformations W_r (one per edge type r)
+- Edge-type-aware attention (GATv2-style)
+
+For each edge (j -> i) of type r, the convolution:
+
+- Transforms node features with the relation-specific matrix W_r.
+- Computes attention coefficients alpha_{ij}^{(r)} conditioned on source features, destination features, and a learned embedding of relation r.
+- Aggregates weighted messages into destination nodes.
+
+The model stacks RGATBlock modules (num_layers), each consisting of:
+
+- Pre-norm RGAT convolution + residual
+- Feed-forward network (FFN) + residual
+
+Multi-head attention is controlled by num_heads, with head_dim = hidden_dim / num_heads.
+
+III-N.2. HGTDevignModel (Heterogeneous Graph Transformer)
+
+HGT is implemented in vuln_detection/models/advanced/hgt.py. Since CPGs in our representation are a single node type with many relation types, HGT is used as a sophisticated relational attention mechanism:
+
+- We build metadata with one node type '0' and relation types labeled '0'..'R-1'.
+- We convert homogeneous (edge_index, edge_type) into an edge_index_dict keyed by relation.
+- HGTConv performs multi-head attention per relation.
+
+The model stacks HGTBlock modules (num_layers), each consisting of:
+
+- Pre-norm HGTConv + residual
+- FFN + residual
+
+III-N.3. HyperDevignModel (Dual-Attention with gated fusion)
+
+The hypergraph model (vuln_detection/models/advanced/hypergraph.py) combines:
+
+- Local neighbor attention (GATv2Conv)
+- Global attention (TransformerConv)
+
+Both branches use edge attributes derived from a learned edge type embedding. The two branches are fused via a learnable gate per node:
+
+h_fused = (1 - gate) * h_local + gate * h_global
+
+Residual scaling is applied as depth increases. The number of attention heads is capped to ensure at least 16 dimensions per head for stability.
+
+III-N.4. MultiViewGGNN (AST/CFG/DFG views)
+
+MultiViewGGNN (vuln_detection/models/advanced/multiview.py) separates the graph into semantic views and processes each view with its own GGNN encoder:
+
+- AST view: syntax structure
+- CFG view: control flow
+- DFG view: data flow
+
+Each view produces a node representation, then node-conditioned attention fuses the view representations:
+
+h_fused(v) = sum_k alpha_k(v) * h_k(v)
+
+where alpha_k(v) is learned per node and per view.
+
+Implementation note:
+
+The mapping from edge types to view membership must be consistent with edge_type_vocab. In a full-edge-type setting, the AST/CFG/DFG partition should be defined by the names (e.g., AST/ARGUMENT/PARAMETER_LINK as AST-like; CFG/CALL/CONDITION as CFG-like; REACHING_DEF/REF as DFG-like). This mapping can be passed via edge_type_config when instantiating the model.
+
+III-O. Training Procedure (train.py and train_advanced.py)
+
+Both training scripts share the same high-level optimization procedure:
+
+1) Load cached PyG graphs from cache_{split}.zip under cache_dir/dataset_name/cache_signature.
+2) Print dataset statistics (class balance, average nodes/edges, input dimension).
+3) Optionally apply graph truncation (max_nodes with semantic_bfs strategy).
+4) Fix edge type naming (edge_attr -> edge_type) for compatibility.
+5) Create DataLoaders with batch_size.
+6) Instantiate model with input_dim = data.x.size(1), hidden_dim, num_edge_types, and architecture-specific hyperparameters.
+7) Compute class weights (pos_weight = num_neg / num_pos) and create loss function.
+8) Train with AdamW, gradient clipping, and ReduceLROnPlateau scheduler.
+9) Evaluate each epoch using AUC and F1 metrics; optionally select the best threshold for F1.
+10) Early stop based on optimize_for setting.
+
+Loss functions:
+
+- BCE: BCEWithLogitsLoss with pos_weight.
+- Focal: focal loss for imbalance.
+- Combined: combination of BCE and focal (and optional soft F1).
+
+The scripts compute full evaluation metrics (AUC, F1, precision, recall, etc.).
+
+III-P. Hyperparameters: layers, heads, hidden dimensions, embedding dimensions
+
+Our pipeline separates three key dimensionalities:
+
+(1) embedding_dim
+
+This is the dimensionality of the precomputed code embedding attached to each node (and optionally each edge) in the cache. Examples:
+
+- word2vec_100d_*: embedding_dim = 100
+- word2vec_200d_*: embedding_dim = 200
+- codet5p_256d_*: embedding_dim = 256
+- graphcodebert_768d_* and unixcoder_768d_*: embedding_dim = 768
+
+(2) one_hot_dim
+
+This is the number of node types in the dataset vocabulary and therefore the dimensionality of one-hot node type features in data.x:
+
+- Devign (full vocab): one_hot_dim = 15
+- Reveal (full vocab): one_hot_dim = 16
+
+(3) hidden_dim
+
+This is the model internal dimensionality used for message passing and classification. Typical values used in our scripts are 128, 256, and 512 depending on model type and memory constraints.
+
+Layer counts and heads:
+
+- In train.py:
+  - gnn_layers controls GGNN steps or number of shallow layers depending on gnn_type.
+  - pooling_type controls the readout.
+
+- In train_advanced.py:
+  - num_layers controls the depth (RGAT blocks, HGT blocks, or dual-attention blocks).
+  - num_heads controls the number of attention heads for RGAT/HGT/hypergraph.
+
+For attention-based models, heads must divide hidden_dim cleanly (RGAT) or are capped to ensure sufficient head dimension (hypergraph).
+
+III-Q. Summary
+
+This methodology establishes a complete, reproducible pipeline that links dataset preprocessing to program analysis to graph learning. We begin by enforcing dataset integrity (split-aware deduplication and function normalization), then standardize datasets into per-function .c files with manifests, extract per-function CPGs and GraphSON exports via Joern, validate and discover the GraphSON schema, and build synchronized vocabularies for node types, edge types, and both node/edge content strings. We then generate embeddings for the resulting text corpora using multiple embedders and store them in SQLite caches. The cache manager converts GraphSON + vocab + embeddings into PyG datasets with stable cache signatures, enabling reliable comparisons across embedding sources and configuration variants. Finally, we train and evaluate multiple GNN architectures (both modular baseline and advanced attention-based models) using a consistent training loop with class weighting, optional graph truncation, and robust metric reporting.
+
+This section is intentionally implementation-aligned: the node/edge types listed here match the on-disk vocabularies, the graph size statistics match the on-disk cache indices, and the architectural descriptions match the model definitions used by train.py and train_advanced.py.

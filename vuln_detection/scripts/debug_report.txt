@@ -1,0 +1,213 @@
+ℹ️  [INFO] Deep Pipeline Debugger - 2025-12-01 16:05:59
+ℹ️  [INFO] This may take several minutes...
+
+
+======================================================================
+1. EMBEDDING DATABASE ANALYSIS
+======================================================================
+ℹ️  [INFO] Analyzing: ./Clean_exports/cache_devign_v2/word2vec_embeddings.sqlite
+ℹ️  [INFO] File size: 871.36 MB
+🔍 [DEBUG] Table schema: CREATE TABLE embeddings (
+                sha256    TEXT PRIMARY KEY,
+                code      TEXT NOT NULL,
+                model     TEXT NOT NULL,
+                dim       INTEGER NOT NULL,
+    ...
+ℹ️  [INFO] Total embeddings in DB: 1,051,060
+🔍 [DEBUG] Columns: ['sha256', 'code', 'model', 'dim', 'vec', 'added_at', 'tok_ids', 'attn_mask', 'tok_len', 'truncated']
+ℹ️  [INFO] Sampling embeddings for quality analysis...
+✅ [OK] Embedding dimension: 128
+ℹ️  [INFO] Zero embeddings: 18/1000 (1.8%)
+ℹ️  [INFO] NaN embeddings: 16/1000
+❌ [ERROR] Found NaN in embeddings!
+ℹ️  [INFO] Extreme value embeddings (|x|>100): 17/1000
+⚠️  [WARN] Significant extreme values in embeddings!
+ℹ️  [INFO] Value range: [-10340364753802392219128071935253020672.0000, 1485821825169059222042745929767845888.0000]
+ℹ️  [INFO] Value mean: -5546397011523836126514873160957952.0000, std: 183069779165812896455101950254383104.0000
+ℹ️  [INFO] 
+Checking embedding uniqueness...
+ℹ️  [INFO] Average cosine similarity between random embeddings: 0.7171
+✅ [OK] Embedding diversity looks reasonable
+
+======================================================================
+2. VOCABULARY ANALYSIS
+======================================================================
+ℹ️  [INFO] Found 7 vocab files: ['edge_type_vocab.json', 'devign_rel_vocab.json', 'node_type_vocab.json', 'node_content_vocab.json', 'edge_content_vocab.json', 'parser_sig.json', 'strings_to_embed.csv']
+ℹ️  [INFO] Node types: 28
+🔍 [DEBUG] Node types: ['CALL', 'IDENTIFIER', 'METHOD_PARAMETER_IN', 'METHOD_PARAMETER_OUT', 'BLOCK', 'METHOD', 'METHOD_RETURN', 'LITERAL', 'FIELD_IDENTIFIER', 'TYPE_DECL']...
+ℹ️  [INFO] Edge types: 5
+🔍 [DEBUG] Edge types: ['AST', 'CFG', 'DFG_READ', 'DFG_WRITE', 'NCS']
+ℹ️  [INFO] 
+Analyzing strings_to_embed.csv...
+ℹ️  [INFO] Total strings (sampled): 100,000
+ℹ️  [INFO] Unique strings: 100,000
+ℹ️  [INFO] Empty strings: 0 (0.0%)
+ℹ️  [INFO] String length: min=2, max=984, mean=57.4
+
+======================================================================
+3. EMBEDDING COVERAGE ANALYSIS
+======================================================================
+ℹ️  [INFO] Checking SHA256 matching between vocab and embeddings...
+ℹ️  [INFO] Unique SHA256s in embedding DB: 1,051,060
+ℹ️  [INFO] Embedding coverage: 50,001/50,001 (100.0%)
+✅ [OK] Good embedding coverage
+
+======================================================================
+4. CACHED .PT FILE ANALYSIS
+======================================================================
+ℹ️  [INFO] Found 21,854 .pt files
+ℹ️  [INFO] Analyzing 500 sampled files...
+ℹ️  [INFO] 
+Graph Statistics (500 samples):
+ℹ️  [INFO]   Nodes per graph: min=8, max=11782, mean=277.0, median=145
+ℹ️  [INFO]   Edges per graph: min=8, max=103191, mean=1968.2, median=734
+✅ [OK]   Feature dimension: 156
+ℹ️  [INFO] 
+Feature Quality:
+ℹ️  [INFO]   Zero-feature graphs: 0/500 (0.0%)
+ℹ️  [INFO]   NaN-feature graphs: 0/500
+ℹ️  [INFO]   Feature mean across graphs: 0.0251 (std: 0.0929)
+ℹ️  [INFO]   Feature std across graphs: 1.4869
+ℹ️  [INFO]   Non-zero percentage: 60.8%
+ℹ️  [INFO] 
+Analyzing feature composition (one-hot vs embedding parts):
+ℹ️  [INFO]   One-hot part (first 28 dims): 3.6% non-zero
+ℹ️  [INFO]   Embedding part (dims 28+): 80.9% non-zero
+ℹ️  [INFO]   Embedding values: min=-1.4562, max=1.4071, mean=-0.0119
+ℹ️  [INFO] 
+Label Distribution:
+ℹ️  [INFO]   Label 0: 277 (55.4%)
+ℹ️  [INFO]   Label 1: 223 (44.6%)
+ℹ️  [INFO] 
+Edge Type Distribution:
+ℹ️  [INFO]   Type 0: 124,250 (12.6%)
+ℹ️  [INFO]   Type 1: 148,377 (15.1%)
+ℹ️  [INFO]   Type 2: 76,342 (7.8%)
+ℹ️  [INFO]   Type 3: 350,168 (35.6%)
+ℹ️  [INFO]   Type 4: 284,954 (29.0%)
+
+======================================================================
+5. END-TO-END SAMPLE TRACE
+======================================================================
+ℹ️  [INFO] Tracing sample: train_func_0021462.c__export__c273e6c5.pt
+🔍 [DEBUG] 
+Data object attributes: ['apply', 'apply_', 'batch', 'clone', 'coalesce', 'concat', 'contains_isolated_nodes', 'contains_self_loops', 'contiguous', 'coo', 'cpu', 'csc', 'csr', 'cuda', 'debug', 'detach', 'detach_', 'edge_attr', 'edge_attrs', 'edge_index', 'edge_stores', 'edge_subgraph', 'edge_weight', 'face', 'from_dict', 'generate_ids', 'get_all_edge_attrs', 'get_all_tensor_attrs', 'get_edge_index', 'get_tensor', 'get_tensor_size', 'has_isolated_nodes', 'has_self_loops', 'is_coalesced', 'is_cuda', 'is_directed', 'is_edge_attr', 'is_node_attr', 'is_sorted', 'is_sorted_by_time', 'is_undirected', 'keys', 'multi_get_tensor', 'node_attrs', 'node_offsets', 'node_stores', 'num_edge_features', 'num_edge_types', 'num_edges', 'num_faces', 'num_features', 'num_node_features', 'num_node_types', 'num_nodes', 'pin_memory', 'pos', 'put_edge_index', 'put_tensor', 'record_stream', 'remove_edge_index', 'remove_tensor', 'requires_grad_', 'share_memory_', 'size', 'snapshot', 'sort', 'sort_by_time', 'stores', 'stores_as', 'subgraph', 'time', 'to', 'to_dict', 'to_heterogeneous', 'to_namedtuple', 'up_to', 'update', 'update_tensor', 'validate', 'view', 'x', 'y']
+ℹ️  [INFO] Node features (x): shape=(162, 156)
+ℹ️  [INFO]   First node features: [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]...
+ℹ️  [INFO]   One-hot indices: [4]
+ℹ️  [INFO]   Embedding non-zeros: 128/128
+ℹ️  [INFO]   Embedding values (sample): [-0.010472859255969524, -0.15947383642196655, -0.07069431990385056, -0.008208409883081913, 0.015836190432310104]
+ℹ️  [INFO] Edge index: shape=(2, 866), num_edges=866
+ℹ️  [INFO]   Unique source nodes: 135
+ℹ️  [INFO]   Unique destination nodes: 153
+ℹ️  [INFO]   Node connectivity: 83.3% nodes have outgoing edges
+ℹ️  [INFO] Edge types: Counter({4: 269, 3: 236, 1: 153, 0: 135, 2: 73})
+ℹ️  [INFO] Label (y): 1
+
+======================================================================
+6. EMBEDDING DISCRIMINABILITY ANALYSIS
+======================================================================
+ℹ️  [INFO] Collecting graph-level embeddings by label...
+ℹ️  [INFO] Collected: [(1, 435), (0, 565)]
+ℹ️  [INFO] 
+Class 0 (non-vuln): 565 samples
+ℹ️  [INFO] Class 1 (vuln): 435 samples
+ℹ️  [INFO] 
+Cosine similarity between class means: 0.9989
+❌ [ERROR] CRITICAL: Class means are nearly IDENTICAL! Features don't distinguish classes!
+ℹ️  [INFO] Euclidean distance between class means: 0.4191
+ℹ️  [INFO] 
+Variance analysis:
+ℹ️  [INFO]   Within-class variance (class 0): 0.999172
+ℹ️  [INFO]   Within-class variance (class 1): 1.333221
+ℹ️  [INFO]   Between-class variance: 0.000282
+ℹ️  [INFO]   Fisher ratio (between/within): 0.0002
+❌ [ERROR] CRITICAL: Fisher ratio very low - features not separating classes!
+ℹ️  [INFO] 
+Analyzing one-hot vs embedding contribution:
+ℹ️  [INFO]   One-hot part distance: 0.0124
+ℹ️  [INFO]   Embedding part distance: 0.4190
+ℹ️  [INFO]   Embedding non-zero (class 0): 100.0%
+ℹ️  [INFO]   Embedding non-zero (class 1): 100.0%
+
+======================================================================
+7. SHA256 MATCHING VERIFICATION
+======================================================================
+ℹ️  [INFO] Testing SHA256 hash matching...
+ℹ️  [INFO] Sample text: 'RET...'
+ℹ️  [INFO] SHA256 computed with different methods:
+ℹ️  [INFO]   raw: e961e779171076be...
+ℹ️  [INFO]   strip: e961e779171076be...
+ℹ️  [INFO]   lower_strip: 85e4aea19de2d285...
+ℹ️  [INFO]   normalize_nfc: e961e779171076be...
+✅ [OK]   ✓ 'raw' method matches DB!
+
+======================================================================
+8. WORD2VEC SPECIFIC ANALYSIS
+======================================================================
+ℹ️  [INFO] Checking embeddings for common C/C++ tokens:
+🔍 [DEBUG]   ✓ 'int' found
+🔍 [DEBUG]   ✓ 'else' found
+🔍 [DEBUG]   ✓ 'void' found
+🔍 [DEBUG]   ✓ 'char' found
+🔍 [DEBUG]   ✓ 'NULL' found
+🔍 [DEBUG]   ✓ 'malloc' found
+🔍 [DEBUG]   ✓ 'free' found
+🔍 [DEBUG]   ✓ 'printf' found
+ℹ️  [INFO] Found 8/13 common tokens
+⚠️  [WARN] Missing: ['return', 'if', 'for', 'while', 'sizeof']
+
+======================================================================
+9. PREDICTION SANITY CHECK
+======================================================================
+ℹ️  [INFO] Found model files: ['results_edge_type_T5_256d/best_model.pt', 'results_hgt/best_model.pt', 'results_mlp_unixcoder_768d/best_model.pt']
+ℹ️  [INFO] To analyze predictions, load the model and check output distribution
+
+======================================================================
+SUMMARY AND RECOMMENDATIONS
+======================================================================
+ℹ️  [INFO] 
+Issues Found: 3
+ℹ️  [INFO]   ❌ Found NaN in embeddings!
+ℹ️  [INFO]   ❌ CRITICAL: Class means are nearly IDENTICAL! Features don't distinguish classes!
+ℹ️  [INFO]   ❌ CRITICAL: Fisher ratio very low - features not separating classes!
+ℹ️  [INFO] 
+Warnings: 2
+ℹ️  [INFO]   ⚠️ Significant extreme values in embeddings!
+ℹ️  [INFO]   ⚠️ Missing: ['return', 'if', 'for', 'while', 'sizeof']
+ℹ️  [INFO] 
+Key Statistics:
+ℹ️  [INFO]   db_total_embeddings: 1051060
+ℹ️  [INFO]   embedding_dim: 128
+ℹ️  [INFO]   emb_value_mean: -5546397011523836126514873160957952.0000
+ℹ️  [INFO]   emb_value_std: 183069779165812896455101950254383104.0000
+ℹ️  [INFO]   avg_embedding_similarity: 0.7171
+ℹ️  [INFO]   num_node_types: 28
+ℹ️  [INFO]   num_edge_types: 5
+ℹ️  [INFO]   total_vocab_strings: 100000
+ℹ️  [INFO]   unique_vocab_strings: 100000
+ℹ️  [INFO]   embedding_coverage_pct: 100.0000
+ℹ️  [INFO]   avg_nodes_per_graph: 277.0020
+ℹ️  [INFO]   avg_edges_per_graph: 1968.1820
+ℹ️  [INFO]   feature_dim: 156
+ℹ️  [INFO]   avg_feature_mean: 0.0251
+ℹ️  [INFO]   avg_feature_std: 1.4869
+ℹ️  [INFO]   avg_nonzero_pct: 60.7769
+ℹ️  [INFO]   onehot_nonzero_pct: 3.5714
+ℹ️  [INFO]   embedding_nonzero_pct: 80.8642
+ℹ️  [INFO]   label_distribution: {1: 223, 0: 277}
+ℹ️  [INFO]   class_mean_similarity: 0.9989
+ℹ️  [INFO]   fisher_ratio: 0.0002
+ℹ️  [INFO] 
+======================================================================
+ℹ️  [INFO] LIKELY ROOT CAUSES (ranked by probability):
+ℹ️  [INFO] ======================================================================
+ℹ️  [INFO] 
+1. [NO CLASS SEPARATION]
+ℹ️  [INFO]    Vulnerable and non-vulnerable code have identical feature means. Model cannot learn to distinguish them. FIX: Check label assignment, or features are not informative.
+ℹ️  [INFO] 
+2. [LOW FISHER RATIO]
+ℹ️  [INFO]    Between-class variance is much smaller than within-class. Features don't help separate classes. FIX: Use different/better embeddings or add more features.
+ℹ️  [INFO] 
+3. [EMBEDDING VALUE INSTABILITY]
+ℹ️  [INFO]    Embedding values have high variance. May cause training instability. FIX: Normalize embeddings or use layer norm in model.

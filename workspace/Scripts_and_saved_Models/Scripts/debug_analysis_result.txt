@@ -1,0 +1,32 @@
+=== DEBUG REPORT FOR: test_func_0001798.c__export__657751f5.pt ===
+Path: ./Clean_exports/cache_devign_v2/devign_normfunc_v2/test/2913d0ac45337fed/objects/00/01/test_func_0001798.c__export__657751f5.pt
+[PASS] File loaded successfully.
+      Type: <class 'torch_geometric.data.data.Data'>
+[PASS] Metadata loaded.
+
+--- NODE FEATURES (x) ---
+Shape: torch.Size([175, 796]) (Nodes x Dim)
+[PASS] Dimensions match metadata (796).
+   > One-Hot Section (Cols 0-27):
+     Max value: 1.0 (Should be 1.0)
+     Min value: 0.0 (Should be 0.0)
+   > CodeBERT Section (Cols 28-795):
+     Mean: 0.313821
+     Std:  0.733059
+[WARN] 33 nodes have ZERO embeddings (Fallback triggered?)
+
+--- EDGE TOPOLOGY ---
+Shape: torch.Size([2, 850])
+Count: 850 edges
+[PASS] All edge indices are valid (< 175).
+   > Edge Attributes/Types:
+     Type 0: 145 edges
+     Type 1: 156 edges
+     Type 2: 64 edges
+     Type 3: 212 edges
+     Type 4: 273 edges
+
+--- TARGET LABEL (y) ---
+Value: 0
+Shape: torch.Size([])
+[PASS] Label matches metadata (0).
