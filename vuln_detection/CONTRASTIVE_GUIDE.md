@@ -363,4 +363,3 @@ python -m vuln_detection.contrastive
 
 ---
 
-Good luck with your vulnerability detection research! 🔒
