@@ -425,7 +425,7 @@ python -m vuln_detection.eval_saved \
   --model-family basic \
   --cache-dir "./Clean_exports/cache_primevul_v2" \
   --dataset-name "word2vec_200d_primevul_full" \
-  --cache-signature "bdbf53801c586471" \
+  --cache-signature "SIGNATURE" \
   --split test \
   --project-manifest-train "./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv" \
   --project-manifest-val   "./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv" \
@@ -437,7 +437,7 @@ python -m vuln_detection.eval_saved \
   --model-family advanced \
   --cache-dir "./Clean_exports/cache_primevul_v2" \
   --dataset-name "word2vec_200d_primevul_full" \
-  --cache-signature "bdbf53801c586471" \
+  --cache-signature "SIGNATURE" \
   --split test \
   --project-manifest-train "./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv" \
   --project-manifest-val   "./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv" \
@@ -449,7 +449,7 @@ python -m vuln_detection.eval_saved \
   --model-family advanced \
   --cache-dir "./Clean_exports/cache_primevul_v2" \
   --dataset-name "word2vec_200d_primevul_full" \
-  --cache-signature "bdbf53801c586471" \
+  --cache-signature "SIGNATURE" \
   --split test \
   --project-manifest-train "./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv" \
   --project-manifest-val   "./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv" \
@@ -461,7 +461,7 @@ python -m vuln_detection.eval_saved \
   --model-family advanced \
   --cache-dir "./Clean_exports/cache_primevul_v2" \
   --dataset-name "word2vec_200d_primevul_full" \
-  --cache-signature "bdbf53801c586471" \
+  --cache-signature "SIGNATURE" \
   --split test \
   --project-manifest-train "./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv" \
   --project-manifest-val   "./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv" \
@@ -473,7 +473,7 @@ python -m vuln_detection.eval_saved \
   --model-family advanced \
   --cache-dir "./Clean_exports/cache_primevul_v2" \
   --dataset-name "word2vec_200d_primevul_full" \
-  --cache-signature "bdbf53801c586471" \
+  --cache-signature "SIGNATURE" \
   --split test \
   --project-manifest-train "./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv" \
   --project-manifest-val   "./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv" \
