@@ -153,6 +153,8 @@ CLI reference notes:
 - `vuln_detection/multi_extractor.py` includes detailed CLI examples and options near the end of the file.
 - `vuln_detection/train.py` includes detailed CLI examples near the end of the file.
 - `vuln_detection/train_advanced.py` includes detailed CLI examples near the end of the file.
+- `vuln_detection/embeddings/word2vec.py` defines how Word2Vec embeddings are loaded and aggregated.
+- `vuln_detection/scripts/train_word2vec.py` provides a full CLI to train a Word2Vec model on code tokens.
 
 ## Train Models
 
@@ -208,6 +210,63 @@ Supported `--model-type` values in `step2_train_advanced.py`:
 - `hgt`
 - `rgat`
 - `hypergraph`
+
+## Word2Vec Training (Devign-style)
+
+The Word2Vec pipeline mirrors the original Devign approach by training token embeddings on code and aggregating them per node.
+
+### How `word2vec.py` works
+
+`vuln_detection/embeddings/word2vec.py` implements `Word2VecEmbedder` and handles two cases:
+
+1. **Token indices input** (`x` is integer indices):
+   - Looks up per-token vectors using `torch.nn.Embedding`.
+   - Aggregates token vectors per node using `mean`, `sum`, or `max`.
+   - Applies dropout after aggregation.
+
+2. **Continuous features input** (`x` already embedded):
+   - If the feature dimension differs from `output_dim`, it projects with a linear layer.
+   - Applies dropout and returns the projected embedding.
+
+Pretrained Word2Vec vectors are loaded via gensim (`.bin` or `.txt`) when `pretrained_path` is set.
+
+### Train Word2Vec on code tokens
+
+Use the training CLI in `vuln_detection/scripts/train_word2vec.py`. Example:
+
+```bash
+python vuln_detection/scripts/train_word2vec.py \
+  --input-manifests \
+    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
+  --output-dir ./Clean_exports/word2vec_devign \
+  --vector-size 200 \
+  --window 5 \
+  --min-count 2 \
+  --workers 8
+```
+
+This writes a gensim Word2Vec model in the output directory. Use the resulting model path with:
+
+```bash
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/devign_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_devign/word2vec_200d_devign.sqlite \
+  --model-type word2vec \
+  --word2vec-path ./Clean_exports/word2vec_devign/word2vec.bin
+```
+
+### Step-by-step flow (full pipeline)
+
+1. **Preprocess and split** raw source files per function.
+2. **Generate CPGs** with Joern.
+3. **Export GraphSON** from CPGs.
+4. **Build vocabularies** with `Clean_exports/vocab_builder.py`.
+5. **Train Word2Vec** on tokenized code (optional, for Devign-style embeddings).
+6. **Extract embeddings** with `vuln_detection/multi_extractor.py`.
+7. **Build PyG caches** with `vuln_detection/scripts/step1_build_caches.py`.
+8. **Train models** with `step2_train.py` and `step2_train_advanced.py`.
+9. **Evaluate and compare** with `step3_compare_results.py`.
 
 ## Evaluation and Comparison
 
