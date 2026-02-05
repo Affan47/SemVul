@@ -42,27 +42,74 @@ Place raw datasets under a local `datasets` folder, then run the preprocessing s
   primevul_raw/
 ```
 
-Run preprocessing (examples):
+Run preprocessing (explicit commands):
 
 ```bash
+# (Optional) Devign deduplication (writes ./datasets/devign_dedup/workspace/deduped)
 python workspace/A_Preprocessing_scripts/01a_inspect_and_deduplicate_devign.py \
-  --input ./datasets/devign_raw \
-  --output ./datasets/devign_dedup
+  --in ./datasets/devign_raw/train.jsonl \
+  --tag train \
+  --root ./datasets/devign_dedup
 
+python workspace/A_Preprocessing_scripts/01a_inspect_and_deduplicate_devign.py \
+  --in ./datasets/devign_raw/validation.jsonl \
+  --tag validation \
+  --root ./datasets/devign_dedup
+
+python workspace/A_Preprocessing_scripts/01a_inspect_and_deduplicate_devign.py \
+  --in ./datasets/devign_raw/test.jsonl \
+  --tag test \
+  --root ./datasets/devign_dedup
+
+# (Optional) rename dedup outputs to the expected split names
+mv ./datasets/devign_dedup/workspace/deduped/dedup_train.jsonl ./datasets/devign_dedup/workspace/deduped/train.jsonl
+mv ./datasets/devign_dedup/workspace/deduped/dedup_validation.jsonl ./datasets/devign_dedup/workspace/deduped/validation.jsonl
+mv ./datasets/devign_dedup/workspace/deduped/dedup_test.jsonl ./datasets/devign_dedup/workspace/deduped/test.jsonl
+
+# (Optional) Devign normalization (writes <split>_normalized.jsonl)
 python workspace/A_Preprocessing_scripts/01b_normalize_devign.py \
-  --input ./datasets/devign_dedup \
-  --output ./datasets/devign_norm
+  --input-dir ./datasets/devign_dedup/workspace/deduped \
+  --output-dir ./datasets/devign_norm \
+  --splits train validation test \
+  --func-key func \
+  --strategy definition
 
+# Devign per-function split (recommended: original/non-normalized)
 python workspace/A_Preprocessing_scripts/01c_split_per_function_devign.py \
-  --input ./datasets/devign_norm \
-  --output ./workspace/03_PerFunction_datasets/normalized_devign_functions
+  --input-base ./datasets/devign_raw \
+  --output-base ./workspace/03_PerFunction_datasets/original_devign_functions \
+  --splits train validation test
 ```
 
-Repeat for Draper, Reveal, PrimeVul with the corresponding scripts:
+Reveal:
 
-- `01d_split_per_function_reveal.py`
-- `01e_split_per_function_draper.py`
-- `01f_split_per_function_primevul.py`
+```bash
+python workspace/A_Preprocessing_scripts/01d_split_per_function_reveal.py \
+  --input-dir ./datasets/reveal_raw \
+  --output-base ./workspace/03_PerFunction_datasets/reveal_functions \
+  --splits train validation test
+```
+
+Draper:
+
+```bash
+python workspace/A_Preprocessing_scripts/01e_split_per_function_draper.py \
+  --input-dir ./datasets/draper_raw \
+  --output-base ./workspace/03_PerFunction_datasets/draper_functions \
+  --splits train validation test \
+  --label-column combine
+```
+
+PrimeVul:
+
+```bash
+python workspace/A_Preprocessing_scripts/01f_split_per_function_primevul.py \
+  --input-dir ./datasets/primevul_raw \
+  --output-base ./workspace/03_PerFunction_datasets/primevul_functions \
+  --splits train validation test \
+  --code-field func \
+  --label-field target
+```
 
 ## CPG Generation and GraphSON Export
 
@@ -76,40 +123,124 @@ The main generators are:
 
 Each of these scripts includes CLI usage examples at the end of the file.
 
-Example for Devign:
+Devign:
 
 ```bash
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_devign_final.py \
-  --input ./workspace/03_PerFunction_datasets/normalized_devign_functions \
-  --output ./CPGs/devign
+  --perfunc-base ./workspace/03_PerFunction_datasets/original_devign_functions \
+  --out-base ./CPGs/original_devign_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson \
+  --parse-workers 4 \
+  --export-workers 4
 ```
 
-Export GraphSON (if using shell scripts):
+Draper:
 
 ```bash
-bash workspace/B_Joern_graphs_generation_scripts/04a_export_cpg_devign.sh \
-  ./CPGs/devign \
-  ./CPGs/devign_graphson
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_draper_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/draper_functions \
+  --out-base ./CPGs/draper_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson \
+  --parse-workers 4 \
+  --export-workers 4
 ```
 
-Repeat for Draper, Reveal, PrimeVul with the matching scripts.
+Reveal:
+
+```bash
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_reveal_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/reveal_functions \
+  --out-base ./CPGs/reveal_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson \
+  --parse-workers 4 \
+  --export-workers 4
+```
+
+PrimeVul:
+
+```bash
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_primevul_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/primevul_functions \
+  --out-base ./CPGs/primevul_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson \
+  --parse-workers 4 \
+  --export-workers 4
+```
 
 ## GraphSON Parsing and Vocabulary Building
 
-Build vocabularies from GraphSON:
+Build vocabularies from GraphSON (explicit for each dataset):
+
+Devign:
 
 ```bash
 python Clean_exports/vocab_builder.py \
   --manifests \
-    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
-    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
-    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_test.csv \
+    ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
   --json-roots \
-    ./CPGs/devign_graphson/train \
-    ./CPGs/devign_graphson/validation \
-    ./CPGs/devign_graphson/test \
+    ./CPGs/original_devign_functions/train \
+    ./CPGs/original_devign_functions/validation \
+    ./CPGs/original_devign_functions/test \
   --edge-mode full_filtered \
   --out-dir ./Clean_exports/devign_vocab
+```
+
+Draper:
+
+```bash
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/draper_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/draper_functions/train \
+    ./CPGs/draper_functions/validation \
+    ./CPGs/draper_functions/test \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/draper_vocab
+```
+
+Reveal:
+
+```bash
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/reveal_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/reveal_functions/train \
+    ./CPGs/reveal_functions/validation \
+    ./CPGs/reveal_functions/test \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/reveal_vocab
+```
+
+PrimeVul:
+
+```bash
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/primevul_functions/train \
+    ./CPGs/primevul_functions/validation \
+    ./CPGs/primevul_functions/test \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/primevul_vocab
 ```
 
 Optional sanity checks:
@@ -121,7 +252,9 @@ python vuln_detection/scripts/vocab_extraction_sanity.py \
 
 ## Embedding Extraction (multi_extractor)
 
-Extract semantic embeddings and build caches. Example for UniXcoder:
+Extract semantic embeddings and build caches (examples for UniXcoder per dataset):
+
+Devign:
 
 ```bash
 python vuln_detection/multi_extractor.py \
@@ -131,17 +264,41 @@ python vuln_detection/multi_extractor.py \
   --batch-size 512
 ```
 
-Repeat for other embedders as needed:
+Draper:
 
-- `word2vec`
-- `codebert`
-- `graphcodebert`
-- `codet5`
-- `unixcoder`
+```bash
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/draper_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_draper/unixcoder_768d_draper.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+```
+
+Reveal:
+
+```bash
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/reveal_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_reveal/unixcoder_768d_reveal.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+```
+
+PrimeVul:
+
+```bash
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/primevul_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_primevul/unixcoder_768d_primevul.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+```
 
 ## Build PyG Caches
 
-Use the step script to build caches that pair structure with embeddings:
+Use the step script to build caches that pair structure with embeddings (one dataset per run):
+
+Devign:
 
 ```bash
 python vuln_detection/scripts/step1_build_caches.py \
@@ -153,11 +310,28 @@ Before running, open `vuln_detection/scripts/step1_build_caches.py` and update
 `DEFAULT_CONFIG` for your dataset:
 - `train_manifest`, `val_manifest`, `test_manifest`
 - `train_json`, `val_json`, `test_json`
+- `cache_root`, `vocab_dir`, and `dataset-name` (inside the cache_manager command)
 
 After cache build, find the cache signature in:
 
 ```
 ./Clean_exports/cache_devign/<dataset_name>/train/
+```
+
+Draper / Reveal / PrimeVul:
+
+```bash
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_draper \
+  --vocab-dir ./Clean_exports/draper_vocab
+
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_reveal \
+  --vocab-dir ./Clean_exports/reveal_vocab
+
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_primevul \
+  --vocab-dir ./Clean_exports/primevul_vocab
 ```
 
 CLI reference notes:
@@ -170,14 +344,14 @@ CLI reference notes:
 
 ## Train Models
 
-### Basic models
+### Basic models (Devign example)
 
 ```bash
 python vuln_detection/scripts/step2_train.py \
   --model-type mlp \
   --cache-dir ./Clean_exports/cache_devign \
-  --dataset-name devign_normfunc_v2 \
-  --cache-signature <SIGNATURE> \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
   --vocab-dir ./Clean_exports/devign_vocab \
   --train-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
   --val-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
@@ -199,14 +373,14 @@ Supported `--model-type` values in `step2_train.py`:
 - `edge_type`
 - `shallow`
 
-### Advanced models
+### Advanced models (Devign example)
 
 ```bash
 python vuln_detection/scripts/step2_train_advanced.py \
   --model-type rgat \
   --cache-dir ./Clean_exports/cache_devign \
-  --dataset-name devign_normfunc_v2 \
-  --cache-signature <SIGNATURE> \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
   --vocab-dir ./Clean_exports/devign_vocab \
   --train-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
   --val-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
@@ -292,3 +466,294 @@ A full run for each dataset follows this order:
 6. Train all basic models with `vuln_detection/scripts/step2_train.py`.
 7. Train all advanced models with `vuln_detection/scripts/step2_train_advanced.py`.
 8. Aggregate results with the results summary scripts.
+
+Below are explicit end-to-end command sequences for each dataset. Replace
+`<CACHE_SIGNATURE>` with the actual cache signature you find under
+`./Clean_exports/cache_<dataset>/<dataset_name>/train/`.
+
+### Devign (original)
+
+```bash
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01c_split_per_function_devign.py \
+  --input-base ./datasets/devign_raw \
+  --output-base ./workspace/03_PerFunction_datasets/original_devign_functions \
+  --splits train validation test
+
+# 2) CPG + GraphSON
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_devign_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/original_devign_functions \
+  --out-base ./CPGs/original_devign_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson
+
+# 3) Vocab
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/original_devign_functions/train/exports \
+    ./CPGs/original_devign_functions/validation/exports \
+    ./CPGs/original_devign_functions/test/exports \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/devign_vocab
+
+# 4) Embeddings (example: UniXcoder)
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/devign_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_devign/unixcoder_768d_devign.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+
+# 5) Build caches (edit DEFAULT_CONFIG inside step1_build_caches.py first)
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_devign \
+  --vocab-dir ./Clean_exports/devign_vocab
+
+# 6) Train basic models
+python vuln_detection/scripts/step2_train.py \
+  --model-type edge_type \
+  --cache-dir ./Clean_exports/cache_devign \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/devign_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --epochs 100 \
+  --output-dir ./results/devign_edge_type
+
+# 7) Train advanced models
+python vuln_detection/scripts/step2_train_advanced.py \
+  --model-type rgat \
+  --cache-dir ./Clean_exports/cache_devign \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/devign_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --layers 2 \
+  --output-dir ./results/devign_rgat
+```
+
+### Draper
+
+```bash
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01e_split_per_function_draper.py \
+  --input-dir ./datasets/draper_raw \
+  --output-base ./workspace/03_PerFunction_datasets/draper_functions \
+  --splits train validation test \
+  --label-column combine
+
+# 2) CPG + GraphSON
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_draper_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/draper_functions \
+  --out-base ./CPGs/draper_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson
+
+# 3) Vocab
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/draper_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/draper_functions/train/exports \
+    ./CPGs/draper_functions/validation/exports \
+    ./CPGs/draper_functions/test/exports \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/draper_vocab
+
+# 4) Embeddings (example: UniXcoder)
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/draper_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_draper/unixcoder_768d_draper.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+
+# 5) Build caches (edit DEFAULT_CONFIG inside step1_build_caches.py first)
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_draper \
+  --vocab-dir ./Clean_exports/draper_vocab
+
+# 6) Train basic models
+python vuln_detection/scripts/step2_train.py \
+  --model-type edge_type \
+  --cache-dir ./Clean_exports/cache_draper \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/draper_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --epochs 100 \
+  --output-dir ./results/draper_edge_type
+
+# 7) Train advanced models
+python vuln_detection/scripts/step2_train_advanced.py \
+  --model-type rgat \
+  --cache-dir ./Clean_exports/cache_draper \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/draper_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --layers 2 \
+  --output-dir ./results/draper_rgat
+```
+
+### Reveal
+
+```bash
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01d_split_per_function_reveal.py \
+  --input-dir ./datasets/reveal_raw \
+  --output-base ./workspace/03_PerFunction_datasets/reveal_functions \
+  --splits train validation test
+
+# 2) CPG + GraphSON
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_reveal_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/reveal_functions \
+  --out-base ./CPGs/reveal_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson
+
+# 3) Vocab
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/reveal_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/reveal_functions/train/exports \
+    ./CPGs/reveal_functions/validation/exports \
+    ./CPGs/reveal_functions/test/exports \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/reveal_vocab
+
+# 4) Embeddings (example: UniXcoder)
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/reveal_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_reveal/unixcoder_768d_reveal.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+
+# 5) Build caches (edit DEFAULT_CONFIG inside step1_build_caches.py first)
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_reveal \
+  --vocab-dir ./Clean_exports/reveal_vocab
+
+# 6) Train basic models
+python vuln_detection/scripts/step2_train.py \
+  --model-type edge_type \
+  --cache-dir ./Clean_exports/cache_reveal \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/reveal_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --epochs 100 \
+  --output-dir ./results/reveal_edge_type
+
+# 7) Train advanced models
+python vuln_detection/scripts/step2_train_advanced.py \
+  --model-type rgat \
+  --cache-dir ./Clean_exports/cache_reveal \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/reveal_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --layers 2 \
+  --output-dir ./results/reveal_rgat
+```
+
+### PrimeVul
+
+```bash
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01f_split_per_function_primevul.py \
+  --input-dir ./datasets/primevul_raw \
+  --output-base ./workspace/03_PerFunction_datasets/primevul_functions \
+  --splits train validation test \
+  --code-field func \
+  --label-field target
+
+# 2) CPG + GraphSON
+python workspace/B_Joern_graphs_generation_scripts/generate_cpg_primevul_final.py \
+  --perfunc-base ./workspace/03_PerFunction_datasets/primevul_functions \
+  --out-base ./CPGs/primevul_functions \
+  --splits train,validation,test \
+  --stage both \
+  --format graphson
+
+# 3) Vocab
+python Clean_exports/vocab_builder.py \
+  --manifests \
+    ./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/primevul_functions/train/exports \
+    ./CPGs/primevul_functions/validation/exports \
+    ./CPGs/primevul_functions/test/exports \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/primevul_vocab
+
+# 4) Embeddings (example: UniXcoder)
+python vuln_detection/multi_extractor.py \
+  --strings-csv ./Clean_exports/primevul_vocab/strings_to_embed.csv \
+  --code-emb-cache ./Clean_exports/cache_primevul/unixcoder_768d_primevul.sqlite \
+  --model-type unixcoder \
+  --batch-size 512
+
+# 5) Build caches (edit DEFAULT_CONFIG inside step1_build_caches.py first)
+python vuln_detection/scripts/step1_build_caches.py \
+  --cache-root ./Clean_exports/cache_primevul \
+  --vocab-dir ./Clean_exports/primevul_vocab
+
+# 6) Train basic models
+python vuln_detection/scripts/step2_train.py \
+  --model-type edge_type \
+  --cache-dir ./Clean_exports/cache_primevul \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/primevul_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --epochs 100 \
+  --output-dir ./results/primevul_edge_type
+
+# 7) Train advanced models
+python vuln_detection/scripts/step2_train_advanced.py \
+  --model-type rgat \
+  --cache-dir ./Clean_exports/cache_primevul \
+  --dataset-name <DATASET_NAME> \
+  --cache-signature <CACHE_SIGNATURE> \
+  --vocab-dir ./Clean_exports/primevul_vocab \
+  --train-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv \
+  --val-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
+  --test-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
+  --hidden-dim 128 \
+  --layers 2 \
+  --output-dir ./results/primevul_rgat
+```
