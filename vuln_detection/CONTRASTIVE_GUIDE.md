@@ -22,7 +22,7 @@ vuln_detection/
 
 ---
 
-## 🏃 Quick Start
+##  Quick Start
 
 ### Option 1: Use the New Training Script (Recommended)
 
@@ -82,7 +82,7 @@ for batch in train_loader:
 
 ---
 
-## 📚 Detailed Stage Explanations
+##  Detailed Stage Explanations
 
 ### Stage 1: Vulnerability-Aware Features (`vuln_features.py`)
 
@@ -187,7 +187,7 @@ Processes edge types in separate groups, then combines via attention:
 
 ---
 
-## 🔧 Integration with Your Existing Pipeline
+##  Integration with Your Existing Pipeline
 
 ### Modifying cache_manager.py for Vulnerability Features
 
@@ -281,7 +281,7 @@ Based on research findings and your diagnostic analysis:
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Model Collapse (predicting all same values)
 - **Cause**: Learning rate too low or contrastive loss dominating
@@ -303,7 +303,7 @@ sys.path.insert(0, '/path/to/vuln_detection')
 
 ---
 
-## 📈 Monitoring Training
+##  Monitoring Training
 
 The training script logs:
 - **Phase 1 (Pretrain)**: Loss, SCL loss, BCE loss, Val AUC/F1
@@ -320,9 +320,9 @@ Bad signs:
 
 ---
 
-## 📝 Citation
+##  Citation
 
-If you use this implementation in research:
+ use this implementation in research:
 
 ```bibtex
 @misc{vuln_detection_contrastive,
@@ -336,7 +336,7 @@ If you use this implementation in research:
 
 ---
 
-## 🎯 Quick Command Reference
+##  Quick Command Reference
 
 ```bash
 # Full training with all enhancements
