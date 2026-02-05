@@ -1,11 +1,11 @@
 # 🚀 3-Stage Vulnerability Detection Enhancement Guide
 
 This guide explains how to use the enhanced vulnerability detection pipeline with:
-- **Stage 1**: Vulnerability-aware node features (+5-10% F1)
-- **Stage 2**: Supervised Contrastive Learning (+15-25% F1)
-- **Stage 3**: HAGNN architecture with separate edge-type processing (+5-10% F1)
+- **Stage 1**: Vulnerability-aware node features 
+- **Stage 2**: Supervised Contrastive Learning 
+- **Stage 3**: HAGNN architecture with separate edge-type processing 
 
-**Expected total improvement: +25-45% F1** over baseline
+
 
 ---
 
