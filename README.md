@@ -337,65 +337,83 @@ python vuln_detection/scripts/step1_build_caches.py \
 CLI reference notes:
 - `Clean_exports/cache_manager.py` includes detailed CLI examples and options near the end of the file.
 - `vuln_detection/multi_extractor.py` includes detailed CLI examples and options near the end of the file.
-- `vuln_detection/train.py` includes detailed CLI examples near the end of the file.
-- `vuln_detection/train_advanced.py` includes detailed CLI examples near the end of the file.
+- **Primary training CLIs** are `vuln_detection/train.py` and `vuln_detection/train_advanced.py` (see examples at the end of each file).
+- `vuln_detection/scripts/step2_train.py` and `vuln_detection/scripts/step2_train_advanced.py` are convenience wrappers; use `train.py` / `train_advanced.py` for full control.
 - `vuln_detection/embeddings/word2vec.py` defines how Word2Vec embeddings are loaded and aggregated.
 - `vuln_detection/scripts/train_word2vec.py` provides a full CLI to train a Word2Vec model on code tokens.
 
 ## Train Models
 
-### Basic models (Devign example)
+The main training entry points are:
+
+- `python -m vuln_detection.train` (baseline and edge-type models)
+- `python -m vuln_detection.train_advanced` (RGAT, HGT, MultiView, HyperGraph, Call-Aware)
+
+### Basic models (Devign example with `train.py`)
 
 ```bash
-python vuln_detection/scripts/step2_train.py \
-  --model-type mlp \
+python -m vuln_detection.train \
+  --model-type improved_devign \
+  --embedder-type word2vec \
+  --use-structural-features \
+  --gnn-type edge_type \
+  --gnn-layers 4 \
+  --pooling-type multi_stat \
+  --num-edge-types 18 \
   --cache-dir ./Clean_exports/cache_devign \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/devign_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_test.csv \
-  --hidden-dim 128 \
+  --embedding-dim 200 \
+  --hidden-dim 192 \
+  --dropout 0.2 \
   --epochs 100 \
-  --output-dir ./results/mlp
+  --patience 30 \
+  --batch-size 256 \
+  --lr 0.001 \
+  --max-nodes 500 \
+  --save-dir ./checkpoints \
+  --experiment-name devign_edge_type
 ```
 
-Supported `--model-type` values in `step2_train.py`:
+Supported `--model-type` values in `train.py`:
 
-- `mlp`
 - `devign`
-- `ggnn`
-- `gcn`
-- `gat`
-- `transformer`
+- `improved_devign`
+- `call_aware`
+- `graph_level_mlp`
 - `attention`
-- `edge_type`
-- `shallow`
+- `custom`
 
-### Advanced models (Devign example)
+### Advanced models (Devign example with `train_advanced.py`)
 
 ```bash
-python vuln_detection/scripts/step2_train_advanced.py \
+python -m vuln_detection.train_advanced \
   --model-type rgat \
   --cache-dir ./Clean_exports/cache_devign \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/devign_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_test.csv \
-  --hidden-dim 128 \
-  --layers 2 \
-  --output-dir ./results/rgat
+  --embedding-dim 200 \
+  --num-edge-types 18 \
+  --num-node-types 16 \
+  --hidden-dim 256 \
+  --num-heads 4 \
+  --num-layers 4 \
+  --dropout 0.2 \
+  --epochs 150 \
+  --patience 30 \
+  --batch-size 32 \
+  --lr 0.0008 \
+  --save-dir ./checkpoints_advanced \
+  --experiment-name devign_rgat
 ```
 
-Supported `--model-type` values in `step2_train_advanced.py`:
+Supported `--model-type` values in `train_advanced.py`:
 
+- `rgat`
 - `multiview`
 - `hgt`
-- `rgat`
 - `hypergraph`
+- `call_aware`
 
 ## Word2Vec Training (Devign-style)
 
@@ -451,7 +469,7 @@ python vuln_detection/multi_extractor.py \
 5. **Train Word2Vec** on code strings (optional, for Devign-style embeddings).
 6. **Extract embeddings** with `vuln_detection/multi_extractor.py` into SQLite caches.
 7. **Build PyG caches** with `vuln_detection/scripts/step1_build_caches.py`.
-8. **Train models** with `step2_train.py` and `step2_train_advanced.py`.
+8. **Train models** with `python -m vuln_detection.train` and `python -m vuln_detection.train_advanced`.
 9. **Evaluate and compare** with the results summary scripts.
 
 ## Reproducing All Models End-to-End
@@ -463,8 +481,8 @@ A full run for each dataset follows this order:
 3. Build vocabularies with `Clean_exports/vocab_builder.py`.
 4. Extract embeddings using `vuln_detection/multi_extractor.py`.
 5. Build PyG caches using `vuln_detection/scripts/step1_build_caches.py`.
-6. Train all basic models with `vuln_detection/scripts/step2_train.py`.
-7. Train all advanced models with `vuln_detection/scripts/step2_train_advanced.py`.
+6. Train all basic models with `python -m vuln_detection.train`.
+7. Train all advanced models with `python -m vuln_detection.train_advanced`.
 8. Aggregate results with the results summary scripts.
 
 Below are explicit end-to-end command sequences for each dataset. Replace
@@ -495,9 +513,9 @@ python Clean_exports/vocab_builder.py \
     ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
     ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
   --json-roots \
-    ./CPGs/original_devign_functions/train/exports \
-    ./CPGs/original_devign_functions/validation/exports \
-    ./CPGs/original_devign_functions/test/exports \
+    ./CPGs/original_devign_functions/train \
+    ./CPGs/original_devign_functions/validation \
+    ./CPGs/original_devign_functions/test \
   --edge-mode full_filtered \
   --out-dir ./Clean_exports/devign_vocab
 
@@ -514,32 +532,47 @@ python vuln_detection/scripts/step1_build_caches.py \
   --vocab-dir ./Clean_exports/devign_vocab
 
 # 6) Train basic models
-python vuln_detection/scripts/step2_train.py \
-  --model-type edge_type \
+python -m vuln_detection.train \
+  --model-type improved_devign \
+  --embedder-type word2vec \
+  --use-structural-features \
+  --gnn-type edge_type \
+  --gnn-layers 4 \
+  --pooling-type multi_stat \
+  --num-edge-types 18 \
   --cache-dir ./Clean_exports/cache_devign \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/devign_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
-  --hidden-dim 128 \
+  --embedding-dim 200 \
+  --hidden-dim 192 \
+  --dropout 0.2 \
   --epochs 100 \
-  --output-dir ./results/devign_edge_type
+  --patience 30 \
+  --batch-size 256 \
+  --lr 0.001 \
+  --max-nodes 500 \
+  --save-dir ./checkpoints \
+  --experiment-name devign_edge_type
 
 # 7) Train advanced models
-python vuln_detection/scripts/step2_train_advanced.py \
+python -m vuln_detection.train_advanced \
   --model-type rgat \
   --cache-dir ./Clean_exports/cache_devign \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/devign_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/original_devign_functions/manifest_test.csv \
-  --hidden-dim 128 \
-  --layers 2 \
-  --output-dir ./results/devign_rgat
+  --embedding-dim 200 \
+  --num-edge-types 18 \
+  --num-node-types 16 \
+  --hidden-dim 256 \
+  --num-heads 4 \
+  --num-layers 4 \
+  --dropout 0.2 \
+  --epochs 150 \
+  --patience 30 \
+  --batch-size 32 \
+  --lr 0.0008 \
+  --save-dir ./checkpoints_advanced \
+  --experiment-name devign_rgat
 ```
 
 ### Draper
@@ -567,9 +600,9 @@ python Clean_exports/vocab_builder.py \
     ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
     ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
   --json-roots \
-    ./CPGs/draper_functions/train/exports \
-    ./CPGs/draper_functions/validation/exports \
-    ./CPGs/draper_functions/test/exports \
+    ./CPGs/draper_functions/train \
+    ./CPGs/draper_functions/validation \
+    ./CPGs/draper_functions/test \
   --edge-mode full_filtered \
   --out-dir ./Clean_exports/draper_vocab
 
@@ -586,32 +619,47 @@ python vuln_detection/scripts/step1_build_caches.py \
   --vocab-dir ./Clean_exports/draper_vocab
 
 # 6) Train basic models
-python vuln_detection/scripts/step2_train.py \
-  --model-type edge_type \
+python -m vuln_detection.train \
+  --model-type improved_devign \
+  --embedder-type word2vec \
+  --use-structural-features \
+  --gnn-type edge_type \
+  --gnn-layers 4 \
+  --pooling-type multi_stat \
+  --num-edge-types 19 \
   --cache-dir ./Clean_exports/cache_draper \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/draper_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
-  --hidden-dim 128 \
+  --embedding-dim 200 \
+  --hidden-dim 192 \
+  --dropout 0.2 \
   --epochs 100 \
-  --output-dir ./results/draper_edge_type
+  --patience 30 \
+  --batch-size 256 \
+  --lr 0.001 \
+  --max-nodes 500 \
+  --save-dir ./checkpoints \
+  --experiment-name draper_edge_type
 
 # 7) Train advanced models
-python vuln_detection/scripts/step2_train_advanced.py \
+python -m vuln_detection.train_advanced \
   --model-type rgat \
   --cache-dir ./Clean_exports/cache_draper \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/draper_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/draper_functions/manifest_test.csv \
-  --hidden-dim 128 \
-  --layers 2 \
-  --output-dir ./results/draper_rgat
+  --embedding-dim 200 \
+  --num-edge-types 19 \
+  --num-node-types 16 \
+  --hidden-dim 256 \
+  --num-heads 4 \
+  --num-layers 4 \
+  --dropout 0.2 \
+  --epochs 150 \
+  --patience 30 \
+  --batch-size 32 \
+  --lr 0.0008 \
+  --save-dir ./checkpoints_advanced \
+  --experiment-name draper_rgat
 ```
 
 ### Reveal
@@ -638,9 +686,9 @@ python Clean_exports/vocab_builder.py \
     ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
     ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
   --json-roots \
-    ./CPGs/reveal_functions/train/exports \
-    ./CPGs/reveal_functions/validation/exports \
-    ./CPGs/reveal_functions/test/exports \
+    ./CPGs/reveal_functions/train \
+    ./CPGs/reveal_functions/validation \
+    ./CPGs/reveal_functions/test \
   --edge-mode full_filtered \
   --out-dir ./Clean_exports/reveal_vocab
 
@@ -657,32 +705,47 @@ python vuln_detection/scripts/step1_build_caches.py \
   --vocab-dir ./Clean_exports/reveal_vocab
 
 # 6) Train basic models
-python vuln_detection/scripts/step2_train.py \
-  --model-type edge_type \
+python -m vuln_detection.train \
+  --model-type improved_devign \
+  --embedder-type word2vec \
+  --use-structural-features \
+  --gnn-type edge_type \
+  --gnn-layers 4 \
+  --pooling-type multi_stat \
+  --num-edge-types 19 \
   --cache-dir ./Clean_exports/cache_reveal \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/reveal_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
-  --hidden-dim 128 \
+  --embedding-dim 200 \
+  --hidden-dim 192 \
+  --dropout 0.2 \
   --epochs 100 \
-  --output-dir ./results/reveal_edge_type
+  --patience 30 \
+  --batch-size 256 \
+  --lr 0.001 \
+  --max-nodes 500 \
+  --save-dir ./checkpoints \
+  --experiment-name reveal_edge_type
 
 # 7) Train advanced models
-python vuln_detection/scripts/step2_train_advanced.py \
+python -m vuln_detection.train_advanced \
   --model-type rgat \
   --cache-dir ./Clean_exports/cache_reveal \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/reveal_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/reveal_functions/manifest_test.csv \
-  --hidden-dim 128 \
-  --layers 2 \
-  --output-dir ./results/reveal_rgat
+  --embedding-dim 200 \
+  --num-edge-types 19 \
+  --num-node-types 16 \
+  --hidden-dim 256 \
+  --num-heads 4 \
+  --num-layers 4 \
+  --dropout 0.2 \
+  --epochs 150 \
+  --patience 30 \
+  --batch-size 32 \
+  --lr 0.0008 \
+  --save-dir ./checkpoints_advanced \
+  --experiment-name reveal_rgat
 ```
 
 ### PrimeVul
@@ -711,9 +774,9 @@ python Clean_exports/vocab_builder.py \
     ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
     ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
   --json-roots \
-    ./CPGs/primevul_functions/train/exports \
-    ./CPGs/primevul_functions/validation/exports \
-    ./CPGs/primevul_functions/test/exports \
+    ./CPGs/primevul_functions/train \
+    ./CPGs/primevul_functions/validation \
+    ./CPGs/primevul_functions/test \
   --edge-mode full_filtered \
   --out-dir ./Clean_exports/primevul_vocab
 
@@ -730,30 +793,45 @@ python vuln_detection/scripts/step1_build_caches.py \
   --vocab-dir ./Clean_exports/primevul_vocab
 
 # 6) Train basic models
-python vuln_detection/scripts/step2_train.py \
-  --model-type edge_type \
+python -m vuln_detection.train \
+  --model-type improved_devign \
+  --embedder-type word2vec \
+  --use-structural-features \
+  --gnn-type edge_type \
+  --gnn-layers 4 \
+  --pooling-type multi_stat \
+  --num-edge-types 19 \
   --cache-dir ./Clean_exports/cache_primevul \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/primevul_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
-  --hidden-dim 128 \
+  --embedding-dim 200 \
+  --hidden-dim 192 \
+  --dropout 0.2 \
   --epochs 100 \
-  --output-dir ./results/primevul_edge_type
+  --patience 30 \
+  --batch-size 256 \
+  --lr 0.001 \
+  --max-nodes 500 \
+  --save-dir ./checkpoints \
+  --experiment-name primevul_edge_type
 
 # 7) Train advanced models
-python vuln_detection/scripts/step2_train_advanced.py \
+python -m vuln_detection.train_advanced \
   --model-type rgat \
   --cache-dir ./Clean_exports/cache_primevul \
   --dataset-name <DATASET_NAME> \
   --cache-signature <CACHE_SIGNATURE> \
-  --vocab-dir ./Clean_exports/primevul_vocab \
-  --train-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_train.csv \
-  --val-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_validation.csv \
-  --test-manifest ./workspace/03_PerFunction_datasets/primevul_functions/manifest_test.csv \
-  --hidden-dim 128 \
-  --layers 2 \
-  --output-dir ./results/primevul_rgat
+  --embedding-dim 200 \
+  --num-edge-types 19 \
+  --num-node-types 16 \
+  --hidden-dim 256 \
+  --num-heads 4 \
+  --num-layers 4 \
+  --dropout 0.2 \
+  --epochs 150 \
+  --patience 30 \
+  --batch-size 32 \
+  --lr 0.0008 \
+  --save-dir ./checkpoints_advanced \
+  --experiment-name primevul_rgat
 ```
