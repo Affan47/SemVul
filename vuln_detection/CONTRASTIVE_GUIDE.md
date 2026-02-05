@@ -1,4 +1,4 @@
-# 🚀 3-Stage Vulnerability Detection Enhancement Guide
+#  3-Stage Vulnerability Detection Enhancement Guide
 
 This guide explains how to use the enhanced vulnerability detection pipeline with:
 - **Stage 1**: Vulnerability-aware node features 
@@ -9,7 +9,7 @@ This guide explains how to use the enhanced vulnerability detection pipeline wit
 
 ---
 
-## 📁 New Files Added
+##  New Files Added
 
 ```
 vuln_detection/
