@@ -148,6 +148,10 @@ After cache build, find the cache signature in:
 ./Clean_exports/cache_devign/<dataset_name>/train/
 ```
 
+CLI reference notes:
+- `Clean_exports/cache_manager.py` includes detailed CLI examples and options near the end of the file.
+- `vuln_detection/multi_extractor.py` includes detailed CLI examples and options near the end of the file.
+
 ## Train Models
 
 ### Basic models
