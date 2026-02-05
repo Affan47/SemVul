@@ -100,8 +100,16 @@ Build vocabularies from GraphSON:
 
 ```bash
 python Clean_exports/vocab_builder.py \
-  --graphson-root ./CPGs/devign_graphson \
-  --output ./Clean_exports/devign_vocab
+  --manifests \
+    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
+    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
+    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_test.csv \
+  --json-roots \
+    ./CPGs/devign_graphson/train \
+    ./CPGs/devign_graphson/validation \
+    ./CPGs/devign_graphson/test \
+  --edge-mode full_filtered \
+  --out-dir ./Clean_exports/devign_vocab
 ```
 
 Optional sanity checks:
@@ -137,10 +145,14 @@ Use the step script to build caches that pair structure with embeddings:
 
 ```bash
 python vuln_detection/scripts/step1_build_caches.py \
-  --graphson-root ./CPGs/devign_graphson \
-  --vocab-dir ./Clean_exports/devign_vocab \
-  --cache-dir ./Clean_exports/cache_devign
+  --cache-root ./Clean_exports/cache_devign \
+  --vocab-dir ./Clean_exports/devign_vocab
 ```
+
+Before running, open `vuln_detection/scripts/step1_build_caches.py` and update
+`DEFAULT_CONFIG` for your dataset:
+- `train_manifest`, `val_manifest`, `test_manifest`
+- `train_json`, `val_json`, `test_json`
 
 After cache build, find the cache signature in:
 
@@ -236,13 +248,13 @@ Use the training CLI in `vuln_detection/scripts/train_word2vec.py`. Example:
 
 ```bash
 python vuln_detection/scripts/train_word2vec.py \
-  --input-manifests \
-    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_train.csv \
-    ./workspace/03_PerFunction_datasets/normalized_devign_functions/manifest_validation.csv \
+  --input-csv \
+    ./Clean_exports/devign_vocab/strings_to_embed.csv \
   --output-dir ./Clean_exports/word2vec_devign \
-  --vector-size 200 \
+  --dim 200 \
   --window 5 \
   --min-count 2 \
+  --epochs 30 \
   --workers 8
 ```
 
@@ -258,12 +270,12 @@ python vuln_detection/multi_extractor.py \
 
 ### Step-by-step flow (full pipeline)
 
-1. **Preprocess and split** raw source files per function.
-2. **Generate CPGs** with Joern.
-3. **Export GraphSON** from CPGs.
-4. **Build vocabularies** with `Clean_exports/vocab_builder.py`.
-5. **Train Word2Vec** on tokenized code (optional, for Devign-style embeddings).
-6. **Extract embeddings** with `vuln_detection/multi_extractor.py`.
+1. **Preprocess and split** raw source files per function to produce `manifest_train/validation/test.csv`.
+2. **Generate CPGs** with Joern for each split.
+3. **Export GraphSON** JSON for each split (`train/validation/test`).
+4. **Build vocabularies** with `Clean_exports/vocab_builder.py` using manifests + JSON roots.
+5. **Train Word2Vec** on code strings (optional, for Devign-style embeddings).
+6. **Extract embeddings** with `vuln_detection/multi_extractor.py` into SQLite caches.
 7. **Build PyG caches** with `vuln_detection/scripts/step1_build_caches.py`.
 8. **Train models** with `step2_train.py` and `step2_train_advanced.py`.
 9. **Evaluate and compare** with the results summary scripts.
