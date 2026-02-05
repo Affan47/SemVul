@@ -2,26 +2,20 @@
 
 A modular, production-ready library for vulnerability detection in code using Graph Neural Networks.
 
-## 📊 Current Results vs Baselines
+##  Current Results vs Baselines
 
 | Method | ACC | F1 | AUC |
 |--------|-----|-----|-----|
 | **Devign (paper)** | **72.26%** | **73.26%** | - |
 | ReVeal | 65% | 48% | 63% |
 | IVDetect | 68% | 52% | 65% |
-| Your GCN (collapsed) | - | - | 50% |
-| **Your Graph-level MLP** | 49%* | 48%* | **63.2%** |
+
 
 *At threshold 0.50 for fair comparison
 
-## 🔑 Key Findings
 
-1. **GraphCodeBERT produces 97% similar embeddings** - Most dimensions are noise
-2. **GNN message passing destroys weak signal** - Use shallow (1 layer) or no GNN
-3. **Multi-statistic pooling works best** - mean + max + std
-4. **Feature compression helps** - 768 → 64 dims reduces noise
 
-## 📁 Complete Package Structure
+##  Complete Package Structure
 
 ```
 vuln_detection/                        # 412KB total
@@ -66,7 +60,7 @@ vuln_detection/                        # 412KB total
     └── learned_embedding_model.py    # Alternative to GraphCodeBERT
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Installation
 
@@ -145,7 +139,7 @@ train_loader, val_loader, test_loader = create_data_loaders(
 )
 ```
 
-## 📦 Available Embedders
+##  Available Embedders
 
 | Embedder | Description | Recommended For |
 |----------|-------------|-----------------|
@@ -157,7 +151,7 @@ train_loader, val_loader, test_loader = create_data_loaders(
 | `codet5` | CodeT5/CodeT5+ | Better code understanding |
 | `unixcoder` | UniXcoder | Multi-modal |
 
-## 🧠 Available Models
+##  Available Models
 
 ### DevignModel
 Original Devign architecture: GGNN + Conv readout
@@ -192,7 +186,7 @@ model = VulnDetector(
 )
 ```
 
-## 📈 Evaluation
+##  Evaluation
 
 The package provides proper evaluation with:
 - **AUC-ROC** (threshold-independent)
@@ -207,7 +201,7 @@ metrics = compute_full_evaluation(probs, labels)
 print_metrics(metrics)
 ```
 
-## 🔧 Configuration Options
+##  Configuration Options
 
 ### Embedder Types
 - `word2vec`: Word2Vec embeddings (train your own or load pretrained)
@@ -237,15 +231,6 @@ print_metrics(metrics)
 - `focal`: Focal Loss (handles imbalance)
 - `combined`: BCE + Focal (recommended)
 
-## 🎯 Recommendations
-
-### To Match Published Devign Baseline (F1 > 73%)
-
-1. Use Word2Vec embeddings (not GraphCodeBERT)
-2. Use GGNN with 4 steps
-3. Use Conv1D readout (DevignConvHead)
-4. Match their evaluation protocol
-
 ```python
 model = create_model("devign", gnn_steps=4, use_word2vec=True)
 ```
@@ -270,18 +255,13 @@ model = create_model("attention", use_gnn=False)
 logits, attn_weights = model(data, return_embeddings=True)
 ```
 
-## 📚 References
+##  References
 
 - [Devign Paper](https://arxiv.org/abs/1909.03496)
 - [ReVeal Paper](https://arxiv.org/abs/2009.07235)
 - [IVDetect Paper](https://arxiv.org/abs/2102.00298)
 - [LineVul Paper](https://arxiv.org/abs/2104.10350)
 
-## 🐛 Known Issues
-
-1. **GraphCodeBERT similarity**: 97% of embeddings are similar. Use compression.
-2. **GNN over-smoothing**: Deep GNNs destroy signal. Use 0-1 layers.
-3. **F1 threshold**: Always report F1 at 0.50 for fair comparison.
 
 ## 📝 License
 
