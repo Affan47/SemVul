@@ -268,17 +268,6 @@ python vuln_detection/multi_extractor.py \
 8. **Train models** with `step2_train.py` and `step2_train_advanced.py`.
 9. **Evaluate and compare** with `step3_compare_results.py`.
 
-## Evaluation and Comparison
-
-Compare all result folders:
-
-```bash
-python vuln_detection/scripts/step3_compare_results.py \
-  --results-dir ./results
-```
-
-The script aggregates per-model metrics into a summary table. Each training run also writes a `results.json` in its output directory.
-
 ## Reproducing All Models End-to-End
 
 A full run for each dataset follows this order:
@@ -291,9 +280,3 @@ A full run for each dataset follows this order:
 6. Train all basic models with `vuln_detection/scripts/step2_train.py`.
 7. Train all advanced models with `vuln_detection/scripts/step2_train_advanced.py`.
 8. Aggregate results with `vuln_detection/scripts/step3_compare_results.py`.
-
-## Notes
-
-- All paths in this repository are relative. Avoid absolute paths when reproducing.
-- Model checkpoints and caches are excluded from Git by default.
-- If you add new datasets, ensure the node and edge type vocabularies are rebuilt.
