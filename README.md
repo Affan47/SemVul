@@ -68,6 +68,14 @@ Repeat for Draper, Reveal, PrimeVul with the corresponding scripts:
 
 Generate CPGs with Joern and export GraphSON. Use the dataset-specific scripts in `workspace/B_Joern_graphs_generation_scripts`.
 
+The main generators are:
+1. `workspace/B_Joern_graphs_generation_scripts/generate_cpg_devign_final.py`
+2. `workspace/B_Joern_graphs_generation_scripts/generate_cpg_draper_final.py`
+3. `workspace/B_Joern_graphs_generation_scripts/generate_cpg_primevul_final.py`
+4. `workspace/B_Joern_graphs_generation_scripts/generate_cpg_reveal_final.py`
+
+Each of these scripts includes CLI usage examples at the end of the file.
+
 Example for Devign:
 
 ```bash
