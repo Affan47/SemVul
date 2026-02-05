@@ -234,25 +234,9 @@ elif model_type == 'hagnn':
 
 ---
 
-## 📊 Expected Results
 
-Based on research findings and your diagnostic analysis:
 
-| Configuration | Expected AUC | Expected F1 |
-|--------------|--------------|-------------|
-| Baseline (current) | ~0.60-0.68 | ~0.55-0.65 |
-| + Contrastive Learning | ~0.72-0.80 | ~0.68-0.78 |
-| + HAGNN | ~0.75-0.82 | ~0.72-0.82 |
-| + Vuln Features | ~0.78-0.85 | ~0.75-0.85 |
-
-**Note**: Actual results depend on:
-- Quality of code embeddings (Word2Vec vs CodeBERT)
-- CPG construction quality
-- Class balance in dataset
-
----
-
-## 🔬 Hyperparameter Recommendations
+##  Hyperparameter Recommendations
 
 ### Contrastive Learning
 ```bash
