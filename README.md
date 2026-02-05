@@ -151,6 +151,8 @@ After cache build, find the cache signature in:
 CLI reference notes:
 - `Clean_exports/cache_manager.py` includes detailed CLI examples and options near the end of the file.
 - `vuln_detection/multi_extractor.py` includes detailed CLI examples and options near the end of the file.
+- `vuln_detection/train.py` includes detailed CLI examples near the end of the file.
+- `vuln_detection/train_advanced.py` includes detailed CLI examples near the end of the file.
 
 ## Train Models
 
