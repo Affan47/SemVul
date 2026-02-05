@@ -266,7 +266,7 @@ python vuln_detection/multi_extractor.py \
 6. **Extract embeddings** with `vuln_detection/multi_extractor.py`.
 7. **Build PyG caches** with `vuln_detection/scripts/step1_build_caches.py`.
 8. **Train models** with `step2_train.py` and `step2_train_advanced.py`.
-9. **Evaluate and compare** with `step3_compare_results.py`.
+9. **Evaluate and compare** with the results summary scripts.
 
 ## Reproducing All Models End-to-End
 
@@ -279,4 +279,4 @@ A full run for each dataset follows this order:
 5. Build PyG caches using `vuln_detection/scripts/step1_build_caches.py`.
 6. Train all basic models with `vuln_detection/scripts/step2_train.py`.
 7. Train all advanced models with `vuln_detection/scripts/step2_train_advanced.py`.
-8. Aggregate results with `vuln_detection/scripts/step3_compare_results.py`.
+8. Aggregate results with the results summary scripts.
