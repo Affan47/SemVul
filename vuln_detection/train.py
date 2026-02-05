@@ -2459,7 +2459,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "unixcoder_768d_full" \
-    --cache-signature "f6f464798e030305" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2482,7 +2482,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "unixcoder_768d_full" \
-    --cache-signature "f6f464798e030305" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2505,7 +2505,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "unixcoder_768d_full" \
-    --cache-signature "f6f464798e030305" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2528,7 +2528,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "unixcoder_768d_full" \
-    --cache-signature "f6f464798e030305" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 800 \
     --dropout 0.25 \
@@ -2552,7 +2552,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "unixcoder_768d_full" \
-    --cache-signature "f6f464798e030305" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.25 \
@@ -2583,7 +2583,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_768d_full" \
-    --cache-signature "d253d91f25af3d71" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2608,7 +2608,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_768d_full" \
-    --cache-signature "d253d91f25af3d71" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2631,7 +2631,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_768d_full" \
-    --cache-signature "d253d91f25af3d71" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2654,7 +2654,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_768d_full" \
-    --cache-signature "d253d91f25af3d71" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.2 \
@@ -2677,7 +2677,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_768d_full" \
-    --cache-signature "d253d91f25af3d71" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 800 \
     --dropout 0.25 \
@@ -2701,7 +2701,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_768d_full" \
-    --cache-signature "d253d91f25af3d71" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 768 \
     --hidden-dim 512 \
     --dropout 0.25 \
@@ -2732,7 +2732,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_128d_full" \
-    --cache-signature "1c3949dcf68534a6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 128 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2757,7 +2757,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_128d_full" \
-    --cache-signature "1c3949dcf68534a6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 128 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2780,7 +2780,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_128d_full" \
-    --cache-signature "1c3949dcf68534a6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 128 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2803,7 +2803,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_128d_full" \
-    --cache-signature "1c3949dcf68534a6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 128 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2826,7 +2826,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_128d_full" \
-    --cache-signature "1c3949dcf68534a6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 128 \
     --hidden-dim 256 \
     --dropout 0.25 \
@@ -2850,7 +2850,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "graphcodebert_128d_full" \
-    --cache-signature "1c3949dcf68534a6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 128 \
     --hidden-dim 256 \
     --dropout 0.25 \
@@ -2881,7 +2881,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "codet5p_256d_full" \
-    --cache-signature "c60b3d632feea19c" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 256 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2906,7 +2906,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "codet5p_256d_full" \
-    --cache-signature "c60b3d632feea19c" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 256 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2929,7 +2929,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "codet5p_256d_full" \
-    --cache-signature "c60b3d632feea19c" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 256 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2952,7 +2952,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "codet5p_256d_full" \
-    --cache-signature "c60b3d632feea19c" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 256 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -2975,7 +2975,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "codet5p_256d_full" \
-    --cache-signature "c60b3d632feea19c" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 256 \
     --hidden-dim 384 \
     --dropout 0.25 \
@@ -2999,7 +2999,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "codet5p_256d_full" \
-    --cache-signature "c60b3d632feea19c" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 256 \
     --hidden-dim 256 \
     --dropout 0.25 \
@@ -3030,7 +3030,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_200d_full" \
-    --cache-signature "86c56b1755c532ee" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 200 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -3055,7 +3055,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_200d_full" \
-    --cache-signature "86c56b1755c532ee" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 200 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -3078,7 +3078,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_200d_full" \
-    --cache-signature "86c56b1755c532ee" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 200 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -3101,7 +3101,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_200d_full" \
-    --cache-signature "86c56b1755c532ee" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 200 \
     --hidden-dim 256 \
     --dropout 0.2 \
@@ -3124,7 +3124,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_200d_full" \
-    --cache-signature "86c56b1755c532ee" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 200 \
     --hidden-dim 384 \
     --dropout 0.25 \
@@ -3148,7 +3148,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_200d_full" \
-    --cache-signature "86c56b1755c532ee" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 200 \
     --hidden-dim 256 \
     --dropout 0.25 \
@@ -3179,7 +3179,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_100d_full" \
-    --cache-signature "0b2074fbdf9296d6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 100 \
     --hidden-dim 192 \
     --dropout 0.2 \
@@ -3204,7 +3204,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_100d_full" \
-    --cache-signature "0b2074fbdf9296d6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 100 \
     --hidden-dim 192 \
     --dropout 0.2 \
@@ -3227,7 +3227,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_100d_full" \
-    --cache-signature "0b2074fbdf9296d6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 100 \
     --hidden-dim 192 \
     --dropout 0.2 \
@@ -3250,7 +3250,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_100d_full" \
-    --cache-signature "0b2074fbdf9296d6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 100 \
     --hidden-dim 192 \
     --dropout 0.2 \
@@ -3273,7 +3273,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_100d_full" \
-    --cache-signature "0b2074fbdf9296d6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 100 \
     --hidden-dim 256 \
     --dropout 0.25 \
@@ -3297,7 +3297,7 @@ python -m vuln_detection.train \
     --optimize-for f1_best \
     --cache-dir "./Clean_exports/cache_devign_v2" \
     --dataset-name "word2vec_100d_full" \
-    --cache-signature "0b2074fbdf9296d6" \
+    --cache-signature "SIGNATURE" \
     --embedding-dim 100 \
     --hidden-dim 192 \
     --dropout 0.25 \
@@ -3312,18 +3312,18 @@ python -m vuln_detection.train \
 ################################################################################
 #
 # REVEAL:
-# - unixcoder_768d_reveal_full: da4ba2df98d97bc8 (dim=768, edge_types=19)
-# - graphcodebert_768d_reveal_full: b5d56d026d3be520 (dim=768, edge_types=19)
-# - codet5p_256d_reveal_full: 924793d828204559 (dim=256, edge_types=19)
-# - word2vec_200d_reveal_full: 907c2c5a79ce186e (dim=200, edge_types=19)
-# - word2vec_100d_reveal_full: 7c1030041c027a9f (dim=100, edge_types=19)
+# - unixcoder_768d_reveal_full: (dim=768, edge_types=19)
+# - graphcodebert_768d_reveal_full:  (dim=768, edge_types=19)
+# - codet5p_256d_reveal_full:  (dim=256, edge_types=19)
+# - word2vec_200d_reveal_full:  (dim=200, edge_types=19)
+# - word2vec_100d_reveal_full:  (dim=100, edge_types=19)
 #
 # DEVIGN:
-# - unixcoder_768d_full: f6f464798e030305 (dim=768, edge_types=18)
-# - graphcodebert_768d_full: d253d91f25af3d71 (dim=768, edge_types=18)
-# - graphcodebert_128d_full: 1c3949dcf68534a6 (dim=128, edge_types=18)
-# - codet5p_256d_full: c60b3d632feea19c (dim=256, edge_types=18)
-# - word2vec_200d_full: 86c56b1755c532ee (dim=200, edge_types=18)
-# - word2vec_100d_full: 0b2074fbdf9296d6 (dim=100, edge_types=18)
+# - unixcoder_768d_full:  (dim=768, edge_types=18)
+# - graphcodebert_768d_full:  (dim=768, edge_types=18)
+# - graphcodebert_128d_full:  (dim=128, edge_types=18)
+# - codet5p_256d_full:  (dim=256, edge_types=18)
+# - word2vec_200d_full:  (dim=200, edge_types=18)
+# - word2vec_100d_full:  (dim=100, edge_types=18)
 #
 """
