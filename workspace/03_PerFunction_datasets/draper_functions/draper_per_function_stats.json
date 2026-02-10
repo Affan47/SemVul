@@ -1,10 +1,10 @@
 {
   "generated_at": "2026-01-10T14:43:36.896556",
-  "output_base": "/home/ayounas/CFG_Data_Models/03_Joern_CPG_Paper_2/workspace/03_PerFunction_datasets/draper_functions",
+  "output_base": "./workspace/03_PerFunction_datasets/draper_functions",
   "inputs": {
-    "train": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/draper/train_draper.csv",
-    "validation": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/draper/validation_draper.csv",
-    "test": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/draper/test_draper.csv"
+    "train": "./datasets/draper_raw/train_draper.csv",
+    "validation": "./datasets/draper_raw/validation_draper.csv",
+    "test": "./datasets/draper_raw/test_draper.csv"
   },
   "splits": [
     {

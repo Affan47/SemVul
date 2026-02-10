@@ -1,7 +1,7 @@
 PrimeVul Per-Function Split Stats
 ========================================================================
 Generated: 2026-01-19T17:27:00.163693
-Output base: /home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/03_PerFunction_datasets/primevul_functions
+Output base: ./workspace/03_PerFunction_datasets/primevul_functions
 
 Split: train
 ------------------------------------------------------------------------

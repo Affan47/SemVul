@@ -32,7 +32,7 @@ export PATH="$JOERN_HOME:$PATH"
 
 ## Data Preparation
 
-The repository includes per-function datasets (manifests + split archives) under:
+The repository includes per-function manifests and dataset stats under:
 
 ```
 ./workspace/03_PerFunction_datasets/
@@ -55,24 +55,11 @@ The repository includes per-function datasets (manifests + split archives) under
     primevul_per_function_stats.json
     primevul_per_function_stats.txt
   mutant_diff_report_test.csv
-  archives/
-    draper_functions_splits.tar.zst
-    reveal_functions_splits.tar.zst
-    primevul_functions_splits.tar.zst
 ```
 
-Extract split archives before CPG generation:
-
-```bash
-tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/draper_functions_splits.tar.zst \
-  -C ./workspace/03_PerFunction_datasets
-tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/reveal_functions_splits.tar.zst \
-  -C ./workspace/03_PerFunction_datasets
-tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/primevul_functions_splits.tar.zst \
-  -C ./workspace/03_PerFunction_datasets
-```
-
-If you want to regenerate per-function splits from raw datasets, place raw datasets under a local `datasets` folder, then run the preprocessing scripts. Use relative paths only. Example structure:
+Per-function source files are not tracked in Git due to size. You must generate
+the `train/validation/test` split directories using the preprocessing scripts
+below. Use relative paths only. Example structure:
 
 ```
 ./datasets/
@@ -377,8 +364,11 @@ python vuln_detection/scripts/step1_build_caches.py \
 CLI reference notes:
 - `Clean_exports/cache_manager.py` includes detailed CLI examples and options near the end of the file.
 - `vuln_detection/multi_extractor.py` includes detailed CLI examples and options near the end of the file.
-- **Primary training CLIs** are `vuln_detection/train.py` and `vuln_detection/train_advanced.py` (see examples at the end of each file).
-- `vuln_detection/scripts/step2_train.py` and `vuln_detection/scripts/step2_train_advanced.py` are convenience wrappers; use `train.py` / `train_advanced.py` for full control.
+- **Primary training CLIs** are `vuln_detection/train.py` and `vuln_detection/train_advanced.py`
+  (use `python -m vuln_detection.train` / `python -m vuln_detection.train_advanced`;
+  see examples at the end of each file).
+- `vuln_detection/scripts/step2_train.py` and `vuln_detection/scripts/step2_train_advanced.py`
+  are convenience wrappers; use `train.py` / `train_advanced.py` for full control.
 - `vuln_detection/embeddings/word2vec.py` defines how Word2Vec embeddings are loaded and aggregated.
 - `vuln_detection/scripts/train_word2vec.py` provides a full CLI to train a Word2Vec model on code tokens.
 
@@ -516,7 +506,7 @@ python vuln_detection/multi_extractor.py \
 
 A full run for each dataset follows this order:
 
-1. Preprocess and split raw data using `workspace/A_Preprocessing_scripts` **or** extract the included per-function archives.
+1. Preprocess and split raw data using `workspace/A_Preprocessing_scripts`.
 2. Generate CPGs and export GraphSON using `workspace/B_Joern_graphs_generation_scripts`.
 3. Build vocabularies with `Clean_exports/vocab_builder.py`.
 4. Extract embeddings using `vuln_detection/multi_extractor.py`.
@@ -618,9 +608,12 @@ python -m vuln_detection.train_advanced \
 ### Draper
 
 ```bash
-# 0) Extract per-function splits (included in repo)
-tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/draper_functions_splits.tar.zst \
-  -C ./workspace/03_PerFunction_datasets
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01e_split_per_function_draper.py \
+  --input-dir ./datasets/draper_raw \
+  --output-base ./workspace/03_PerFunction_datasets/draper_functions \
+  --splits train validation test \
+  --label-column combine
 
 # 2) CPG + GraphSON
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_draper_final.py \
@@ -702,9 +695,11 @@ python -m vuln_detection.train_advanced \
 ### Reveal
 
 ```bash
-# 0) Extract per-function splits (included in repo)
-tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/reveal_functions_splits.tar.zst \
-  -C ./workspace/03_PerFunction_datasets
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01d_split_per_function_reveal.py \
+  --input-dir ./datasets/reveal_raw \
+  --output-base ./workspace/03_PerFunction_datasets/reveal_functions \
+  --splits train validation test
 
 # 2) CPG + GraphSON
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_reveal_final.py \
@@ -786,9 +781,13 @@ python -m vuln_detection.train_advanced \
 ### PrimeVul
 
 ```bash
-# 0) Extract per-function splits (included in repo)
-tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/primevul_functions_splits.tar.zst \
-  -C ./workspace/03_PerFunction_datasets
+# 1) Split per-function
+python workspace/A_Preprocessing_scripts/01f_split_per_function_primevul.py \
+  --input-dir ./datasets/primevul_raw \
+  --output-base ./workspace/03_PerFunction_datasets/primevul_functions \
+  --splits train validation test \
+  --code-field func \
+  --label-field target
 
 # 2) CPG + GraphSON
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_primevul_final.py \
