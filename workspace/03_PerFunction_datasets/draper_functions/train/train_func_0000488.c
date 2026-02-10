@@ -1,0 +1,9 @@
+rb_file_s_ctime(klass, fname)
+    VALUE klass, fname;
+{
+    struct stat st;
+
+    if (rb_stat(fname, &st) < 0)
+	rb_sys_fail(RSTRING(fname)->ptr);
+    return rb_time_new(st.st_ctime, 0);
+}

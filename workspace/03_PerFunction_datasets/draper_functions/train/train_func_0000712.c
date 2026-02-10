@@ -1,0 +1,9 @@
+php_check_dots(const char *element, int n)
+{
+	for(n--; n >= 0; --n) {
+		if (element[n] != '.') {
+			return 1;
+		}
+	}
+	return 0;
+}

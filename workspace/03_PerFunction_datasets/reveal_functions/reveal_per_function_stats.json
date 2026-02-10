@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-01-07T12:13:18.096104",
+  "output_base": "/home/ayounas/CFG_Data_Models/03_Joern_CPG_Paper_2/workspace/03_PerFunction_datasets/reveal_functions",
+  "inputs": {
+    "train": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/reveal/train_reveal.csv",
+    "validation": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/reveal/validation_reveal.csv",
+    "test": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/reveal/test_reveal.csv"
+  },
+  "splits": [
+    {
+      "split": "train",
+      "total_rows": 17974,
+      "written": 17974,
+      "empty_function": 0,
+      "missing_label": 0,
+      "bad_label": 0,
+      "missing_project": 0,
+      "duplicate_hash": 0,
+      "label_counts": {},
+      "project_counts": {},
+      "function_chars": {
+        "min": 32,
+        "max": 234966,
+        "mean": 1363.082285523534
+      },
+      "function_lines": {
+        "min": 3,
+        "max": 5679,
+        "mean": 33.393679759652834
+      }
+    },
+    {
+      "split": "validation",
+      "total_rows": 2200,
+      "written": 2200,
+      "empty_function": 0,
+      "missing_label": 0,
+      "bad_label": 0,
+      "missing_project": 0,
+      "duplicate_hash": 0,
+      "label_counts": {},
+      "project_counts": {},
+      "function_chars": {
+        "min": 48,
+        "max": 51618,
+        "mean": 1250.6113636363636
+      },
+      "function_lines": {
+        "min": 3,
+        "max": 830,
+        "mean": 31.009090909090908
+      }
+    },
+    {
+      "split": "test",
+      "total_rows": 2209,
+      "written": 2209,
+      "empty_function": 0,
+      "missing_label": 0,
+      "bad_label": 0,
+      "missing_project": 0,
+      "duplicate_hash": 0,
+      "label_counts": {},
+      "project_counts": {},
+      "function_chars": {
+        "min": 41,
+        "max": 234966,
+        "mean": 1486.9904934359438
+      },
+      "function_lines": {
+        "min": 3,
+        "max": 5679,
+        "mean": 36.9714803078316
+      }
+    }
+  ]
+}

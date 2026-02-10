@@ -1,0 +1,34 @@
+REVEAL Per-Function Split Stats
+========================================================================
+Generated: 2026-01-07T12:13:18.096104
+Output base: /home/ayounas/CFG_Data_Models/03_Joern_CPG_Paper_2/workspace/03_PerFunction_datasets/reveal_functions
+
+Split: train
+------------------------------------------------------------------------
+Rows: 17974  Written: 17974  Empty: 0
+Missing label: 0  Bad label: 0
+Missing project: 0  Duplicate hash: 0
+Labels: {}
+Projects: {}
+Function chars: {'min': 32, 'max': 234966, 'mean': 1363.082285523534}
+Function lines: {'min': 3, 'max': 5679, 'mean': 33.393679759652834}
+
+Split: validation
+------------------------------------------------------------------------
+Rows: 2200  Written: 2200  Empty: 0
+Missing label: 0  Bad label: 0
+Missing project: 0  Duplicate hash: 0
+Labels: {}
+Projects: {}
+Function chars: {'min': 48, 'max': 51618, 'mean': 1250.6113636363636}
+Function lines: {'min': 3, 'max': 830, 'mean': 31.009090909090908}
+
+Split: test
+------------------------------------------------------------------------
+Rows: 2209  Written: 2209  Empty: 0
+Missing label: 0  Bad label: 0
+Missing project: 0  Duplicate hash: 0
+Labels: {}
+Projects: {}
+Function chars: {'min': 41, 'max': 234966, 'mean': 1486.9904934359438}
+Function lines: {'min': 3, 'max': 5679, 'mean': 36.9714803078316}

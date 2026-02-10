@@ -9,7 +9,6 @@
 /workspace/verify_reports/
 /workspace/Scripts_and_saved_Models/Saved_Models/
 /workspace/Scripts_and_saved_Models/Models/
-/workspace/03_PerFunction_datasets/
 
 # Model and cache files
 *.pt

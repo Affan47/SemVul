@@ -1,0 +1,44 @@
+GaussianSetHistogram(struct histogram_s *h, float mean, float sd)
+{
+  int   sc;
+  int   hsize, idx;
+  int   nbins;
+  float delta;
+
+  UnfitHistogram(h);
+  h->fit_type          = HISTFIT_GAUSSIAN;
+  h->param[GAUSS_MEAN] = mean;
+  h->param[GAUSS_SD]   = sd;
+
+
+  hsize     = h->max - h->min + 1;
+  h->expect = (float *) MallocOrDie(sizeof(float) * hsize);
+  for (idx = 0; idx < hsize; idx++)
+    h->expect[idx] = 0.;
+
+
+  for (sc = h->min; sc <= h->max; sc++)
+    {
+      delta = ((float)sc + 0.5) - h->param[GAUSS_MEAN];
+      h->expect[sc - h->min] =
+	(float) h->total * ((1. / (h->param[GAUSS_SD] * sqrt(2.*3.14159))) *
+	    (exp(-1.*delta*delta / (2. * h->param[GAUSS_SD] * h->param[GAUSS_SD]))));
+    }
+
+
+  h->chisq = 0.;
+  nbins    = 0;
+  for (sc = h->lowscore; sc <= h->highscore; sc++)
+    if (h->expect[sc-h->min] >= 5. && h->histogram[sc-h->min] >= 5)
+      {
+	delta = (float) h->histogram[sc-h->min] - h->expect[sc-h->min];
+	h->chisq += delta * delta / h->expect[sc-h->min];
+	nbins++;
+      }
+
+  if (nbins > 1)
+    h->chip = (float) IncompleteGamma((double)(nbins-1)/2.,
+				      (double) h->chisq/2.);
+  else
+    h->chip = 0.;
+}

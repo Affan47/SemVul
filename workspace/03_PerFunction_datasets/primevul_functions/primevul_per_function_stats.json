@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-01-19T17:27:00.163693",
+  "output_base": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/03_PerFunction_datasets/primevul_functions",
+  "inputs": {
+    "train": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/01_Datasets/PrimeVul_HF/train.json",
+    "validation": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/01_Datasets/PrimeVul_HF/validation.json",
+    "test": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/01_Datasets/PrimeVul_HF/test.json"
+  },
+  "splits": [
+    {
+      "split": "train",
+      "total_rows": 174310,
+      "written": 174310,
+      "empty_function": 0,
+      "missing_label": 0,
+      "bad_label": 0,
+      "missing_hash": 0,
+      "label_counts": {
+        "1": 4823,
+        "0": 169487
+      },
+      "function_chars": {
+        "min": 12,
+        "max": 484187,
+        "mean": 1156.7734668120015
+      },
+      "function_lines": {
+        "min": 2,
+        "max": 24061,
+        "mean": 42.307108025930816
+      }
+    },
+    {
+      "split": "validation",
+      "total_rows": 23625,
+      "written": 23625,
+      "empty_function": 0,
+      "missing_label": 0,
+      "bad_label": 0,
+      "missing_hash": 0,
+      "label_counts": {
+        "0": 23039,
+        "1": 586
+      },
+      "function_chars": {
+        "min": 9,
+        "max": 91949,
+        "mean": 1072.6052486772487
+      },
+      "function_lines": {
+        "min": 2,
+        "max": 2874,
+        "mean": 39.438179894179896
+      }
+    },
+    {
+      "split": "test",
+      "total_rows": 24319,
+      "written": 24319,
+      "empty_function": 0,
+      "missing_label": 0,
+      "bad_label": 0,
+      "missing_hash": 0,
+      "label_counts": {
+        "0": 23773,
+        "1": 546
+      },
+      "function_chars": {
+        "min": 17,
+        "max": 134819,
+        "mean": 1137.9893910111437
+      },
+      "function_lines": {
+        "min": 2,
+        "max": 3979,
+        "mean": 42.49870471647683
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+bnx2fc_send_session_disable_req(struct fcoe_port *port,
+				    struct bnx2fc_rport *tgt)
+{
+	struct bnx2fc_interface *interface = port->priv;
+	struct fcoe_ctlr *ctlr = bnx2fc_to_ctlr(interface);
+	struct bnx2fc_hba *hba = interface->hba;
+	struct fcoe_kwqe_conn_enable_disable disable_req;
+	struct kwqe *kwqe_arr[2];
+	struct fc_rport *rport = tgt->rport;
+	int num_kwqes = 1;
+	int rc = 0;
+	u32 port_id;
+
+	memset(&disable_req, 0x00,
+	       sizeof(struct fcoe_kwqe_conn_enable_disable));
+	disable_req.hdr.op_code = FCOE_KWQE_OPCODE_DISABLE_CONN;
+	disable_req.hdr.flags =
+		(FCOE_KWQE_LAYER_CODE << FCOE_KWQE_HEADER_LAYER_CODE_SHIFT);
+
+	disable_req.src_mac_addr_lo[0] =  tgt->src_addr[5];
+	disable_req.src_mac_addr_lo[1] =  tgt->src_addr[4];
+	disable_req.src_mac_addr_mid[0] =  tgt->src_addr[3];
+	disable_req.src_mac_addr_mid[1] =  tgt->src_addr[2];
+	disable_req.src_mac_addr_hi[0] =  tgt->src_addr[1];
+	disable_req.src_mac_addr_hi[1] =  tgt->src_addr[0];
+
+	disable_req.dst_mac_addr_lo[0] =  ctlr->dest_addr[5];
+	disable_req.dst_mac_addr_lo[1] =  ctlr->dest_addr[4];
+	disable_req.dst_mac_addr_mid[0] = ctlr->dest_addr[3];
+	disable_req.dst_mac_addr_mid[1] = ctlr->dest_addr[2];
+	disable_req.dst_mac_addr_hi[0] = ctlr->dest_addr[1];
+	disable_req.dst_mac_addr_hi[1] = ctlr->dest_addr[0];
+
+	port_id = tgt->sid;
+	disable_req.s_id[0] = (port_id & 0x000000FF);
+	disable_req.s_id[1] = (port_id & 0x0000FF00) >> 8;
+	disable_req.s_id[2] = (port_id & 0x00FF0000) >> 16;
+
+
+	port_id = rport->port_id;
+	disable_req.d_id[0] = (port_id & 0x000000FF);
+	disable_req.d_id[1] = (port_id & 0x0000FF00) >> 8;
+	disable_req.d_id[2] = (port_id & 0x00FF0000) >> 16;
+	disable_req.context_id = tgt->context_id;
+	disable_req.conn_id = tgt->fcoe_conn_id;
+	disable_req.vlan_tag = interface->vlan_id <<
+				FCOE_KWQE_CONN_ENABLE_DISABLE_VLAN_ID_SHIFT;
+	disable_req.vlan_tag |=
+			3 << FCOE_KWQE_CONN_ENABLE_DISABLE_PRIORITY_SHIFT;
+	disable_req.vlan_flag = interface->vlan_enabled;
+
+	kwqe_arr[0] = (struct kwqe *) &disable_req;
+
+	if (hba->cnic && hba->cnic->submit_kwqes)
+		rc = hba->cnic->submit_kwqes(hba->cnic, kwqe_arr, num_kwqes);
+
+	return rc;
+}

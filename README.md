@@ -32,7 +32,47 @@ export PATH="$JOERN_HOME:$PATH"
 
 ## Data Preparation
 
-Place raw datasets under a local `datasets` folder, then run the preprocessing scripts. Use relative paths only. Example structure:
+The repository includes per-function datasets (manifests + split archives) under:
+
+```
+./workspace/03_PerFunction_datasets/
+  draper_functions/
+    manifest_train.csv
+    manifest_validation.csv
+    manifest_test.csv
+    draper_per_function_stats.json
+    draper_per_function_stats.txt
+  reveal_functions/
+    manifest_train.csv
+    manifest_validation.csv
+    manifest_test.csv
+    reveal_per_function_stats.json
+    reveal_per_function_stats.txt
+  primevul_functions/
+    manifest_train.csv
+    manifest_validation.csv
+    manifest_test.csv
+    primevul_per_function_stats.json
+    primevul_per_function_stats.txt
+  mutant_diff_report_test.csv
+  archives/
+    draper_functions_splits.tar.zst
+    reveal_functions_splits.tar.zst
+    primevul_functions_splits.tar.zst
+```
+
+Extract split archives before CPG generation:
+
+```bash
+tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/draper_functions_splits.tar.zst \
+  -C ./workspace/03_PerFunction_datasets
+tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/reveal_functions_splits.tar.zst \
+  -C ./workspace/03_PerFunction_datasets
+tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/primevul_functions_splits.tar.zst \
+  -C ./workspace/03_PerFunction_datasets
+```
+
+If you want to regenerate per-function splits from raw datasets, place raw datasets under a local `datasets` folder, then run the preprocessing scripts. Use relative paths only. Example structure:
 
 ```
 ./datasets/
@@ -476,7 +516,7 @@ python vuln_detection/multi_extractor.py \
 
 A full run for each dataset follows this order:
 
-1. Preprocess and split raw data using `workspace/A_Preprocessing_scripts`.
+1. Preprocess and split raw data using `workspace/A_Preprocessing_scripts` **or** extract the included per-function archives.
 2. Generate CPGs and export GraphSON using `workspace/B_Joern_graphs_generation_scripts`.
 3. Build vocabularies with `Clean_exports/vocab_builder.py`.
 4. Extract embeddings using `vuln_detection/multi_extractor.py`.
@@ -578,12 +618,9 @@ python -m vuln_detection.train_advanced \
 ### Draper
 
 ```bash
-# 1) Split per-function
-python workspace/A_Preprocessing_scripts/01e_split_per_function_draper.py \
-  --input-dir ./datasets/draper_raw \
-  --output-base ./workspace/03_PerFunction_datasets/draper_functions \
-  --splits train validation test \
-  --label-column combine
+# 0) Extract per-function splits (included in repo)
+tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/draper_functions_splits.tar.zst \
+  -C ./workspace/03_PerFunction_datasets
 
 # 2) CPG + GraphSON
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_draper_final.py \
@@ -665,11 +702,9 @@ python -m vuln_detection.train_advanced \
 ### Reveal
 
 ```bash
-# 1) Split per-function
-python workspace/A_Preprocessing_scripts/01d_split_per_function_reveal.py \
-  --input-dir ./datasets/reveal_raw \
-  --output-base ./workspace/03_PerFunction_datasets/reveal_functions \
-  --splits train validation test
+# 0) Extract per-function splits (included in repo)
+tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/reveal_functions_splits.tar.zst \
+  -C ./workspace/03_PerFunction_datasets
 
 # 2) CPG + GraphSON
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_reveal_final.py \
@@ -751,13 +786,9 @@ python -m vuln_detection.train_advanced \
 ### PrimeVul
 
 ```bash
-# 1) Split per-function
-python workspace/A_Preprocessing_scripts/01f_split_per_function_primevul.py \
-  --input-dir ./datasets/primevul_raw \
-  --output-base ./workspace/03_PerFunction_datasets/primevul_functions \
-  --splits train validation test \
-  --code-field func \
-  --label-field target
+# 0) Extract per-function splits (included in repo)
+tar --zstd -xf ./workspace/03_PerFunction_datasets/archives/primevul_functions_splits.tar.zst \
+  -C ./workspace/03_PerFunction_datasets
 
 # 2) CPG + GraphSON
 python workspace/B_Joern_graphs_generation_scripts/generate_cpg_primevul_final.py \

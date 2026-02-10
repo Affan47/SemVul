@@ -1,0 +1,15 @@
+rb_yield_splat(values)
+    VALUE values;
+{
+    int avalue = Qfalse;
+
+    if (TYPE(values) == T_ARRAY) {
+	if (RARRAY(values)->len == 0) {
+	    values = Qundef;
+	}
+	else {
+	    avalue = Qtrue;
+	}
+    }
+    return rb_yield_0(values, 0, 0, 0, avalue);
+}

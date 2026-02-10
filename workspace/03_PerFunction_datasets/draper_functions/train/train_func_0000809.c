@@ -1,0 +1,65 @@
+max_min(argvars, rettv, domax)
+    typval_T	*argvars;
+    typval_T	*rettv;
+    int		domax;
+{
+    long	n = 0;
+    long	i;
+    int		error = FALSE;
+
+    if (argvars[0].v_type == VAR_LIST)
+    {
+	list_T		*l;
+	listitem_T	*li;
+
+	l = argvars[0].vval.v_list;
+	if (l != NULL)
+	{
+	    li = l->lv_first;
+	    if (li != NULL)
+	    {
+		n = get_tv_number_chk(&li->li_tv, &error);
+		for (;;)
+		{
+		    li = li->li_next;
+		    if (li == NULL)
+			break;
+		    i = get_tv_number_chk(&li->li_tv, &error);
+		    if (domax ? i > n : i < n)
+			n = i;
+		}
+	    }
+	}
+    }
+    else if (argvars[0].v_type == VAR_DICT)
+    {
+	dict_T		*d;
+	int		first = TRUE;
+	hashitem_T	*hi;
+	int		todo;
+
+	d = argvars[0].vval.v_dict;
+	if (d != NULL)
+	{
+	    todo = (int)d->dv_hashtab.ht_used;
+	    for (hi = d->dv_hashtab.ht_array; todo > 0; ++hi)
+	    {
+		if (!HASHITEM_EMPTY(hi))
+		{
+		    --todo;
+		    i = get_tv_number_chk(&HI2DI(hi)->di_tv, &error);
+		    if (first)
+		    {
+			n = i;
+			first = FALSE;
+		    }
+		    else if (domax ? i > n : i < n)
+			n = i;
+		}
+	    }
+	}
+    }
+    else
+	EMSG(_(e_listdictarg));
+    rettv->vval.v_number = error ? 0 : n;
+}

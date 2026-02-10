@@ -1,0 +1,12 @@
+rb_dvar_curr(id)
+    ID id;
+{
+    struct RVarmap *vars = ruby_dyna_vars;
+
+    while (vars) {
+	if (vars->id == 0) break;
+	if (vars->id == id) return Qtrue;
+	vars = vars->next;
+    }
+    return Qfalse;
+}
