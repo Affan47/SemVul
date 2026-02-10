@@ -17,6 +17,12 @@ This repository contains the full pipeline to reproduce the SemVul experiments, 
 - A working Joern installation.
 - CUDA-capable GPU recommended for large embeddings and training.
 
+## Data and Cache Availability
+
+This repository is kept anonymous and within GitHub size limits. As a result, we do not share
+large artifacts such as precomputed caches, embeddings, or per-function source files. The
+pipeline below reproduces everything from raw datasets using relative paths.
+
 Suggested Python packages:
 
 ```bash
@@ -67,6 +73,17 @@ below. Use relative paths only. Example structure:
   draper_raw/
   reveal_raw/
   primevul_raw/
+```
+
+To download Devign, use the included script and then run the per-function splitter:
+
+```bash
+python scripts/download_devign.py --output ./datasets/devign_raw --formats json
+
+python workspace/A_Preprocessing_scripts/01c_split_per_function_devign.py \
+  --input-base ./datasets/devign_raw \
+  --output-base ./workspace/03_PerFunction_datasets/original_devign_functions \
+  --splits train validation test
 ```
 
 Run preprocessing (explicit commands):
