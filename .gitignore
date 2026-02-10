@@ -10,6 +10,11 @@
 /workspace/Scripts_and_saved_Models/Saved_Models/
 /workspace/Scripts_and_saved_Models/Models/
 
+# External tools (keep out of git)
+/external/
+joern-install.sh
+joern-cli.zip
+
 # Model and cache files
 *.pt
 *.pth
@@ -29,3 +34,8 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# LaTeX/paper drafts (kept out of the repo to preserve anonymity)
+*.tex
+*.sty
+*.cls
