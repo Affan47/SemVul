@@ -20,7 +20,7 @@ This repository contains the full pipeline to reproduce the SemVul experiments, 
 ## Data and Cache Availability
 
 This repository is kept anonymous and within GitHub size limits. As a result, we do not share
-large artifacts such as precomputed caches, embeddings, or per-function source files. The
+large artifacts such as precomputed caches, embeddings, . The
 pipeline below reproduces everything from raw datasets using relative paths.
 
 Suggested Python packages:
