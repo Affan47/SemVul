@@ -1,10 +1,10 @@
 {
   "generated_at": "2026-01-07T12:13:18.096104",
-  "output_base": "./workspace/03_PerFunction_datasets/reveal_functions",
+  "output_base": "/home/ayounas/CFG_Data_Models/03_Joern_CPG_Paper_2/workspace/03_PerFunction_datasets/reveal_functions",
   "inputs": {
-    "train": "./datasets/reveal_raw/train_reveal.csv",
-    "validation": "./datasets/reveal_raw/validation_reveal.csv",
-    "test": "./datasets/reveal_raw/test_reveal.csv"
+    "train": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/reveal/train_reveal.csv",
+    "validation": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/reveal/validation_reveal.csv",
+    "test": "/home/ayounas/CFG_Data_Models/Shiva's_NAS_CPG/reveal/test_reveal.csv"
   },
   "splits": [
     {

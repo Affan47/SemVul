@@ -1,7 +1,7 @@
 REVEAL Per-Function Split Stats
 ========================================================================
 Generated: 2026-01-07T12:13:18.096104
-Output base: ./workspace/03_PerFunction_datasets/reveal_functions
+Output base: /home/ayounas/CFG_Data_Models/03_Joern_CPG_Paper_2/workspace/03_PerFunction_datasets/reveal_functions
 
 Split: train
 ------------------------------------------------------------------------
