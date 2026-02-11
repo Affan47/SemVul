@@ -1,7 +1,7 @@
 DRAPER Per-Function Split Stats
 ========================================================================
 Generated: 2026-01-10T14:43:36.896556
-Output base: ./workspace/03_PerFunction_datasets/draper_functions
+Output base: /home/ayounas/CFG_Data_Models/03_Joern_CPG_Paper_2/workspace/03_PerFunction_datasets/draper_functions
 
 Split: train
 ------------------------------------------------------------------------

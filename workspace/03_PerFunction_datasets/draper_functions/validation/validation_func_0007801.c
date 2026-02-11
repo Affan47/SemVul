@@ -1,0 +1,50 @@
+get_dir_index_using_offset(struct super_block *sb,
+	u64 *next_block, int *next_offset, u64 index_start, int index_offset,
+	int i_count, u64 f_pos)
+{
+	struct squashfs_sb_info *msblk = sb->s_fs_info;
+	int err, i, index, length = 0;
+	unsigned int size;
+	struct squashfs_dir_index dir_index;
+
+	TRACE("Entered get_dir_index_using_offset, i_count %d, f_pos %lld\n",
+					i_count, f_pos);
+
+
+	if (f_pos <= 3)
+		return f_pos;
+	f_pos -= 3;
+
+	for (i = 0; i < i_count; i++) {
+		err = squashfs_read_metadata(sb, &dir_index, &index_start,
+				&index_offset, sizeof(dir_index));
+		if (err < 0)
+			break;
+
+		index = le32_to_cpu(dir_index.index);
+		if (index > f_pos)
+
+
+			break;
+
+		size = le32_to_cpu(dir_index.size) + 1;
+
+
+		if (size > SQUASHFS_NAME_LEN)
+			break;
+
+		err = squashfs_read_metadata(sb, NULL, &index_start,
+				&index_offset, size);
+		if (err < 0)
+			break;
+
+		length = index;
+		*next_block = le32_to_cpu(dir_index.start_block) +
+					msblk->directory_table;
+	}
+
+	*next_offset = (length + *next_offset) % SQUASHFS_METADATA_SIZE;
+
+
+	return length + 3;
+}

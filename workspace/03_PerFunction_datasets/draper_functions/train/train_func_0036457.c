@@ -1,0 +1,19 @@
+start_sample (int number, int volume, int repeats, zword eos)
+{
+
+    static zbyte lh_repeats[] = {
+	0x00, 0x00, 0x00, 0x01, 0xff,
+	0x00, 0x01, 0x01, 0x01, 0x01,
+	0xff, 0x01, 0x01, 0xff, 0x00,
+	0xff, 0xff, 0xff, 0xff, 0xff
+    };
+
+    if (story_id == LURKING_HORROR)
+	repeats = lh_repeats[number];
+
+    os_start_sample (number, volume, repeats, eos);
+
+    routine = eos;
+    playing = TRUE;
+
+}

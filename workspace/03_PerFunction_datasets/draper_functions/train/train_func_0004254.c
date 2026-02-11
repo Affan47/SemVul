@@ -1,0 +1,38 @@
+dvb_event_get_end_timestamp (DVBEvent* self) {
+	time_t result = 0;
+	struct tm end_time = {0};
+	guint _tmp0_ = 0U;
+	guint _tmp1_ = 0U;
+	guint _tmp2_ = 0U;
+	guint _tmp3_ = 0U;
+	guint _tmp4_ = 0U;
+	guint _tmp5_ = 0U;
+	struct tm _tmp6_ = {0};
+	time_t before = 0;
+	time_t _tmp7_ = 0;
+	gint _tmp8_ = 0;
+	guint _tmp9_ = 0U;
+	time_t after = 0;
+	time_t _tmp10_ = 0;
+	guint _tmp11_ = 0U;
+	g_return_val_if_fail (self != NULL, 0);
+	_tmp0_ = self->year;
+	_tmp1_ = self->month;
+	_tmp2_ = self->day;
+	_tmp3_ = self->hour;
+	_tmp4_ = self->minute;
+	_tmp5_ = self->second;
+	dvb_utils_create_utc_time ((gint) _tmp0_, (gint) _tmp1_, (gint) _tmp2_, (gint) _tmp3_, (gint) _tmp4_, (gint) _tmp5_, &_tmp6_);
+	end_time = _tmp6_;
+	_tmp7_ = mktime (&end_time);
+	before = _tmp7_;
+	_tmp8_ = end_time.tm_sec;
+	_tmp9_ = self->duration;
+	end_time.tm_sec = _tmp8_ + ((gint) _tmp9_);
+	_tmp10_ = mktime (&end_time);
+	after = _tmp10_;
+	_tmp11_ = self->duration;
+	_vala_assert ((after - before) == ((time_t) _tmp11_), "after - before == this.duration");
+	result = after;
+	return result;
+}

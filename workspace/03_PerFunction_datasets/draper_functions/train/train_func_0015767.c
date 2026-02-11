@@ -1,0 +1,32 @@
+i915_gem_object_create_stolen(struct drm_device *dev, u32 size)
+{
+	struct drm_i915_private *dev_priv = dev->dev_private;
+	struct drm_i915_gem_object *obj;
+	struct drm_mm_node *stolen;
+	int ret;
+
+	if (!drm_mm_initialized(&dev_priv->mm.stolen))
+		return NULL;
+
+	DRM_DEBUG_KMS("creating stolen object: size=%x\n", size);
+	if (size == 0)
+		return NULL;
+
+	stolen = kzalloc(sizeof(*stolen), GFP_KERNEL);
+	if (!stolen)
+		return NULL;
+
+	ret = i915_gem_stolen_insert_node(dev_priv, stolen, size, 4096);
+	if (ret) {
+		kfree(stolen);
+		return NULL;
+	}
+
+	obj = _i915_gem_object_create_stolen(dev, stolen);
+	if (obj)
+		return obj;
+
+	i915_gem_stolen_remove_node(dev_priv, stolen);
+	kfree(stolen);
+	return NULL;
+}

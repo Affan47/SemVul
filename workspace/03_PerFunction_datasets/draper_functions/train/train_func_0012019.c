@@ -1,0 +1,30 @@
+PerformPortalClose(const char *name)
+{
+	Portal		portal;
+
+
+	if (name == NULL)
+	{
+		PortalHashTableDeleteAll();
+		return;
+	}
+
+
+	if (name[0] == '\0')
+		ereport(ERROR,
+				(errcode(ERRCODE_INVALID_CURSOR_NAME),
+				 errmsg("invalid cursor name: must not be empty")));
+
+
+	portal = GetPortalByName(name);
+	if (!PortalIsValid(portal))
+	{
+		ereport(ERROR,
+				(errcode(ERRCODE_UNDEFINED_CURSOR),
+				 errmsg("cursor \"%s\" does not exist", name)));
+		return;
+	}
+
+
+	PortalDrop(portal, false);
+}

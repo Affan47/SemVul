@@ -1,0 +1,4 @@
+conditional_context ()
+{
+  return block_stack && block_stack->data.block.conditional_code;
+}

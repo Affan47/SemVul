@@ -1,0 +1,12 @@
+nvkm_notify_func(struct nvkm_notify *notify)
+{
+	struct nvkm_event *event = notify->event;
+	int ret = notify->func(notify);
+	unsigned long flags;
+	if ((ret == NVKM_NOTIFY_KEEP) ||
+	    !test_and_clear_bit(NVKM_NOTIFY_USER, &notify->flags)) {
+		spin_lock_irqsave(&event->refs_lock, flags);
+		nvkm_notify_get_locked(notify);
+		spin_unlock_irqrestore(&event->refs_lock, flags);
+	}
+}

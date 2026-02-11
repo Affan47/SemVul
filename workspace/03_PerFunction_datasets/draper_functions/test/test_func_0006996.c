@@ -1,0 +1,8 @@
+tintervalstart(PG_FUNCTION_ARGS)
+{
+	TimeInterval i = PG_GETARG_TIMEINTERVAL(0);
+
+	if (i->status == T_INTERVAL_INVAL)
+		PG_RETURN_ABSOLUTETIME(INVALID_ABSTIME);
+	PG_RETURN_ABSOLUTETIME(i->data[0]);
+}

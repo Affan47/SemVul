@@ -1,0 +1,50 @@
+camif_hw_dump_regs(struct camif_dev *camif, const char *label)
+{
+	struct {
+		u32 offset;
+		const char * const name;
+	} registers[] = {
+		{ S3C_CAMIF_REG_CISRCFMT,		"CISRCFMT" },
+		{ S3C_CAMIF_REG_CIWDOFST,		"CIWDOFST" },
+		{ S3C_CAMIF_REG_CIGCTRL,		"CIGCTRL" },
+		{ S3C_CAMIF_REG_CIWDOFST2,		"CIWDOFST2" },
+		{ S3C_CAMIF_REG_CIYSA(0, 0),		"CICOYSA0" },
+		{ S3C_CAMIF_REG_CICBSA(0, 0),		"CICOCBSA0" },
+		{ S3C_CAMIF_REG_CICRSA(0, 0),		"CICOCRSA0" },
+		{ S3C_CAMIF_REG_CIYSA(0, 1),		"CICOYSA1" },
+		{ S3C_CAMIF_REG_CICBSA(0, 1),		"CICOCBSA1" },
+		{ S3C_CAMIF_REG_CICRSA(0, 1),		"CICOCRSA1" },
+		{ S3C_CAMIF_REG_CIYSA(0, 2),		"CICOYSA2" },
+		{ S3C_CAMIF_REG_CICBSA(0, 2),		"CICOCBSA2" },
+		{ S3C_CAMIF_REG_CICRSA(0, 2),		"CICOCRSA2" },
+		{ S3C_CAMIF_REG_CIYSA(0, 3),		"CICOYSA3" },
+		{ S3C_CAMIF_REG_CICBSA(0, 3),		"CICOCBSA3" },
+		{ S3C_CAMIF_REG_CICRSA(0, 3),		"CICOCRSA3" },
+		{ S3C_CAMIF_REG_CIYSA(1, 0),		"CIPRYSA0" },
+		{ S3C_CAMIF_REG_CIYSA(1, 1),		"CIPRYSA1" },
+		{ S3C_CAMIF_REG_CIYSA(1, 2),		"CIPRYSA2" },
+		{ S3C_CAMIF_REG_CIYSA(1, 3),		"CIPRYSA3" },
+		{ S3C_CAMIF_REG_CITRGFMT(0, 0),		"CICOTRGFMT" },
+		{ S3C_CAMIF_REG_CITRGFMT(1, 0),		"CIPRTRGFMT" },
+		{ S3C_CAMIF_REG_CICTRL(0, 0),		"CICOCTRL" },
+		{ S3C_CAMIF_REG_CICTRL(1, 0),		"CIPRCTRL" },
+		{ S3C_CAMIF_REG_CISCPREDST(0, 0),	"CICOSCPREDST" },
+		{ S3C_CAMIF_REG_CISCPREDST(1, 0),	"CIPRSCPREDST" },
+		{ S3C_CAMIF_REG_CISCPRERATIO(0, 0),	"CICOSCPRERATIO" },
+		{ S3C_CAMIF_REG_CISCPRERATIO(1, 0),	"CIPRSCPRERATIO" },
+		{ S3C_CAMIF_REG_CISCCTRL(0, 0),		"CICOSCCTRL" },
+		{ S3C_CAMIF_REG_CISCCTRL(1, 0),		"CIPRSCCTRL" },
+		{ S3C_CAMIF_REG_CITAREA(0, 0),		"CICOTAREA" },
+		{ S3C_CAMIF_REG_CITAREA(1, 0),		"CIPRTAREA" },
+		{ S3C_CAMIF_REG_CISTATUS(0, 0),		"CICOSTATUS" },
+		{ S3C_CAMIF_REG_CISTATUS(1, 0),		"CIPRSTATUS" },
+		{ S3C_CAMIF_REG_CIIMGCPT(0),		"CIIMGCPT" },
+	};
+	u32 i;
+
+	pr_info("--- %s ---\n", label);
+	for (i = 0; i < ARRAY_SIZE(registers); i++) {
+		u32 cfg = readl(camif->io_base + registers[i].offset);
+		dev_info(camif->dev, "%s:\t0x%08x\n", registers[i].name, cfg);
+	}
+}

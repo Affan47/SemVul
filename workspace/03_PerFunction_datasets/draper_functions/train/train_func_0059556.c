@@ -1,0 +1,74 @@
+repl_run (Repl* self) {
+	gboolean result = FALSE;
+	gchar* line = NULL;
+	g_return_val_if_fail (self != NULL, FALSE);
+	while (TRUE) {
+		FILE* _tmp0_;
+		gchar* _tmp1_ = NULL;
+		const gchar* _tmp2_;
+		SkkContext* _tmp3_;
+		const gchar* _tmp4_;
+		SkkContext* _tmp5_;
+		gchar* _tmp6_ = NULL;
+		gchar* output;
+		SkkContext* _tmp7_;
+		const gchar* _tmp8_;
+		const gchar* _tmp9_;
+		gchar* _tmp10_;
+		gchar* preedit;
+		FILE* _tmp11_;
+		const gchar* _tmp12_;
+		gchar* _tmp13_ = NULL;
+		gchar* _tmp14_;
+		const gchar* _tmp15_;
+		gchar* _tmp16_ = NULL;
+		gchar* _tmp17_;
+		const gchar* _tmp18_;
+		gchar* _tmp19_ = NULL;
+		gchar* _tmp20_;
+		SkkContext* _tmp21_;
+		SkkContext* _tmp22_;
+		_tmp0_ = stdin;
+		_tmp1_ = g_file_stream_read_line (_tmp0_);
+		_g_free0 (line);
+		line = _tmp1_;
+		_tmp2_ = line;
+		if (!(_tmp2_ != NULL)) {
+			break;
+		}
+		_tmp3_ = self->priv->context;
+		_tmp4_ = line;
+		skk_context_process_key_events (_tmp3_, _tmp4_);
+		_tmp5_ = self->priv->context;
+		_tmp6_ = skk_context_poll_output (_tmp5_);
+		output = _tmp6_;
+		_tmp7_ = self->priv->context;
+		_tmp8_ = skk_context_get_preedit (_tmp7_);
+		_tmp9_ = _tmp8_;
+		_tmp10_ = g_strdup (_tmp9_);
+		preedit = _tmp10_;
+		_tmp11_ = stdout;
+		_tmp12_ = line;
+		_tmp13_ = string_replace (_tmp12_, "\"", "\\\"");
+		_tmp14_ = _tmp13_;
+		_tmp15_ = output;
+		_tmp16_ = string_replace (_tmp15_, "\"", "\\\"");
+		_tmp17_ = _tmp16_;
+		_tmp18_ = preedit;
+		_tmp19_ = string_replace (_tmp18_, "\"", "\\\"");
+		_tmp20_ = _tmp19_;
+		fprintf (_tmp11_, "{ \"input\": \"%s\", " "\"output\": \"%s\", " "\"preedit\": \"%s\" }\n", _tmp14_, _tmp17_, _tmp20_);
+		_g_free0 (_tmp20_);
+		_g_free0 (_tmp17_);
+		_g_free0 (_tmp14_);
+		_tmp21_ = self->priv->context;
+		skk_context_reset (_tmp21_);
+		_tmp22_ = self->priv->context;
+		skk_context_clear_output (_tmp22_);
+		_g_free0 (preedit);
+		_g_free0 (output);
+	}
+	result = TRUE;
+	_g_free0 (line);
+	return result;
+}

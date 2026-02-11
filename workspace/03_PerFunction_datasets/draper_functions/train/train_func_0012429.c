@@ -1,0 +1,56 @@
+completion_provider_show_calltip_cmd_prototype (CompletionProvider* self, const gchar* arg_cmd, GeeArrayList* arguments) {
+	GeeHashMap* _tmp0_ = NULL;
+	const gchar* _tmp1_ = NULL;
+	gboolean _tmp2_ = FALSE;
+	CompletionProviderCompletionCommand command = {0};
+	GeeHashMap* _tmp3_ = NULL;
+	const gchar* _tmp4_ = NULL;
+	gpointer _tmp5_ = NULL;
+	CompletionProviderCompletionCommand* _tmp6_ = NULL;
+	CompletionProviderCompletionCommand _tmp7_ = {0};
+	CompletionProviderCompletionCommand _tmp8_ = {0};
+	gint arg_num = 0;
+	CompletionProviderCompletionCommand _tmp9_ = {0};
+	CompletionProviderCompletionArgument* _tmp10_ = NULL;
+	gint _tmp10__length1 = 0;
+	GeeArrayList* _tmp11_ = NULL;
+	gint _tmp12_ = 0;
+	gint _tmp13_ = 0;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (arg_cmd != NULL);
+	g_return_if_fail (arguments != NULL);
+	_tmp0_ = self->priv->_commands;
+	_tmp1_ = arg_cmd;
+	_tmp2_ = gee_abstract_map_has_key ((GeeAbstractMap*) _tmp0_, _tmp1_);
+	g_return_if_fail (_tmp2_);
+	_tmp3_ = self->priv->_commands;
+	_tmp4_ = arg_cmd;
+	_tmp5_ = gee_abstract_map_get ((GeeAbstractMap*) _tmp3_, _tmp4_);
+	_tmp6_ = (CompletionProviderCompletionCommand*) _tmp5_;
+	completion_provider_completion_command_copy (_tmp6_, &_tmp7_);
+	_tmp8_ = _tmp7_;
+	_completion_provider_completion_command_free0 (_tmp6_);
+	command = _tmp8_;
+	_tmp9_ = command;
+	_tmp10_ = _tmp9_.args;
+	_tmp10__length1 = _tmp9_.args_length1;
+	_tmp11_ = arguments;
+	_tmp12_ = completion_provider_get_argument_num (self, _tmp10_, _tmp10__length1, _tmp11_);
+	arg_num = _tmp12_;
+	_tmp13_ = arg_num;
+	if (_tmp13_ != (-1)) {
+		gchar* info = NULL;
+		CompletionProviderCompletionCommand _tmp14_ = {0};
+		gint _tmp15_ = 0;
+		gchar* _tmp16_ = NULL;
+		const gchar* _tmp17_ = NULL;
+		_tmp14_ = command;
+		_tmp15_ = arg_num;
+		_tmp16_ = completion_provider_get_command_info (self, &_tmp14_, _tmp15_);
+		info = _tmp16_;
+		_tmp17_ = info;
+		completion_provider_show_calltip_info (self, _tmp17_);
+		_g_free0 (info);
+	}
+	completion_provider_completion_command_destroy (&command);
+}

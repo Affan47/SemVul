@@ -1,0 +1,20 @@
+__iwl_dbg(struct device *dev,
+	       u32 level, bool limit, const char *function,
+	       const char *fmt, ...)
+{
+	struct va_format vaf = {
+		.fmt = fmt,
+	};
+	va_list args;
+
+	va_start(args, fmt);
+	vaf.va = &args;
+#ifdef CONFIG_IWLWIFI_DEBUG
+	if (iwl_have_debug_level(level) &&
+	    (!limit || net_ratelimit()))
+		dev_printk(KERN_DEBUG, dev, "%c %s %pV",
+			   in_interrupt() ? 'I' : 'U', function, &vaf);
+#endif
+	trace_iwlwifi_dbg(level, in_interrupt(), function, &vaf);
+	va_end(args);
+}

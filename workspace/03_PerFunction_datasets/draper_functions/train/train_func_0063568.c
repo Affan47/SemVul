@@ -1,0 +1,35 @@
+theme_draw_number (Theme* self, cairo_t* context, gdouble x, gdouble y, guint number) {
+	guint _tmp0_;
+	gchar* _tmp1_ = NULL;
+	gchar* text;
+	cairo_text_extents_t extents = {0};
+	cairo_t* _tmp2_;
+	cairo_text_extents_t _tmp3_ = {0};
+	cairo_t* _tmp4_;
+	gdouble _tmp5_;
+	cairo_text_extents_t _tmp6_;
+	gdouble _tmp7_;
+	gdouble _tmp8_;
+	cairo_text_extents_t _tmp9_;
+	gdouble _tmp10_;
+	cairo_t* _tmp11_;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (context != NULL);
+	_tmp0_ = number;
+	_tmp1_ = g_strdup_printf ("%u", _tmp0_);
+	text = _tmp1_;
+	_tmp2_ = context;
+	cairo_text_extents (_tmp2_, text, &_tmp3_);
+	extents = _tmp3_;
+	_tmp4_ = context;
+	_tmp5_ = x;
+	_tmp6_ = extents;
+	_tmp7_ = _tmp6_.width;
+	_tmp8_ = y;
+	_tmp9_ = extents;
+	_tmp10_ = _tmp9_.height;
+	cairo_move_to (_tmp4_, _tmp5_ - (_tmp7_ / 2.0), _tmp8_ + (_tmp10_ / 2.0));
+	_tmp11_ = context;
+	cairo_show_text (_tmp11_, text);
+	_g_free0 (text);
+}

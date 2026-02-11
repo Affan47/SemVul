@@ -1,0 +1,31 @@
+fso_framework_wait_for_predicate_construct (GType object_type, guint secs, GSourceFunc func, void* func_target, GDestroyNotify func_target_destroy_notify) {
+	FsoFrameworkWaitForPredicate * self = NULL;
+	guint _tmp0_ = 0U;
+	GSourceFunc _tmp1_ = NULL;
+	void* _tmp1__target = NULL;
+	GMainLoop* _tmp2_ = NULL;
+	GMainLoop* _tmp3_ = NULL;
+	self = (FsoFrameworkWaitForPredicate*) g_object_new (object_type, NULL);
+	_tmp0_ = secs;
+	self->priv->secs = (gint) _tmp0_;
+	_tmp1_ = func;
+	_tmp1__target = func_target;
+	(self->priv->func_target_destroy_notify == NULL) ? NULL : (self->priv->func_target_destroy_notify (self->priv->func_target), NULL);
+	self->priv->func = NULL;
+	self->priv->func_target = NULL;
+	self->priv->func_target_destroy_notify = NULL;
+	self->priv->func = _tmp1_;
+	self->priv->func_target = _tmp1__target;
+	self->priv->func_target_destroy_notify = NULL;
+	_tmp2_ = g_main_loop_new (NULL, FALSE);
+	_g_main_loop_unref0 (self->priv->loop);
+	self->priv->loop = _tmp2_;
+	g_timeout_add_seconds_full (G_PRIORITY_DEFAULT, (guint) 1, _fso_framework_wait_for_predicate_onTimeout_gsource_func, g_object_ref (self), g_object_unref);
+	_tmp3_ = self->priv->loop;
+	g_main_loop_run (_tmp3_);
+	(func_target_destroy_notify == NULL) ? NULL : (func_target_destroy_notify (func_target), NULL);
+	func = NULL;
+	func_target = NULL;
+	func_target_destroy_notify = NULL;
+	return self;
+}

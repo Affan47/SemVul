@@ -1,0 +1,11 @@
+dwarfout_end_function (line)
+     unsigned int line ATTRIBUTE_UNUSED;
+{
+  char label[MAX_ARTIFICIAL_LABEL_BYTES];
+
+  if (! use_gnu_debug_info_extensions)
+    return;
+  function_section (current_function_decl);
+  sprintf (label, BODY_END_LABEL_FMT, current_function_funcdef_no);
+  ASM_OUTPUT_LABEL (asm_out_file, label);
+}

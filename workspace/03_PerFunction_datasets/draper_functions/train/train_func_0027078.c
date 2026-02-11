@@ -1,0 +1,26 @@
+mark_not_eliminable (dest, x, data)
+     rtx dest;
+     rtx x;
+     void *data ATTRIBUTE_UNUSED;
+{
+  unsigned int i;
+
+
+  if (GET_CODE (dest) == SUBREG)
+    dest = SUBREG_REG (dest);
+
+  if (dest == hard_frame_pointer_rtx)
+    return;
+
+  for (i = 0; i < NUM_ELIMINABLE_REGS; i++)
+    if (reg_eliminate[i].can_eliminate && dest == reg_eliminate[i].to_rtx
+	&& (GET_CODE (x) != SET
+	    || GET_CODE (SET_SRC (x)) != PLUS
+	    || XEXP (SET_SRC (x), 0) != dest
+	    || GET_CODE (XEXP (SET_SRC (x), 1)) != CONST_INT))
+      {
+	reg_eliminate[i].can_eliminate_previous
+	  = reg_eliminate[i].can_eliminate = 0;
+	num_eliminable--;
+      }
+}

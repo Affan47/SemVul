@@ -1,0 +1,28 @@
+radeon_bo_check_tiling(struct radeon_bo *bo, bool has_moved,
+				bool force_drop)
+{
+	if (!force_drop)
+		lockdep_assert_held(&bo->tbo.resv->lock.base);
+
+	if (!(bo->tiling_flags & RADEON_TILING_SURFACE))
+		return 0;
+
+	if (force_drop) {
+		radeon_bo_clear_surface_reg(bo);
+		return 0;
+	}
+
+	if (bo->tbo.mem.mem_type != TTM_PL_VRAM) {
+		if (!has_moved)
+			return 0;
+
+		if (bo->surface_reg >= 0)
+			radeon_bo_clear_surface_reg(bo);
+		return 0;
+	}
+
+	if ((bo->surface_reg >= 0) && !has_moved)
+		return 0;
+
+	return radeon_bo_get_surface_reg(bo);
+}

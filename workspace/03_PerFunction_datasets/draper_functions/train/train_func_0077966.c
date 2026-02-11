@@ -1,0 +1,31 @@
+skk_state_where_is (SkkState* self, const gchar* command) {
+	SkkKeyEvent* result = NULL;
+	SkkRule* _tmp0_;
+	SkkKeymapMapFile** _tmp1_;
+	gint _tmp1__length1;
+	SkkInputMode _tmp2_;
+	SkkInputMode _tmp3_;
+	SkkKeymapMapFile* _tmp4_;
+	SkkKeymap* _tmp5_;
+	SkkKeymap* _tmp6_;
+	SkkKeymap* keymap;
+	const gchar* _tmp7_;
+	SkkKeyEvent* _tmp8_ = NULL;
+	g_return_val_if_fail (self != NULL, NULL);
+	g_return_val_if_fail (command != NULL, NULL);
+	_tmp0_ = self->priv->_typing_rule;
+	_tmp1_ = _tmp0_->keymaps;
+	_tmp1__length1 = _tmp0_->keymaps_length1;
+	_tmp2_ = skk_state_get_input_mode (self);
+	_tmp3_ = _tmp2_;
+	_tmp4_ = _tmp1_[_tmp3_];
+	_tmp5_ = _tmp4_->keymap;
+	_tmp6_ = _g_object_ref0 (_tmp5_);
+	keymap = _tmp6_;
+	g_return_val_if_fail (keymap != NULL, NULL);
+	_tmp7_ = command;
+	_tmp8_ = skk_keymap_where_is (keymap, _tmp7_);
+	result = _tmp8_;
+	_g_object_unref0 (keymap);
+	return result;
+}

@@ -1,0 +1,15 @@
+plc_config_mux(struct s_smc *smc, int mux)
+{
+	if (smc->s.sas != SMT_DAS)
+		return ;
+	if (mux == MUX_WRAPB) {
+		SETMASK(PLC(PA,PL_CNTRL_B),PL_CONFIG_CNTRL,PL_CONFIG_CNTRL) ;
+		SETMASK(PLC(PA,PL_CNTRL_A),PL_SC_REM_LOOP,PL_SC_REM_LOOP) ;
+	}
+	else {
+		CLEAR(PLC(PA,PL_CNTRL_B),PL_CONFIG_CNTRL) ;
+		CLEAR(PLC(PA,PL_CNTRL_A),PL_SC_REM_LOOP) ;
+	}
+	CLEAR(PLC(PB,PL_CNTRL_B),PL_CONFIG_CNTRL) ;
+	CLEAR(PLC(PB,PL_CNTRL_A),PL_SC_REM_LOOP) ;
+}

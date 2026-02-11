@@ -1,0 +1,12 @@
+__ecereMethod___ecereNameSpace__eda__ReportDestination_EndPage(struct __ecereNameSpace__ecere__com__Instance * this, struct __ecereNameSpace__ecere__com__Instance * page)
+{
+struct __ecereNameSpace__ecere__sys__Size __simpleStruct4;
+struct __ecereNameSpace__ecere__sys__Size __simpleStruct3;
+struct __ecereNameSpace__ecere__sys__Size __simpleStruct2;
+struct __ecereNameSpace__ecere__sys__Point __simpleStruct1;
+struct __ecereNameSpace__ecere__sys__Size __simpleStruct0;
+struct __ecereNameSpace__eda__ReportDestination * __ecerePointer___ecereNameSpace__eda__ReportDestination = (struct __ecereNameSpace__eda__ReportDestination *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__eda__ReportDestination->offset) : 0);
+
+__ecereMethod___ecereNameSpace__ecere__gui__Window_SetScrollArea(this, (int)(__ecereProp___ecereNameSpace__ecere__gui__Window_Get_size(__ecereProp___ecereNameSpace__ecere__gui__Window_Get_master(page), &__simpleStruct0), __simpleStruct0).w, (__ecereProp___ecereNameSpace__ecere__gui__Window_Get_position(__ecereProp___ecereNameSpace__ecere__gui__Window_Get_master(page), &__simpleStruct1), __simpleStruct1.y + (int)(__ecereProp___ecereNameSpace__ecere__gui__Window_Get_size(__ecereProp___ecereNameSpace__ecere__gui__Window_Get_master(page), &__simpleStruct2), __simpleStruct2).h), 0x0);
+__ecereMethod___ecereNameSpace__ecere__gui__Window_SetScrollPosition(this, (int)(((__ecereProp___ecereNameSpace__ecere__gui__Window_Get_clientSize(this, &__simpleStruct4), (__ecereProp___ecereNameSpace__ecere__gui__Window_Get_size(__ecereProp___ecereNameSpace__ecere__gui__Window_Get_master(page), &__simpleStruct3), __simpleStruct3.w - (__ecereProp___ecereNameSpace__ecere__gui__Window_Get_clientSize(this, &__simpleStruct4), __simpleStruct4).w))) / 2), 0);
+}

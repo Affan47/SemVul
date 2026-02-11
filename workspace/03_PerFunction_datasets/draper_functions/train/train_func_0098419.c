@@ -1,0 +1,19 @@
+msvideo1_decode_init(AVCodecContext *avctx)
+{
+    Msvideo1Context *s = avctx->priv_data;
+
+    s->avctx = avctx;
+
+
+    if (s->avctx->palctrl) {
+        s->mode_8bit = 1;
+        avctx->pix_fmt = PIX_FMT_PAL8;
+    } else {
+        s->mode_8bit = 0;
+        avctx->pix_fmt = PIX_FMT_RGB555;
+    }
+
+    s->frame.data[0] = NULL;
+
+    return 0;
+}

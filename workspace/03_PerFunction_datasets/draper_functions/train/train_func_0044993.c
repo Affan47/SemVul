@@ -1,0 +1,30 @@
+int2octets (unsigned char **r_frame, gcry_mpi_t value, size_t nbytes)
+{
+  gpg_err_code_t rc;
+  size_t nframe, noff, n;
+  unsigned char *frame;
+
+  rc = _gcry_mpi_print (GCRYMPI_FMT_USG, NULL, 0, &nframe, value);
+  if (rc)
+    return rc;
+  if (nframe > nbytes)
+    return GPG_ERR_TOO_LARGE;
+
+  noff = (nframe < nbytes)? nbytes - nframe : 0;
+  n = nframe + noff;
+  frame = mpi_is_secure (value)? xtrymalloc_secure (n) : xtrymalloc (n);
+  if (!frame)
+    return gpg_err_code_from_syserror ();
+  if (noff)
+    memset (frame, 0, noff);
+  nframe += noff;
+  rc = _gcry_mpi_print (GCRYMPI_FMT_USG, frame+noff, nframe-noff, NULL, value);
+  if (rc)
+    {
+      xfree (frame);
+      return rc;
+    }
+
+  *r_frame = frame;
+  return 0;
+}

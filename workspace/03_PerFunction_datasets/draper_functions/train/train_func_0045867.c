@@ -1,0 +1,42 @@
+early_init_amd(struct cpuinfo_x86 *c)
+{
+	early_init_amd_mc(c);
+
+
+	if (c->x86_power & (1 << 8)) {
+		set_cpu_cap(c, X86_FEATURE_CONSTANT_TSC);
+		set_cpu_cap(c, X86_FEATURE_NONSTOP_TSC);
+		if (!check_tsc_unstable())
+			set_sched_clock_stable();
+	}
+
+#ifdef CONFIG_X86_64
+	set_cpu_cap(c, X86_FEATURE_SYSCALL32);
+#else
+
+	if (c->x86 == 5)
+		if (c->x86_model == 13 || c->x86_model == 9 ||
+		    (c->x86_model == 8 && c->x86_mask >= 8))
+			set_cpu_cap(c, X86_FEATURE_K6_MTRR);
+#endif
+#if defined(CONFIG_X86_LOCAL_APIC) && defined(CONFIG_PCI)
+
+
+	if (cpu_has_apic && c->x86 > 0x16) {
+		set_cpu_cap(c, X86_FEATURE_EXTD_APICID);
+	} else if (cpu_has_apic && c->x86 >= 0xf) {
+
+		unsigned int val;
+		val = read_pci_config(0, 24, 0, 0x68);
+		if ((val & ((1 << 17) | (1 << 18))) == ((1 << 17) | (1 << 18)))
+			set_cpu_cap(c, X86_FEATURE_EXTD_APICID);
+	}
+#endif
+
+
+	set_cpu_cap(c, X86_FEATURE_VMMCALL);
+
+
+	if (c->x86 == 0x16 && c->x86_model <= 0xf)
+		msr_set_bit(MSR_AMD64_LS_CFG, 15);
+}

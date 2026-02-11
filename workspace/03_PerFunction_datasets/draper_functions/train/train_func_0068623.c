@@ -1,0 +1,8 @@
+__ecereMethod___ecereNameSpace__ecere__gui__controls__Label_OnLeftButtonDown(struct __ecereNameSpace__ecere__com__Instance * this, int x, int y, unsigned int mods)
+{
+struct __ecereNameSpace__ecere__gui__controls__Label * __ecerePointer___ecereNameSpace__ecere__gui__controls__Label = (struct __ecereNameSpace__ecere__gui__controls__Label *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__Label->offset) : 0);
+
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window && __ecereProp___ecereNameSpace__ecere__gui__Window_Get_visible(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window) && __ecereProp___ecereNameSpace__ecere__gui__Window_Get_created(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window) && !__ecereProp___ecereNameSpace__ecere__gui__Window_Get_disabled(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window))
+__ecereMethod___ecereNameSpace__ecere__gui__Window_Activate(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window);
+return __ecerePointer___ecereNameSpace__ecere__gui__controls__Label->isGroupBox;
+}

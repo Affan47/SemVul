@@ -1,0 +1,27 @@
+AVI_set_audio_position(avi_t *AVI, long byte)
+{
+   long n0, n1, n;
+
+   if(AVI->mode==AVI_MODE_WRITE) { AVI_errno = AVI_ERR_NOT_PERM; return -1; }
+   if(!AVI->track[AVI->aptr].audio_index)         { AVI_errno = AVI_ERR_NO_IDX;   return -1; }
+
+   if(byte < 0) byte = 0;
+
+
+   n0 = 0;
+   n1 = AVI->track[AVI->aptr].audio_chunks;
+
+   while(n0<n1-1)
+   {
+      n = (n0+n1)/2;
+      if(AVI->track[AVI->aptr].audio_index[n].tot>byte)
+         n1 = n;
+      else
+         n0 = n;
+   }
+
+   AVI->track[AVI->aptr].audio_posc = n0;
+   AVI->track[AVI->aptr].audio_posb = byte - AVI->track[AVI->aptr].audio_index[n0].tot;
+
+   return 0;
+}

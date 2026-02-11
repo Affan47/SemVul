@@ -1,0 +1,6 @@
+extwriter_counter_inc(struct btrfs_transaction *trans,
+					 unsigned int type)
+{
+	if (type & TRANS_EXTWRITERS)
+		atomic_inc(&trans->num_extwriters);
+}

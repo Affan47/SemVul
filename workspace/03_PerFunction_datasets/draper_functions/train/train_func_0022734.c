@@ -1,0 +1,17 @@
+__ecereProp___ecereNameSpace__ecere__gui__controls__Stacker_Set_endButtons(struct __ecereNameSpace__ecere__com__Instance * this, unsigned int value)
+{
+struct __ecereNameSpace__ecere__gui__controls__Stacker * __ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker = (struct __ecereNameSpace__ecere__gui__controls__Stacker *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__Stacker->offset) : 0);
+
+if(((unsigned int)((__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->bits & 0x10) >> 4)) && __ecereProp___ecereNameSpace__ecere__gui__controls__Stacker_Get_scrollable(this) && !value)
+{
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_visible(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->left, 0x0);
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_visible(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->right, 0x0);
+}
+__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->bits = (__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->bits & ~0x10) | (((unsigned int)value) << 4);
+if(value && __ecereProp___ecereNameSpace__ecere__gui__controls__Stacker_Get_scrollable(this))
+{
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_visible(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->left, 0x1);
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_visible(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->right, 0x1);
+}
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__ecere__gui__controls__Stacker_endButtons), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__ecere__gui__controls__Stacker_endButtons);
+}

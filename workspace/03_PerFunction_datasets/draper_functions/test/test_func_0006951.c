@@ -1,0 +1,9 @@
+pst_wtermsig(st)
+    VALUE st;
+{
+    int status = NUM2INT(st);
+
+    if (WIFSIGNALED(status))
+	return INT2NUM(WTERMSIG(status));
+    return Qnil;
+}

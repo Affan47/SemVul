@@ -1,0 +1,27 @@
+diff_buf_adjust(win)
+    win_T	*win;
+{
+    win_T	*wp;
+    int		i;
+
+    if (!win->w_p_diff)
+    {
+
+
+	for (wp = firstwin; wp != NULL; wp = wp->w_next)
+	    if (wp->w_buffer == win->w_buffer && wp->w_p_diff)
+		break;
+	if (wp == NULL)
+	{
+	    i = diff_buf_idx(win->w_buffer);
+	    if (i != DB_COUNT)
+	    {
+		curtab->tp_diffbuf[i] = NULL;
+		curtab->tp_diff_invalid = TRUE;
+		diff_redraw(TRUE);
+	    }
+	}
+    }
+    else
+	diff_buf_add(win->w_buffer);
+}

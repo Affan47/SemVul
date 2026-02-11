@@ -1,0 +1,10 @@
+__ecereInstMeth___ecereNameSpace__ecere__gui__dialogs__FindDialog_NotifyDestroyed__00000011(struct __ecereNameSpace__ecere__com__Instance * this, struct __ecereNameSpace__ecere__com__Instance * window, int64 result)
+{
+struct __ecereNameSpace__ecere__gui__controls__EditBox * __ecerePointer___ecereNameSpace__ecere__gui__controls__EditBox = (struct __ecereNameSpace__ecere__gui__controls__EditBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__EditBox->offset) : 0);
+struct __ecereNameSpace__ecere__com__Instance * dialog = (struct __ecereNameSpace__ecere__com__Instance *)window;
+
+__ecereNameSpace__ecere__gui__controls__searchUp = __ecereProp___ecereNameSpace__ecere__gui__dialogs__FindDialog_Get_searchUp(dialog);
+strcpy(__ecereNameSpace__ecere__gui__controls__searchString, __ecereProp___ecereNameSpace__ecere__gui__dialogs__FindDialog_Get_searchString(dialog));
+__ecereNameSpace__ecere__gui__controls__matchCase = __ecereProp___ecereNameSpace__ecere__gui__dialogs__FindDialog_Get_matchCase(dialog);
+__ecereNameSpace__ecere__gui__controls__wholeWord = __ecereProp___ecereNameSpace__ecere__gui__dialogs__FindDialog_Get_wholeWord(dialog);
+}

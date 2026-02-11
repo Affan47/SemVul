@@ -1,0 +1,62 @@
+asd_process_ctrl_a_user(struct asd_ha_struct *asd_ha,
+				   struct asd_flash_dir *flash_dir)
+{
+	int err, i;
+	u32 offs, size;
+	struct asd_ll_el *el = NULL;
+	struct asd_ctrla_phy_settings *ps;
+	struct asd_ctrla_phy_settings dflt_ps;
+
+	err = asd_find_flash_de(flash_dir, FLASH_DE_CTRL_A_USER, &offs, &size);
+	if (err) {
+		ASD_DPRINTK("couldn't find CTRL-A user settings section\n");
+		ASD_DPRINTK("Creating default CTRL-A user settings section\n");
+
+		dflt_ps.id0 = 'h';
+		dflt_ps.num_phys = 8;
+		for (i =0; i < ASD_MAX_PHYS; i++) {
+			memcpy(dflt_ps.phy_ent[i].sas_addr,
+			       asd_ha->hw_prof.sas_addr, SAS_ADDR_SIZE);
+			dflt_ps.phy_ent[i].sas_link_rates = 0x98;
+			dflt_ps.phy_ent[i].flags = 0x0;
+			dflt_ps.phy_ent[i].sata_link_rates = 0x0;
+		}
+
+		size = sizeof(struct asd_ctrla_phy_settings);
+		ps = &dflt_ps;
+		goto out_process;
+	}
+
+	if (size == 0)
+		goto out;
+
+	err = -ENOMEM;
+	el = kmalloc(size, GFP_KERNEL);
+	if (!el) {
+		ASD_DPRINTK("no mem for ctrla user settings section\n");
+		goto out;
+	}
+
+	err = asd_read_flash_seg(asd_ha, (void *)el, offs, size);
+	if (err) {
+		ASD_DPRINTK("couldn't read ctrla phy settings section\n");
+		goto out2;
+	}
+
+	err = -ENOENT;
+	ps = asd_find_ll_by_id(el, 'h', 0xFF);
+	if (!ps) {
+		ASD_DPRINTK("couldn't find ctrla phy settings struct\n");
+		goto out2;
+	}
+out_process:
+	err = asd_process_ctrla_phy_settings(asd_ha, ps);
+	if (err) {
+		ASD_DPRINTK("couldn't process ctrla phy settings\n");
+		goto out2;
+	}
+out2:
+	kfree(el);
+out:
+	return err;
+}

@@ -1,0 +1,63 @@
+sm501fb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+{
+	struct sm501fb_par  *par = info->par;
+	struct sm501fb_info *fbi = par->info;
+	int width = rect->width, height = rect->height;
+
+	if ((rect->dx >= info->var.xres_virtual) ||
+	    (rect->dy >= info->var.yres_virtual))
+
+		return;
+	if ((rect->dx + width) >= info->var.xres_virtual)
+		width = info->var.xres_virtual - rect->dx - 1;
+	if ((rect->dy + height) >= info->var.yres_virtual)
+		height = info->var.yres_virtual - rect->dy - 1;
+
+	if (sm501fb_sync(info))
+		return;
+
+
+	smc501_writel(par->screen.sm_addr, fbi->regs2d + SM501_2D_SOURCE_BASE);
+	smc501_writel(par->screen.sm_addr,
+			fbi->regs2d + SM501_2D_DESTINATION_BASE);
+
+
+	smc501_writel((info->var.xres << 16) | info->var.xres,
+	       fbi->regs2d + SM501_2D_WINDOW_WIDTH);
+
+
+	smc501_writel((info->var.xres_virtual << 16) | info->var.xres_virtual,
+	       fbi->regs2d + SM501_2D_PITCH);
+
+
+	switch (info->var.bits_per_pixel) {
+	case 8:
+		smc501_writel(0, fbi->regs2d + SM501_2D_STRETCH);
+		break;
+	case 16:
+		smc501_writel(0x00100000, fbi->regs2d + SM501_2D_STRETCH);
+		break;
+	case 32:
+		smc501_writel(0x00200000, fbi->regs2d + SM501_2D_STRETCH);
+		break;
+	}
+
+
+	smc501_writel(0xffffffff, fbi->regs2d + SM501_2D_COLOR_COMPARE_MASK);
+
+
+	smc501_writel(0xffffffff, fbi->regs2d + SM501_2D_MASK);
+
+
+	smc501_writel(rect->color, fbi->regs2d + SM501_2D_FOREGROUND);
+
+
+	smc501_writel((rect->dx << 16) | rect->dy,
+			fbi->regs2d + SM501_2D_DESTINATION);
+
+
+	smc501_writel((width << 16) | height, fbi->regs2d + SM501_2D_DIMENSION);
+
+
+	smc501_writel(0x800100cc, fbi->regs2d + SM501_2D_CONTROL);
+}

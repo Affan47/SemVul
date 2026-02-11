@@ -1,0 +1,11 @@
+rb_ary_collect_bang(ary)
+    VALUE ary;
+{
+    long i;
+
+    rb_ary_modify(ary);
+    for (i = 0; i < RARRAY(ary)->len; i++) {
+	rb_ary_store(ary, i, rb_yield(RARRAY(ary)->ptr[i]));
+    }
+    return ary;
+}

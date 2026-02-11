@@ -1,0 +1,28 @@
+vba56_test_middle(int fd)
+{
+	char test_middle[MIDDLE_SIZE];
+
+
+	static const uint8_t middle1_str[MIDDLE_SIZE] = {
+		0x00, 0x01, 0x0d, 0x45, 0x2e, 0xe1, 0xe0, 0x8f, 0x10, 0x1a,
+		0x85, 0x2e, 0x02, 0x60, 0x8c, 0x4d, 0x0b, 0xb4, 0x00, 0x00
+	};
+
+	static const uint8_t middle2_str[MIDDLE_SIZE] = {
+		0x00, 0x00, 0xe1, 0x2e, 0x45, 0x0d, 0x8f, 0xe0, 0x1a, 0x10,
+		0x85, 0x2e, 0x02, 0x60, 0x8c, 0x4d, 0x0b, 0xb4, 0x00, 0x00
+	};
+
+	if(cli_readn(fd, &test_middle, MIDDLE_SIZE) != MIDDLE_SIZE)
+		return;
+
+	if((memcmp(test_middle, middle1_str, MIDDLE_SIZE) != 0) &&
+	   (memcmp(test_middle, middle2_str, MIDDLE_SIZE) != 0)) {
+		cli_dbgmsg("middle not found\n");
+		if (lseek(fd, -MIDDLE_SIZE, SEEK_CUR) == -1) {
+            cli_dbgmsg("vba_test_middle: call to lseek() failed\n");
+            return;
+        }
+	} else
+		cli_dbgmsg("middle found\n");
+}

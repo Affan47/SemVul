@@ -1,0 +1,19 @@
+modifier_len(cmd)
+    char_u	*cmd;
+{
+    int		i, j;
+    char_u	*p = cmd;
+
+    if (VIM_ISDIGIT(*cmd))
+	p = skipwhite(skipdigits(cmd));
+    for (i = 0; i < (int)(sizeof(cmdmods) / sizeof(struct cmdmod)); ++i)
+    {
+	for (j = 0; p[j] != NUL; ++j)
+	    if (p[j] != cmdmods[i].name[j])
+		break;
+	if (!isalpha(p[j]) && j >= cmdmods[i].minlen
+					&& (p == cmd || cmdmods[i].has_count))
+	    return j + (int)(p - cmd);
+    }
+    return 0;
+}

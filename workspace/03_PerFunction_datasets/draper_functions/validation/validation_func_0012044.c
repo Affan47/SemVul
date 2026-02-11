@@ -1,0 +1,4 @@
+RuleElement()
+{
+    setNeg(false);
+}

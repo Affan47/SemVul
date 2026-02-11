@@ -1,0 +1,10 @@
+rb_ary_push_m(argc, argv, ary)
+    int argc;
+    VALUE *argv;
+    VALUE ary;
+{
+    while (argc--) {
+	rb_ary_push(ary, *argv++);
+    }
+    return ary;
+}

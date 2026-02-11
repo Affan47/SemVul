@@ -1,0 +1,6 @@
+output_add_newline (buffer)
+     output_buffer *buffer;
+{
+  obstack_1grow (&buffer->obstack, '\n');
+  output_text_length (buffer) = 0;
+}

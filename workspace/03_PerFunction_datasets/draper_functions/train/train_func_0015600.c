@@ -1,0 +1,12 @@
+sweep_source_filename(key, value)
+    char *key, *value;
+{
+    if (*value) {
+	*value = 0;
+	return ST_CONTINUE;
+    }
+    else {
+	free(value);
+	return ST_DELETE;
+    }
+}

@@ -1,0 +1,16 @@
+PerlIO_apply_layera(pTHX_ PerlIO *f, const char *mode,
+		    PerlIO_list_t *layers, IV n, IV max)
+{
+    int code = 0;
+    while (n < max) {
+	PerlIO_funcs * const tab = PerlIO_layer_fetch(aTHX_ layers, n, NULL);
+	if (tab) {
+	    if (!PerlIO_push(aTHX_ f, tab, mode, PerlIOArg)) {
+		code = -1;
+		break;
+	    }
+	}
+	n++;
+    }
+    return code;
+}

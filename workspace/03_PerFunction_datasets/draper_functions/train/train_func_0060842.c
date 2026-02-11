@@ -1,0 +1,10 @@
+get(void)
+{
+    if(is_stale)
+    {
+        value.put(icd_cmd("$$7016\r")&0x00ff);
+        is_stale=0;
+        replaced->update();
+    }
+    return(value.get());
+}

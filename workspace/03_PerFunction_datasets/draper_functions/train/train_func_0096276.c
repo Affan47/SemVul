@@ -1,0 +1,9 @@
+__module_get(struct module *module)
+{
+	if (module) {
+		preempt_disable();
+		atomic_inc(&module->refcnt);
+		trace_module_get(module, _RET_IP_);
+		preempt_enable();
+	}
+}

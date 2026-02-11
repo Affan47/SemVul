@@ -1,0 +1,11 @@
+soap_out_m__EchoTestMultipleResponse(struct soap *soap, const char *tag, int id, const struct m__EchoTestMultipleResponse *a, const char *type)
+{
+	(void)soap; (void)tag; (void)id; (void)type;
+	if (soap_element_begin_out(soap, tag, soap_embedded_id(soap, id, a, SOAP_TYPE_m__EchoTestMultipleResponse), type))
+		return soap->error;
+	if (a->x__EchoTest)
+		soap_element_result(soap, "x:EchoTest");
+	if (soap_out_PointerTox__WrapperType(soap, "x:EchoTest", -1, &a->x__EchoTest, ""))
+		return soap->error;
+	return soap_element_end_out(soap, tag);
+}

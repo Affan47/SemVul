@@ -1,0 +1,31 @@
+add_fde_cfi (label, cfi)
+     const char *label;
+     dw_cfi_ref cfi;
+{
+  if (label)
+    {
+      dw_fde_ref fde = &fde_table[fde_table_in_use - 1];
+
+      if (*label == 0)
+	label = dwarf2out_cfi_label ();
+
+      if (fde->dw_fde_current_label == NULL
+	  || strcmp (label, fde->dw_fde_current_label) != 0)
+	{
+	  dw_cfi_ref xcfi;
+
+	  fde->dw_fde_current_label = label = xstrdup (label);
+
+
+	  xcfi = new_cfi ();
+	  xcfi->dw_cfi_opc = DW_CFA_advance_loc4;
+	  xcfi->dw_cfi_oprnd1.dw_cfi_addr = label;
+	  add_cfi (&fde->dw_fde_cfi, xcfi);
+	}
+
+      add_cfi (&fde->dw_fde_cfi, cfi);
+    }
+
+  else
+    add_cfi (&cie_cfi_head, cfi);
+}

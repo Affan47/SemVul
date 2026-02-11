@@ -1,0 +1,18 @@
+svg_parse_renderinghint(SVG_RenderingHint *value, char *value_string)
+{
+	if (!strcmp(value_string, "inherit")) {
+		*value = SVG_RENDERINGHINT_INHERIT;
+	} else if (!strcmp(value_string, "auto")) {
+		*value = SVG_RENDERINGHINT_AUTO;
+	} else if (!strcmp(value_string, "optimizeQuality")) {
+		*value = SVG_RENDERINGHINT_OPTIMIZEQUALITY;
+	} else if (!strcmp(value_string, "optimizeSpeed")) {
+		*value = SVG_RENDERINGHINT_OPTIMIZESPEED;
+	} else if (!strcmp(value_string, "optimizeLegibility")) {
+		*value = SVG_RENDERINGHINT_OPTIMIZELEGIBILITY;
+	} else if (!strcmp(value_string, "crispEdges")) {
+		*value = SVG_RENDERINGHINT_CRISPEDGES;
+	} else if (!strcmp(value_string, "geometricPrecision")) {
+		*value = SVG_RENDERINGHINT_GEOMETRICPRECISION;
+	}
+}

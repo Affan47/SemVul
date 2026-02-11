@@ -1,0 +1,10 @@
+builtin_function_disabled_p (const char *name)
+{
+  disabled_builtin *p;
+  for (p = disabled_builtins; p != NULL; p = p->next)
+    {
+      if (strcmp (name, p->name) == 0)
+	return true;
+    }
+  return false;
+}

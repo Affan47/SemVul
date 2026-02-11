@@ -1,0 +1,6 @@
+gmbus_is_index_read(struct i2c_msg *msgs, int i, int num)
+{
+	return (i + 1 < num &&
+		!(msgs[i].flags & I2C_M_RD) && msgs[i].len <= 2 &&
+		(msgs[i + 1].flags & I2C_M_RD));
+}

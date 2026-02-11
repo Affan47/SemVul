@@ -1,0 +1,67 @@
+ggc_print_common_statistics (stream, stats)
+     FILE *stream;
+     ggc_statistics *stats;
+{
+  int code;
+
+
+  ggc_stats = stats;
+
+
+  ggc_collect ();
+
+
+  for (code = 0; code < MAX_TREE_CODES; ++code)
+    {
+      stats->total_num_trees += stats->num_trees[code];
+      stats->total_size_trees += stats->size_trees[code];
+    }
+  for (code = 0; code < NUM_RTX_CODE; ++code)
+    {
+      stats->total_num_rtxs += stats->num_rtxs[code];
+      stats->total_size_rtxs += stats->size_rtxs[code];
+    }
+
+
+  fprintf (stream, "\n%-17s%10s %16s %10s\n", "Tree",
+	   "Number", "Bytes", "% Total");
+  for (code = 0; code < MAX_TREE_CODES; ++code)
+    if (ggc_stats->num_trees[code])
+      {
+	fprintf (stream, "%-17s%10u%16ld%c %10.3f\n",
+		 tree_code_name[code],
+		 ggc_stats->num_trees[code],
+		 SCALE (ggc_stats->size_trees[code]),
+		 LABEL (ggc_stats->size_trees[code]),
+		 (100 * ((double) ggc_stats->size_trees[code])
+		  / ggc_stats->total_size_trees));
+      }
+  fprintf (stream,
+	   "%-17s%10u%16ld%c\n", "Total",
+	   ggc_stats->total_num_trees,
+	   SCALE (ggc_stats->total_size_trees),
+	   LABEL (ggc_stats->total_size_trees));
+
+
+  fprintf (stream, "\n%-17s%10s %16s %10s\n", "RTX",
+	   "Number", "Bytes", "% Total");
+  for (code = 0; code < NUM_RTX_CODE; ++code)
+    if (ggc_stats->num_rtxs[code])
+      {
+	fprintf (stream, "%-17s%10u%16ld%c %10.3f\n",
+		 rtx_name[code],
+		 ggc_stats->num_rtxs[code],
+		 SCALE (ggc_stats->size_rtxs[code]),
+		 LABEL (ggc_stats->size_rtxs[code]),
+		 (100 * ((double) ggc_stats->size_rtxs[code])
+		  / ggc_stats->total_size_rtxs));
+      }
+  fprintf (stream,
+	   "%-17s%10u%16ld%c\n", "Total",
+	   ggc_stats->total_num_rtxs,
+	   SCALE (ggc_stats->total_size_rtxs),
+	   LABEL (ggc_stats->total_size_rtxs));
+
+
+  ggc_stats = NULL;
+}

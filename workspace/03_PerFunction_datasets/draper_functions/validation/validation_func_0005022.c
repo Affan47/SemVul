@@ -1,0 +1,9 @@
+shootArray( HepRandomEngine* anEngine,
+                            const int size, double* vect )
+{
+   register int i;
+
+   for (i=0; i<size; ++i) {
+     vect[i] = shoot(anEngine);
+   }
+}

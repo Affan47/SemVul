@@ -1,0 +1,37 @@
+reservedNames()
+{
+    static const ReservedNames names = boost::assign::list_of
+    ("Accept-Ranges")
+    ("Age")
+    ("Allow")
+    ("Allowed")
+    ("Connection")
+    ("Content-Length")
+    ("Content-Location")
+    ("Content-Range")
+    ("ETag")
+    ("GET")
+    ("Host")
+    ("HEAD")
+    ("Last-Modified")
+    ("Locations")
+    ("Max-Forwards")
+    ("POST")
+    ("Proxy-Authenticate")
+    ("Proxy-Authorization")
+    ("Public")
+    ("Range")
+    ("Retry-After")
+    ("Server")
+    ("TE")
+    ("Trailer")
+    ("Transfer-Encoding")
+    ("Upgrade")
+    ("URI")
+    ("Vary")
+    ("Via")
+    ("Warning")
+    ("WWW-Authenticate");
+
+    return names;
+}

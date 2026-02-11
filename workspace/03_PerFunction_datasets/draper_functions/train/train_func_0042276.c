@@ -1,0 +1,16 @@
+rb_cvar_defined(klass, id)
+    VALUE klass;
+    ID id;
+{
+    VALUE tmp;
+
+    tmp = klass;
+    while (tmp) {
+	if (RCLASS(tmp)->iv_tbl && st_lookup(RCLASS(tmp)->iv_tbl,id,0)) {
+	    return Qtrue;
+	}
+	tmp = RCLASS(tmp)->super;
+    }
+
+    return Qfalse;
+}

@@ -1,0 +1,9 @@
+fopen_unlocked(const char *path, const char *mode) {
+  int f=0;
+  int fd;
+
+  f=__stdio_parse_mode(mode);
+  if ((fd=__libc_open(path,f,0666))<0)
+    return 0;
+  return __stdio_init_file(fd,1,f);
+}

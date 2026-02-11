@@ -1,0 +1,15 @@
+hex2digit (boost::uint8_t digit)
+{
+    if (digit == 0)
+        return 0;
+
+    if (digit >= '0' && digit <= '9')
+        return digit - '0';
+    if (digit >= 'a' && digit <= 'f')
+        return digit - 'a' + 10;
+    if (digit >= 'A' && digit <= 'F')
+        return digit - 'A' + 10;
+
+
+    return -1;
+}

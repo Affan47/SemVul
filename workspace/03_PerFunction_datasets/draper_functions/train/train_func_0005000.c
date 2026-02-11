@@ -1,0 +1,26 @@
+camif_request_irqs(struct platform_device *pdev,
+			      struct camif_dev *camif)
+{
+	int irq, ret, i;
+
+	for (i = 0; i < CAMIF_VP_NUM; i++) {
+		struct camif_vp *vp = &camif->vp[i];
+
+		init_waitqueue_head(&vp->irq_queue);
+
+		irq = platform_get_irq(pdev, i);
+		if (irq <= 0) {
+			dev_err(&pdev->dev, "failed to get IRQ %d\n", i);
+			return -ENXIO;
+		}
+
+		ret = devm_request_irq(&pdev->dev, irq, s3c_camif_irq_handler,
+				       0, dev_name(&pdev->dev), vp);
+		if (ret < 0) {
+			dev_err(&pdev->dev, "failed to install IRQ: %d\n", ret);
+			break;
+		}
+	}
+
+	return ret;
+}

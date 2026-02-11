@@ -1,0 +1,63 @@
+HxDoHexOutputC (
+    void)
+{
+    UINT8                   FileData[HEX_TABLE_LINE_SIZE];
+    UINT32                  LineLength;
+    UINT32                  Offset = 0;
+    UINT32                  AmlFileSize;
+    UINT32                  i;
+
+
+    AmlFileSize = FlGetFileSize (ASL_FILE_AML_OUTPUT);
+    FlSeekFile (ASL_FILE_AML_OUTPUT, 0);
+
+    FlPrintFile (ASL_FILE_HEX_OUTPUT, " * C source code output\n");
+    FlPrintFile (ASL_FILE_HEX_OUTPUT, " * AML code block contains 0x%X bytes\n *\n */\n",
+        AmlFileSize);
+    FlPrintFile (ASL_FILE_HEX_OUTPUT, "unsigned char AmlCode[] =\n{\n");
+
+    while (Offset < AmlFileSize)
+    {
+
+
+        LineLength = HxReadAmlOutputFile (FileData);
+        if (!LineLength)
+        {
+            break;
+        }
+
+        FlPrintFile (ASL_FILE_HEX_OUTPUT, "    ");
+
+        for (i = 0; i < LineLength; i++)
+        {
+
+
+            FlPrintFile (ASL_FILE_HEX_OUTPUT, "0x%2.2X", FileData[i]);
+            if ((Offset + i + 1) < AmlFileSize)
+            {
+                FlPrintFile (ASL_FILE_HEX_OUTPUT, ",");
+            }
+            else
+            {
+                FlPrintFile (ASL_FILE_HEX_OUTPUT, " ");
+            }
+        }
+
+
+        if (LineLength < HEX_TABLE_LINE_SIZE)
+        {
+            FlPrintFile (ASL_FILE_HEX_OUTPUT, "%*s",
+                5 * (HEX_TABLE_LINE_SIZE - LineLength), " ");
+        }
+
+
+        FlPrintFile (ASL_FILE_HEX_OUTPUT, "  /* %8.8X", Offset);
+        LsDumpAsciiInComment (ASL_FILE_HEX_OUTPUT, LineLength, FileData);
+        FlPrintFile (ASL_FILE_HEX_OUTPUT, "%*s*/\n",
+            HEX_TABLE_LINE_SIZE - LineLength + 1, " ");
+
+        Offset += LineLength;
+    }
+
+    FlPrintFile (ASL_FILE_HEX_OUTPUT, "};\n");
+}

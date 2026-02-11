@@ -1,0 +1,71 @@
+bfa_fcxp_queue(struct bfa_fcxp_s *fcxp, struct bfi_fcxp_send_req_s *send_req)
+{
+	struct bfa_s			*bfa = fcxp->fcxp_mod->bfa;
+	struct bfa_fcxp_req_info_s	*reqi = &fcxp->req_info;
+	struct bfa_fcxp_rsp_info_s	*rspi = &fcxp->rsp_info;
+	struct bfa_rport_s		*rport = reqi->bfa_rport;
+
+	bfi_h2i_set(send_req->mh, BFI_MC_FCXP, BFI_FCXP_H2I_SEND_REQ,
+		    bfa_fn_lpu(bfa));
+
+	send_req->fcxp_tag = cpu_to_be16(fcxp->fcxp_tag);
+	if (rport) {
+		send_req->rport_fw_hndl = rport->fw_handle;
+		send_req->max_frmsz = cpu_to_be16(rport->rport_info.max_frmsz);
+		if (send_req->max_frmsz == 0)
+			send_req->max_frmsz = cpu_to_be16(FC_MAX_PDUSZ);
+	} else {
+		send_req->rport_fw_hndl = 0;
+		send_req->max_frmsz = cpu_to_be16(FC_MAX_PDUSZ);
+	}
+
+	send_req->vf_id = cpu_to_be16(reqi->vf_id);
+	send_req->lp_fwtag = bfa_lps_get_fwtag(bfa, reqi->lp_tag);
+	send_req->class = reqi->class;
+	send_req->rsp_timeout = rspi->rsp_timeout;
+	send_req->cts = reqi->cts;
+	send_req->fchs = reqi->fchs;
+
+	send_req->req_len = cpu_to_be32(reqi->req_tot_len);
+	send_req->rsp_maxlen = cpu_to_be32(rspi->rsp_maxlen);
+
+
+	if (fcxp->use_ireqbuf == 1) {
+		bfa_alen_set(&send_req->req_alen, reqi->req_tot_len,
+					BFA_FCXP_REQ_PLD_PA(fcxp));
+	} else {
+		if (fcxp->nreq_sgles > 0) {
+			WARN_ON(fcxp->nreq_sgles != 1);
+			bfa_alen_set(&send_req->req_alen, reqi->req_tot_len,
+				fcxp->req_sga_cbfn(fcxp->caller, 0));
+		} else {
+			WARN_ON(reqi->req_tot_len != 0);
+			bfa_alen_set(&send_req->rsp_alen, 0, 0);
+		}
+	}
+
+
+	if (fcxp->use_irspbuf == 1) {
+		WARN_ON(rspi->rsp_maxlen > BFA_FCXP_MAX_LBUF_SZ);
+
+		bfa_alen_set(&send_req->rsp_alen, rspi->rsp_maxlen,
+					BFA_FCXP_RSP_PLD_PA(fcxp));
+	} else {
+		if (fcxp->nrsp_sgles > 0) {
+			WARN_ON(fcxp->nrsp_sgles != 1);
+			bfa_alen_set(&send_req->rsp_alen, rspi->rsp_maxlen,
+				fcxp->rsp_sga_cbfn(fcxp->caller, 0));
+
+		} else {
+			WARN_ON(rspi->rsp_maxlen != 0);
+			bfa_alen_set(&send_req->rsp_alen, 0, 0);
+		}
+	}
+
+	hal_fcxp_tx_plog(bfa, reqi->req_tot_len, fcxp, &reqi->fchs);
+
+	bfa_reqq_produce(bfa, BFA_REQQ_FCXP, send_req->mh);
+
+	bfa_trc(bfa, bfa_reqq_pi(bfa, BFA_REQQ_FCXP));
+	bfa_trc(bfa, bfa_reqq_ci(bfa, BFA_REQQ_FCXP));
+}

@@ -1,0 +1,13 @@
+rb_ary_reverse_each(ary)
+    VALUE ary;
+{
+    long len = RARRAY(ary)->len;
+
+    while (len--) {
+	rb_yield(RARRAY(ary)->ptr[len]);
+	if (RARRAY(ary)->len < len) {
+	    len = RARRAY(ary)->len;
+	}
+    }
+    return ary;
+}

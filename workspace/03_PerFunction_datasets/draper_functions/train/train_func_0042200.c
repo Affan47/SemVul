@@ -1,0 +1,23 @@
+sge_plus_constant (rtx x, rtx c)
+{
+  if (GET_CODE (x) == CONST_INT)
+    return GEN_INT (INTVAL (x) + INTVAL (c));
+  else if (GET_CODE (x) != PLUS)
+    return gen_rtx_PLUS (GET_MODE (x), x, c);
+  else if (GET_CODE (XEXP (x, 1)) == CONST_INT)
+    {
+      return gen_rtx_PLUS (GET_MODE (x), XEXP (x, 0),
+			   GEN_INT (INTVAL (XEXP (x, 1)) + INTVAL (c)));
+    }
+  else if (GET_CODE (XEXP (x, 0)) == PLUS
+	   || GET_CODE (XEXP (x, 1)) != PLUS)
+    {
+      return gen_rtx_PLUS (GET_MODE (x),
+			   sge_plus_constant (XEXP (x, 0), c), XEXP (x, 1));
+    }
+  else
+    {
+      return gen_rtx_PLUS (GET_MODE (x),
+			   sge_plus_constant (XEXP (x, 1), c), XEXP (x, 0));
+    }
+}

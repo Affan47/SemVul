@@ -1,0 +1,18 @@
+ruby_options(argc, argv)
+    int argc;
+    char **argv;
+{
+    int state;
+
+    Init_stack((void*)&state);
+    PUSH_TAG(PROT_NONE);
+    if ((state = EXEC_TAG()) == 0) {
+	ruby_process_options(argc, argv);
+    }
+    else {
+	trace_func = 0;
+	tracing = 0;
+	exit(error_handle(state));
+    }
+    POP_TAG();
+}

@@ -1,0 +1,8 @@
+free_jumplist(wp)
+    win_T	*wp;
+{
+    int		i;
+
+    for (i = 0; i < wp->w_jumplistlen; ++i)
+	vim_free(wp->w_jumplist[i].fname);
+}

@@ -1,0 +1,9 @@
+RimbalzoVerticale(void)
+{
+    if(pl->dir!=0)
+    {
+        pl->dir=255-pl->dir;
+        pl->dir++;
+    }
+    UpdateBallSpeed();
+}

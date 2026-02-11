@@ -1,0 +1,51 @@
+rate_n_flags_from_tbl(struct iwl_priv *priv,
+				 struct iwl_scale_tbl_info *tbl,
+				 int index, u8 use_green)
+{
+	u32 rate_n_flags = 0;
+
+	if (is_legacy(tbl->lq_type)) {
+		rate_n_flags = iwl_rates[index].plcp;
+		if (index >= IWL_FIRST_CCK_RATE && index <= IWL_LAST_CCK_RATE)
+			rate_n_flags |= RATE_MCS_CCK_MSK;
+
+	} else if (is_Ht(tbl->lq_type)) {
+		if (index > IWL_LAST_OFDM_RATE) {
+			IWL_ERR(priv, "Invalid HT rate index %d\n", index);
+			index = IWL_LAST_OFDM_RATE;
+		}
+		rate_n_flags = RATE_MCS_HT_MSK;
+
+		if (is_siso(tbl->lq_type))
+			rate_n_flags |=	iwl_rates[index].plcp_siso;
+		else if (is_mimo2(tbl->lq_type))
+			rate_n_flags |=	iwl_rates[index].plcp_mimo2;
+		else
+			rate_n_flags |=	iwl_rates[index].plcp_mimo3;
+	} else {
+		IWL_ERR(priv, "Invalid tbl->lq_type %d\n", tbl->lq_type);
+	}
+
+	rate_n_flags |= ((tbl->ant_type << RATE_MCS_ANT_POS) &
+						     RATE_MCS_ANT_ABC_MSK);
+
+	if (is_Ht(tbl->lq_type)) {
+		if (tbl->is_ht40) {
+			if (tbl->is_dup)
+				rate_n_flags |= RATE_MCS_DUP_MSK;
+			else
+				rate_n_flags |= RATE_MCS_HT40_MSK;
+		}
+		if (tbl->is_SGI)
+			rate_n_flags |= RATE_MCS_SGI_MSK;
+
+		if (use_green) {
+			rate_n_flags |= RATE_MCS_GF_MSK;
+			if (is_siso(tbl->lq_type) && tbl->is_SGI) {
+				rate_n_flags &= ~RATE_MCS_SGI_MSK;
+				IWL_ERR(priv, "GF was set with SGI:SISO\n");
+			}
+		}
+	}
+	return rate_n_flags;
+}

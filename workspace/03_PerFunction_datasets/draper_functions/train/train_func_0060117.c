@@ -1,0 +1,33 @@
+tracker_model_launch_selected_parent_dir (GtkTreeModel* model, GtkTreePath* path, gint col) {
+	GtkTreeModel* _tmp0_;
+	GtkTreePath* _tmp1_;
+	gint _tmp2_;
+	gchar* _tmp3_ = NULL;
+	gchar* uri;
+	GFile* _tmp4_ = NULL;
+	GFile* f;
+	GFile* _tmp5_ = NULL;
+	GFile* p;
+	gchar* _tmp6_ = NULL;
+	gchar* parent_uri;
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (path != NULL);
+	_tmp0_ = model;
+	_tmp1_ = path;
+	_tmp2_ = col;
+	_tmp3_ = uri_get_selected (_tmp0_, _tmp1_, _tmp2_);
+	uri = _tmp3_;
+	g_debug ("tracker-utils.vala:78: Selected uri:'%s'", uri);
+	_tmp4_ = g_file_new_for_uri (uri);
+	f = _tmp4_;
+	_tmp5_ = g_file_get_parent (f);
+	p = _tmp5_;
+	_tmp6_ = g_file_get_uri (p);
+	parent_uri = _tmp6_;
+	g_debug ("tracker-utils.vala:84: Parent uri:'%s'", parent_uri);
+	uri_launch (parent_uri);
+	_g_free0 (parent_uri);
+	_g_object_unref0 (p);
+	_g_object_unref0 (f);
+	_g_free0 (uri);
+}

@@ -1,0 +1,53 @@
+ib_ud_header_init(int     		    payload_bytes,
+		       int		    lrh_present,
+		       int		    eth_present,
+		       int		    vlan_present,
+		       int    		    grh_present,
+		       int		    immediate_present,
+		       struct ib_ud_header *header)
+{
+	memset(header, 0, sizeof *header);
+
+	if (lrh_present) {
+		u16 packet_length;
+
+		header->lrh.link_version     = 0;
+		header->lrh.link_next_header =
+			grh_present ? IB_LNH_IBA_GLOBAL : IB_LNH_IBA_LOCAL;
+		packet_length = (IB_LRH_BYTES	+
+				 IB_BTH_BYTES	+
+				 IB_DETH_BYTES	+
+				 (grh_present ? IB_GRH_BYTES : 0) +
+				 payload_bytes	+
+				 4		+
+				 3) / 4;
+		header->lrh.packet_length = cpu_to_be16(packet_length);
+	}
+
+	if (vlan_present)
+		header->eth.type = cpu_to_be16(ETH_P_8021Q);
+
+	if (grh_present) {
+		header->grh.ip_version      = 6;
+		header->grh.payload_length  =
+			cpu_to_be16((IB_BTH_BYTES     +
+				     IB_DETH_BYTES    +
+				     payload_bytes    +
+				     4                +
+				     3) & ~3);
+		header->grh.next_header     = 0x1b;
+	}
+
+	if (immediate_present)
+		header->bth.opcode           = IB_OPCODE_UD_SEND_ONLY_WITH_IMMEDIATE;
+	else
+		header->bth.opcode           = IB_OPCODE_UD_SEND_ONLY;
+	header->bth.pad_count                = (4 - payload_bytes) & 3;
+	header->bth.transport_header_version = 0;
+
+	header->lrh_present = lrh_present;
+	header->eth_present = eth_present;
+	header->vlan_present = vlan_present;
+	header->grh_present = grh_present;
+	header->immediate_present = immediate_present;
+}

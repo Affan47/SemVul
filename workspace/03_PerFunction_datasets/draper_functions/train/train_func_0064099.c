@@ -1,0 +1,46 @@
+do_autoexposure(struct gspca_dev *gspca_dev, u16 avg_lum)
+{
+	struct sd *sd = (struct sd *) gspca_dev;
+	s32 cur_exp = v4l2_ctrl_g_ctrl(sd->exposure);
+	s32 max = sd->exposure->maximum - sd->exposure_step;
+	s32 min = sd->exposure->minimum + sd->exposure_step;
+	s16 new_exp;
+
+
+	if (avg_lum < MIN_AVG_LUM) {
+		if (cur_exp > max)
+			return;
+
+		new_exp = cur_exp + sd->exposure_step;
+		if (new_exp > max)
+			new_exp = max;
+		if (new_exp < min)
+			new_exp = min;
+		v4l2_ctrl_s_ctrl(sd->exposure, new_exp);
+
+		sd->older_step = sd->old_step;
+		sd->old_step = 1;
+
+		if (sd->old_step ^ sd->older_step)
+			sd->exposure_step /= 2;
+		else
+			sd->exposure_step += 2;
+	}
+	if (avg_lum > MAX_AVG_LUM) {
+		if (cur_exp < min)
+			return;
+		new_exp = cur_exp - sd->exposure_step;
+		if (new_exp > max)
+			new_exp = max;
+		if (new_exp < min)
+			new_exp = min;
+		v4l2_ctrl_s_ctrl(sd->exposure, new_exp);
+		sd->older_step = sd->old_step;
+		sd->old_step = 0;
+
+		if (sd->old_step ^ sd->older_step)
+			sd->exposure_step /= 2;
+		else
+			sd->exposure_step += 2;
+	}
+}

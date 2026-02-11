@@ -1,0 +1,14 @@
+rb_ary_shift(ary)
+    VALUE ary;
+{
+    VALUE top;
+
+    rb_ary_modify_check(ary);
+    if (RARRAY(ary)->len == 0) return Qnil;
+    top = RARRAY(ary)->ptr[0];
+    ary_make_shared(ary);
+    RARRAY(ary)->ptr++;
+    RARRAY(ary)->len--;
+
+    return top;
+}

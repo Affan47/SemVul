@@ -1,0 +1,15 @@
+dir_s_glob(argc, argv, obj)
+    int argc;
+    VALUE *argv;
+    VALUE obj;
+{
+    VALUE str, rflags;
+    int flags;
+
+    if (rb_scan_args(argc, argv, "11", &str, &rflags) == 2)
+	flags = NUM2INT(rflags);
+    else
+	flags = 0;
+
+    return rb_push_glob(str, flags);
+}

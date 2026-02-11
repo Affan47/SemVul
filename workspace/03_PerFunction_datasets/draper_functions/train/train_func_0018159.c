@@ -1,0 +1,11 @@
+xdr_u_char(XDR* xdrs, unsigned char* cp)
+{
+	unsigned int u;
+
+	u = (*cp);
+	if (!xdr_u_int(xdrs, &u)) {
+		return (FALSE);
+	}
+	*cp = u;
+	return (TRUE);
+}

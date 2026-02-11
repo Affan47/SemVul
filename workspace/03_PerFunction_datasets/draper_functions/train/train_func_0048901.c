@@ -1,0 +1,33 @@
+___lambda10_ (Block12Data* _data12_) {
+	Block11Data* _data11_;
+	GeeTraversable * self;
+	GType a_type;
+	GBoxedCopyFunc a_dup_func;
+	GDestroyNotify a_destroy_func;
+	gpointer result = NULL;
+	gpointer tmp = NULL;
+	GeeLazy* _tmp0_ = NULL;
+	gpointer _tmp1_ = NULL;
+	GeeMapFunc _tmp2_ = NULL;
+	void* _tmp2__target = NULL;
+	gpointer _tmp3_ = NULL;
+	gpointer _tmp4_ = NULL;
+	_data11_ = _data12_->_data11_;
+	self = _data11_->self;
+	a_type = _data11_->a_type;
+	a_dup_func = _data11_->a_dup_func;
+	a_destroy_func = _data11_->a_destroy_func;
+	_tmp0_ = _data12_->item;
+	_tmp1_ = gee_lazy_get (_tmp0_);
+	tmp = _tmp1_;
+	_gee_lazy_unref0 (_data12_->item);
+	_data12_->item = NULL;
+	_tmp2_ = _data11_->f;
+	_tmp2__target = _data11_->f_target;
+	_tmp3_ = tmp;
+	tmp = NULL;
+	_tmp4_ = _tmp2_ (_tmp3_, _tmp2__target);
+	result = _tmp4_;
+	_a_destroy_func0 (tmp);
+	return result;
+}

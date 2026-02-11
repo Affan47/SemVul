@@ -1,0 +1,8 @@
+get_line(char* line)
+{
+  while (*line && *line != '\n')
+    line++;
+  if (*line)
+    line++;
+  return line;
+}

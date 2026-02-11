@@ -1,0 +1,30 @@
+replace_in_call_usage (rtx *loc, unsigned int dst_reg, rtx src, rtx insn)
+{
+  rtx x = *loc;
+  enum rtx_code code;
+  const char *fmt;
+  int i, j;
+
+  if (! x)
+    return;
+
+  code = GET_CODE (x);
+  if (code == REG)
+    {
+      if (REGNO (x) != dst_reg)
+	return;
+
+      validate_change (insn, loc, src, 1);
+
+      return;
+    }
+
+
+  fmt = GET_RTX_FORMAT (code);
+  for (i = 0; i < GET_RTX_LENGTH (code); i++, fmt++)
+    if (*fmt == 'e')
+      replace_in_call_usage (&XEXP (x, i), dst_reg, src, insn);
+    else if (*fmt == 'E')
+      for (j = 0; j < XVECLEN (x, i); j++)
+	replace_in_call_usage (& XVECEXP (x, i, j), dst_reg, src, insn);
+}

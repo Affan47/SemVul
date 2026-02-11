@@ -1,0 +1,27 @@
+poly64(UINT64 cur, UINT64 key, UINT64 data)
+{
+    UINT32 key_hi = (UINT32)(key >> 32),
+           key_lo = (UINT32)key,
+           cur_hi = (UINT32)(cur >> 32),
+           cur_lo = (UINT32)cur,
+           x_lo,
+           x_hi;
+    UINT64 X,T,res;
+
+    X =  MUL64(key_hi, cur_lo) + MUL64(cur_hi, key_lo);
+    x_lo = (UINT32)X;
+    x_hi = (UINT32)(X >> 32);
+
+    res = (MUL64(key_hi, cur_hi) + x_hi) * 59 + MUL64(key_lo, cur_lo);
+
+    T = ((UINT64)x_lo << 32);
+    res += T;
+    if (res < T)
+        res += 59;
+
+    res += data;
+    if (res < data)
+        res += 59;
+
+    return res;
+}

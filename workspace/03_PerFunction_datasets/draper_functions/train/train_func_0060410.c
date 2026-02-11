@@ -1,0 +1,10 @@
+pwr()
+{
+   if(sp<2)
+      return(STUNDERFLOW);
+   if(stack[sp-1]<0)
+      return(ILLEGALFN);
+   stack[sp-2].value=pow(stack[sp-1],stack[sp-2]);
+   sp--;
+   return(OKAY);
+}

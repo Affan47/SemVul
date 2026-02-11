@@ -1,0 +1,27 @@
+clk_pll_sr2_set_rate(struct clk_hw *hw, unsigned long rate, unsigned long prate)
+{
+	struct clk_pll *pll = to_clk_pll(hw);
+	const struct pll_freq_tbl *f;
+	bool enabled;
+	u32 mode;
+	u32 enable_mask = PLL_OUTCTRL | PLL_BYPASSNL | PLL_RESET_N;
+
+	f = find_freq(pll->freq_tbl, rate);
+	if (!f)
+		return -EINVAL;
+
+	regmap_read(pll->clkr.regmap, pll->mode_reg, &mode);
+	enabled = (mode & enable_mask) == enable_mask;
+
+	if (enabled)
+		clk_pll_disable(hw);
+
+	regmap_update_bits(pll->clkr.regmap, pll->l_reg, 0x3ff, f->l);
+	regmap_update_bits(pll->clkr.regmap, pll->m_reg, 0x7ffff, f->m);
+	regmap_update_bits(pll->clkr.regmap, pll->n_reg, 0x7ffff, f->n);
+
+	if (enabled)
+		clk_pll_sr2_enable(hw);
+
+	return 0;
+}

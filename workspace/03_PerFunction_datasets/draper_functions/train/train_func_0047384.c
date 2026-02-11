@@ -1,0 +1,9 @@
+rb_big_abs(x)
+    VALUE x;
+{
+    if (!RBIGNUM(x)->sign) {
+	x = rb_big_clone(x);
+	RBIGNUM(x)->sign = 1;
+    }
+    return x;
+}

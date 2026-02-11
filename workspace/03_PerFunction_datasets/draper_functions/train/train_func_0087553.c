@@ -1,0 +1,16 @@
+gui_find_scrollbar(ident)
+    long	ident;
+{
+    win_T	*wp;
+
+    if (gui.bottom_sbar.ident == ident)
+	return &gui.bottom_sbar;
+    FOR_ALL_WINDOWS(wp)
+    {
+	if (wp->w_scrollbars[SBAR_LEFT].ident == ident)
+	    return &wp->w_scrollbars[SBAR_LEFT];
+	if (wp->w_scrollbars[SBAR_RIGHT].ident == ident)
+	    return &wp->w_scrollbars[SBAR_RIGHT];
+    }
+    return NULL;
+}

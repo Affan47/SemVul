@@ -1,0 +1,55 @@
+bnx2i_conn_bind(struct iscsi_cls_session *cls_session,
+			   struct iscsi_cls_conn *cls_conn,
+			   uint64_t transport_fd, int is_leading)
+{
+	struct iscsi_conn *conn = cls_conn->dd_data;
+	struct bnx2i_conn *bnx2i_conn = conn->dd_data;
+	struct Scsi_Host *shost = iscsi_session_to_shost(cls_session);
+	struct bnx2i_hba *hba = iscsi_host_priv(shost);
+	struct bnx2i_endpoint *bnx2i_ep;
+	struct iscsi_endpoint *ep;
+	int ret_code;
+
+	ep = iscsi_lookup_endpoint(transport_fd);
+	if (!ep)
+		return -EINVAL;
+
+
+	if (bnx2i_adapter_ready(hba))
+		return -EIO;
+
+	bnx2i_ep = ep->dd_data;
+	if ((bnx2i_ep->state == EP_STATE_TCP_FIN_RCVD) ||
+	    (bnx2i_ep->state == EP_STATE_TCP_RST_RCVD))
+
+		return -EINVAL;
+
+	if (iscsi_conn_bind(cls_session, cls_conn, is_leading))
+		return -EINVAL;
+
+	if (bnx2i_ep->hba != hba) {
+
+
+		iscsi_conn_printk(KERN_ALERT, cls_conn->dd_data,
+				  "conn bind, ep=0x%p (%s) does not",
+				  bnx2i_ep, bnx2i_ep->hba->netdev->name);
+		iscsi_conn_printk(KERN_ALERT, cls_conn->dd_data,
+				  "belong to hba (%s)\n",
+				  hba->netdev->name);
+		return -EEXIST;
+	}
+	bnx2i_ep->conn = bnx2i_conn;
+	bnx2i_conn->ep = bnx2i_ep;
+	bnx2i_conn->iscsi_conn_cid = bnx2i_ep->ep_iscsi_cid;
+	bnx2i_conn->fw_cid = bnx2i_ep->ep_cid;
+
+	ret_code = bnx2i_bind_conn_to_iscsi_cid(hba, bnx2i_conn,
+						bnx2i_ep->ep_iscsi_cid);
+
+
+	if (test_bit(BNX2I_NX2_DEV_57710, &bnx2i_ep->hba->cnic_dev_type))
+		bnx2i_put_rq_buf(bnx2i_conn, 0);
+
+	bnx2i_arm_cq_event_coalescing(bnx2i_conn->ep, CNIC_ARM_CQE);
+	return ret_code;
+}

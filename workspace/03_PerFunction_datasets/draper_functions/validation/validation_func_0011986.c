@@ -1,0 +1,8 @@
+free_tree_refs(struct audit_context *ctx)
+{
+	struct audit_tree_refs *p, *q;
+	for (p = ctx->first_trees; p; p = q) {
+		q = p->next;
+		kfree(p);
+	}
+}

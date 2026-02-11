@@ -1,0 +1,9 @@
+__ecereInstMeth___ecereNameSpace__ecere__gui__controls__Button_NotifyClicked__00000003(struct __ecereNameSpace__ecere__com__Instance * this, struct __ecereNameSpace__ecere__com__Instance * button, int x, int y, unsigned int mods)
+{
+struct __ecereNameSpace__ecere__gui__controls__DirectoriesBox * __ecerePointer___ecereNameSpace__ecere__gui__controls__DirectoriesBox = (struct __ecereNameSpace__ecere__gui__controls__DirectoriesBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__DirectoriesBox->offset) : 0);
+
+__ecereMethod___ecereNameSpace__ecere__gui__controls__ListBox_StopEditing(__ecerePointer___ecereNameSpace__ecere__gui__controls__DirectoriesBox->list, 0x1);
+__ecereMethod___ecereNameSpace__ecere__gui__controls__DataRow_Edit(__ecereProp___ecereNameSpace__ecere__gui__controls__ListBox_Get_lastRow(__ecerePointer___ecereNameSpace__ecere__gui__controls__DirectoriesBox->list), (((void *)0)));
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_modifiedDocument(__ecerePointer___ecereNameSpace__ecere__gui__controls__DirectoriesBox->list, 0x1);
+return 0x1;
+}

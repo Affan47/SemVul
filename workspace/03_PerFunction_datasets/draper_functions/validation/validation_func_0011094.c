@@ -1,0 +1,25 @@
+GEOSBufferParams_setSingleSided_r(GEOSContextHandle_t extHandle,
+  GEOSBufferParams* p, int ss)
+{
+    if ( 0 == extHandle ) return 0;
+
+    GEOSContextHandleInternal_t *handle = 0;
+    handle = reinterpret_cast<GEOSContextHandleInternal_t*>(extHandle);
+    if ( 0 == handle->initialized ) return 0;
+
+    try
+    {
+        p->setSingleSided( (ss != 0) );
+        return 1;
+    }
+    catch (const std::exception &e)
+    {
+        handle->ERROR_MESSAGE("%s", e.what());
+    }
+    catch (...)
+    {
+        handle->ERROR_MESSAGE("Unknown exception thrown");
+    }
+
+    return 0;
+}

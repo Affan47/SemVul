@@ -1,0 +1,100 @@
+pk11_get_EC_PointLenInBytes(PLArenaPool *arena, const SECItem *ecParams)
+{
+   SECItem oid;
+   SECOidTag tag;
+   SECStatus rv;
+
+
+   rv = SEC_QuickDERDecodeItem(arena, &oid,
+		SEC_ASN1_GET(SEC_ObjectIDTemplate), ecParams);
+   if (rv != SECSuccess) {
+
+
+	return 0;
+   }
+
+   tag = SECOID_FindOIDTag(&oid);
+   switch (tag) {
+    case SEC_OID_SECG_EC_SECP112R1:
+    case SEC_OID_SECG_EC_SECP112R2:
+	return 29;
+    case SEC_OID_SECG_EC_SECT113R1:
+    case SEC_OID_SECG_EC_SECT113R2:
+	return 31;
+    case SEC_OID_SECG_EC_SECP128R1:
+    case SEC_OID_SECG_EC_SECP128R2:
+	return 33;
+    case SEC_OID_SECG_EC_SECT131R1:
+    case SEC_OID_SECG_EC_SECT131R2:
+	return 35;
+    case SEC_OID_SECG_EC_SECP160K1:
+    case SEC_OID_SECG_EC_SECP160R1:
+    case SEC_OID_SECG_EC_SECP160R2:
+	return 41;
+    case SEC_OID_SECG_EC_SECT163K1:
+    case SEC_OID_SECG_EC_SECT163R1:
+    case SEC_OID_SECG_EC_SECT163R2:
+    case SEC_OID_ANSIX962_EC_C2PNB163V1:
+    case SEC_OID_ANSIX962_EC_C2PNB163V2:
+    case SEC_OID_ANSIX962_EC_C2PNB163V3:
+	return 43;
+    case SEC_OID_ANSIX962_EC_C2PNB176V1:
+	return 45;
+    case SEC_OID_ANSIX962_EC_C2TNB191V1:
+    case SEC_OID_ANSIX962_EC_C2TNB191V2:
+    case SEC_OID_ANSIX962_EC_C2TNB191V3:
+    case SEC_OID_SECG_EC_SECP192K1:
+    case SEC_OID_ANSIX962_EC_PRIME192V1:
+    case SEC_OID_ANSIX962_EC_PRIME192V2:
+    case SEC_OID_ANSIX962_EC_PRIME192V3:
+	return 49;
+    case SEC_OID_SECG_EC_SECT193R1:
+    case SEC_OID_SECG_EC_SECT193R2:
+	return 51;
+    case SEC_OID_ANSIX962_EC_C2PNB208W1:
+	return 53;
+    case SEC_OID_SECG_EC_SECP224K1:
+    case SEC_OID_SECG_EC_SECP224R1:
+	return 57;
+    case SEC_OID_SECG_EC_SECT233K1:
+    case SEC_OID_SECG_EC_SECT233R1:
+    case SEC_OID_SECG_EC_SECT239K1:
+    case SEC_OID_ANSIX962_EC_PRIME239V1:
+    case SEC_OID_ANSIX962_EC_PRIME239V2:
+    case SEC_OID_ANSIX962_EC_PRIME239V3:
+    case SEC_OID_ANSIX962_EC_C2TNB239V1:
+    case SEC_OID_ANSIX962_EC_C2TNB239V2:
+    case SEC_OID_ANSIX962_EC_C2TNB239V3:
+	return 61;
+    case SEC_OID_ANSIX962_EC_PRIME256V1:
+    case SEC_OID_SECG_EC_SECP256K1:
+	return 65;
+    case SEC_OID_ANSIX962_EC_C2PNB272W1:
+	return 69;
+    case SEC_OID_SECG_EC_SECT283K1:
+    case SEC_OID_SECG_EC_SECT283R1:
+	return 73;
+    case SEC_OID_ANSIX962_EC_C2PNB304W1:
+	return 77;
+    case SEC_OID_ANSIX962_EC_C2TNB359V1:
+	return 91;
+    case SEC_OID_ANSIX962_EC_C2PNB368W1:
+	return 93;
+    case SEC_OID_SECG_EC_SECP384R1:
+	return 97;
+    case SEC_OID_SECG_EC_SECT409K1:
+    case SEC_OID_SECG_EC_SECT409R1:
+	return 105;
+    case SEC_OID_ANSIX962_EC_C2TNB431R1:
+	return 109;
+    case SEC_OID_SECG_EC_SECP521R1:
+	return 133;
+    case SEC_OID_SECG_EC_SECT571K1:
+    case SEC_OID_SECG_EC_SECT571R1:
+	return 145;
+
+    default:
+	break;
+   }
+   return 0;
+}

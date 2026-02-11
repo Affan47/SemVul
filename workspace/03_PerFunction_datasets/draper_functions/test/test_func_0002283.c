@@ -1,0 +1,34 @@
+binheap_trickledown(const struct binheap *bh, unsigned u)
+{
+	unsigned v1, v2;
+
+	assert(bh != NULL);
+	assert(bh->magic == BINHEAP_MAGIC);
+	assert(u < bh->next);
+	assert(A(bh, u) != NULL);
+
+	while (1) {
+		assert(u < bh->next);
+		assert(A(bh, u) != NULL);
+		child(bh, u, &v1, &v2);
+		assert(v1 > 0);
+		assert(v2 > 0);
+		assert(v1 <= v2);
+
+		if (v1 >= bh->next)
+			return (u);
+
+		assert(A(bh, v1) != NULL);
+		if (v1 != v2 && v2 < bh->next) {
+			assert(A(bh, v2) != NULL);
+			if (bh->cmp(bh->priv, A(bh, v2), A(bh, v1)))
+				v1 = v2;
+		}
+		assert(v1 < bh->next);
+		assert(A(bh, v1) != NULL);
+		if (bh->cmp(bh->priv, A(bh, u), A(bh, v1)))
+			return (u);
+		binhead_swap(bh, u, v1);
+		u = v1;
+	}
+}

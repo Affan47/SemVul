@@ -1,0 +1,21 @@
+vover_new(void)
+{
+	int voice, mvoice;
+
+	mvoice = curvoice->mvoice;
+	for (voice = curvoice - voice_tb + 1; voice <= nvoice; voice++)
+		if (voice_tb[voice].mvoice == mvoice)
+			break;
+	if (voice > nvoice) {
+		if (nvoice >= MAXVOICE) {
+			syntax("Too many voices", 0);
+			return;
+		}
+		nvoice = voice;
+		voice_tb[voice].id[0] = '&';
+		voice_tb[voice].mvoice = mvoice;
+	}
+	voice_tb[voice].ulen = curvoice->ulen;
+	voice_tb[voice].add_pitch = curvoice->add_pitch;
+	curvoice = &voice_tb[voice];
+}

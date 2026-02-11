@@ -1,0 +1,62 @@
+mv_u3d_process_ep_req(struct mv_u3d *u3d, int index,
+	struct mv_u3d_req *curr_req)
+{
+	struct mv_u3d_trb	*curr_trb;
+	dma_addr_t cur_deq_lo;
+	struct mv_u3d_ep_context	*curr_ep_context;
+	int trb_complete, actual, remaining_length = 0;
+	int direction, ep_num;
+	int retval = 0;
+	u32 tmp, status, length;
+
+	curr_ep_context = &u3d->ep_context[index];
+	direction = index % 2;
+	ep_num = index / 2;
+
+	trb_complete = 0;
+	actual = curr_req->req.length;
+
+	while (!list_empty(&curr_req->trb_list)) {
+		curr_trb = list_entry(curr_req->trb_list.next,
+					struct mv_u3d_trb, trb_list);
+		if (!curr_trb->trb_hw->ctrl.own) {
+			dev_err(u3d->dev, "%s, TRB own error!\n",
+				u3d->eps[index].name);
+			return 1;
+		}
+
+		curr_trb->trb_hw->ctrl.own = 0;
+		if (direction == MV_U3D_EP_DIR_OUT) {
+			tmp = ioread32(&u3d->vuc_regs->rxst[ep_num].statuslo);
+			cur_deq_lo =
+				ioread32(&u3d->vuc_regs->rxst[ep_num].curdeqlo);
+		} else {
+			tmp = ioread32(&u3d->vuc_regs->txst[ep_num].statuslo);
+			cur_deq_lo =
+				ioread32(&u3d->vuc_regs->txst[ep_num].curdeqlo);
+		}
+
+		status = tmp >> MV_U3D_XFERSTATUS_COMPLETE_SHIFT;
+		length = tmp & MV_U3D_XFERSTATUS_TRB_LENGTH_MASK;
+
+		if (status == MV_U3D_COMPLETE_SUCCESS ||
+			(status == MV_U3D_COMPLETE_SHORT_PACKET &&
+			direction == MV_U3D_EP_DIR_OUT)) {
+			remaining_length += length;
+			actual -= remaining_length;
+		} else {
+			dev_err(u3d->dev,
+				"complete_tr error: ep=%d %s: error = 0x%x\n",
+				index >> 1, direction ? "SEND" : "RECV",
+				status);
+			retval = -EPROTO;
+		}
+
+		list_del_init(&curr_trb->trb_list);
+	}
+	if (retval)
+		return retval;
+
+	curr_req->req.actual = actual;
+	return 0;
+}

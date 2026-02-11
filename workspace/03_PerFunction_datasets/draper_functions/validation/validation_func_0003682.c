@@ -1,0 +1,26 @@
+dse_destroy(struct dse *pdse)
+{
+    int nentries = 0;
+
+    if (NULL == pdse) {
+        return 0;
+    }
+    if (pdse->dse_rwlock)
+        slapi_rwlock_wrlock(pdse->dse_rwlock);
+    slapi_ch_free((void **)&(pdse->dse_filename));
+    slapi_ch_free((void **)&(pdse->dse_tmpfile));
+    slapi_ch_free((void **)&(pdse->dse_fileback));
+    slapi_ch_free((void **)&(pdse->dse_filestartOK));
+    dse_callback_deletelist(&pdse->dse_callback);
+    charray_free(pdse->dse_filelist);
+    nentries = avl_free(pdse->dse_tree, dse_internal_delete_entry);
+    if (pdse->dse_rwlock) {
+        slapi_rwlock_unlock(pdse->dse_rwlock);
+        slapi_destroy_rwlock(pdse->dse_rwlock);
+    }
+    slapi_ch_free((void **)&pdse);
+    LDAPDebug( SLAPI_DSE_TRACELEVEL, "Removed [%d] entries from the dse tree.\n",
+                 nentries,0,0 );
+
+    return 0;
+}

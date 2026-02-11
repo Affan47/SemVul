@@ -1,0 +1,31 @@
+qlcnic_sriov_issue_bc_post(struct qlcnic_bc_trans *trans, u8 type)
+{
+	struct qlcnic_vf_info *vf = trans->vf;
+	u32 pay_size, hdr_size;
+	u32 *hdr, *pay;
+	int ret;
+	u8 pci_func = trans->func_id;
+
+	if (__qlcnic_sriov_issue_bc_post(vf))
+		return -EBUSY;
+
+	if (type == QLC_BC_COMMAND) {
+		hdr = (u32 *)(trans->req_hdr + trans->curr_req_frag);
+		pay = (u32 *)(trans->req_pay + trans->curr_req_frag);
+		hdr_size = (sizeof(struct qlcnic_bc_hdr) / sizeof(u32));
+		pay_size = qlcnic_sriov_get_bc_paysize(trans->req_pay_size,
+						       trans->curr_req_frag);
+		pay_size = (pay_size / sizeof(u32));
+	} else {
+		hdr = (u32 *)(trans->rsp_hdr + trans->curr_rsp_frag);
+		pay = (u32 *)(trans->rsp_pay + trans->curr_rsp_frag);
+		hdr_size = (sizeof(struct qlcnic_bc_hdr) / sizeof(u32));
+		pay_size = qlcnic_sriov_get_bc_paysize(trans->rsp_pay_size,
+						       trans->curr_rsp_frag);
+		pay_size = (pay_size / sizeof(u32));
+	}
+
+	ret = qlcnic_sriov_post_bc_msg(vf->adapter, hdr, pay,
+				       pci_func, pay_size);
+	return ret;
+}

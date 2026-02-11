@@ -1,0 +1,37 @@
+ocfs2_refresh_inode_from_lvb(struct inode *inode)
+{
+	struct ocfs2_inode_info *oi = OCFS2_I(inode);
+	struct ocfs2_lock_res *lockres = &oi->ip_inode_lockres;
+	struct ocfs2_meta_lvb *lvb;
+
+	mlog_meta_lvb(0, lockres);
+
+	lvb = ocfs2_dlm_lvb(&lockres->l_lksb);
+
+
+	spin_lock(&oi->ip_lock);
+	oi->ip_clusters = be32_to_cpu(lvb->lvb_iclusters);
+	i_size_write(inode, be64_to_cpu(lvb->lvb_isize));
+
+	oi->ip_attr = be32_to_cpu(lvb->lvb_iattr);
+	oi->ip_dyn_features = be16_to_cpu(lvb->lvb_idynfeatures);
+	ocfs2_set_inode_flags(inode);
+
+
+	if (S_ISLNK(inode->i_mode) && !oi->ip_clusters)
+		inode->i_blocks = 0;
+	else
+		inode->i_blocks = ocfs2_inode_sector_count(inode);
+
+	i_uid_write(inode, be32_to_cpu(lvb->lvb_iuid));
+	i_gid_write(inode, be32_to_cpu(lvb->lvb_igid));
+	inode->i_mode    = be16_to_cpu(lvb->lvb_imode);
+	set_nlink(inode, be16_to_cpu(lvb->lvb_inlink));
+	ocfs2_unpack_timespec(&inode->i_atime,
+			      be64_to_cpu(lvb->lvb_iatime_packed));
+	ocfs2_unpack_timespec(&inode->i_mtime,
+			      be64_to_cpu(lvb->lvb_imtime_packed));
+	ocfs2_unpack_timespec(&inode->i_ctime,
+			      be64_to_cpu(lvb->lvb_ictime_packed));
+	spin_unlock(&oi->ip_lock);
+}

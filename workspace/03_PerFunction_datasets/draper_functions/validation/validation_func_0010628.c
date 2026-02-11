@@ -1,0 +1,12 @@
+in_expr_list_p (listp, node)
+     rtx listp;
+     rtx node;
+{
+  rtx x;
+
+  for (x = listp; x; x = XEXP (x, 1))
+    if (node == XEXP (x, 0))
+      return 1;
+
+  return 0;
+}

@@ -1,0 +1,17 @@
+fb_bl_default_curve(struct fb_info *fb_info, u8 off, u8 min, u8 max)
+{
+	unsigned int i, flat, count, range = (max - min);
+
+	mutex_lock(&fb_info->bl_curve_mutex);
+
+	fb_info->bl_curve[0] = off;
+
+	for (flat = 1; flat < (FB_BACKLIGHT_LEVELS / 16); ++flat)
+		fb_info->bl_curve[flat] = min;
+
+	count = FB_BACKLIGHT_LEVELS * 15 / 16;
+	for (i = 0; i < count; ++i)
+		fb_info->bl_curve[flat + i] = min + (range * (i + 1) / count);
+
+	mutex_unlock(&fb_info->bl_curve_mutex);
+}

@@ -1,0 +1,17 @@
+destroy()
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    archive_option_destroy_mask(x_selection);
+	    archive_option_destroy_mask(x_subtree);
+	    archive_option_destroy_mask(x_ea_mask);
+	    archive_option_destroy_crit_action(x_overwrite);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }

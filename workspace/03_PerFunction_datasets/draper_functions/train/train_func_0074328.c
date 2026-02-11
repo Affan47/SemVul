@@ -1,0 +1,15 @@
+constant_boolean_node (int value, tree type)
+{
+  if (type == integer_type_node)
+    return value ? integer_one_node : integer_zero_node;
+  else if (TREE_CODE (type) == BOOLEAN_TYPE)
+    return (*lang_hooks.truthvalue_conversion) (value ? integer_one_node :
+						integer_zero_node);
+  else
+    {
+      tree t = build_int_2 (value, 0);
+
+      TREE_TYPE (t) = type;
+      return t;
+    }
+}

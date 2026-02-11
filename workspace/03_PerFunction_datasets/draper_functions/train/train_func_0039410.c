@@ -1,0 +1,24 @@
+new_ncci(capidrv_contr *card,
+				     capidrv_plci *plcip,
+				     u32 ncci)
+{
+	capidrv_ncci *nccip;
+
+	nccip = kzalloc(sizeof(capidrv_ncci), GFP_ATOMIC);
+
+	if (nccip == NULL)
+		return NULL;
+
+	nccip->ncci = ncci;
+	nccip->state = ST_NCCI_NONE;
+	nccip->plcip = plcip;
+	nccip->chan = plcip->chan;
+	nccip->datahandle = 0;
+
+	nccip->next = plcip->ncci_list;
+	plcip->ncci_list = nccip;
+
+	card->bchans[plcip->chan].nccip = nccip;
+
+	return nccip;
+}

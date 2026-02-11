@@ -1,0 +1,28 @@
+forge_udp()
+{
+    unsigned short chksum;
+
+    opt.pktlen = 61;
+    memcpy(h80211, UDP_PACKET, opt.pktlen);
+
+    if( set_tofromds(h80211) != 0 ) return 1;
+    if( set_bssid(h80211)    != 0 ) return 1;
+    if( set_smac(h80211)     != 0 ) return 1;
+    if( set_dmac(h80211)     != 0 ) return 1;
+
+    if( set_dip(h80211, 48)  != 0 ) return 1;
+    if( set_sip(h80211, 44)  != 0 ) return 1;
+    if( opt.ttl != -1 )
+        if( set_ip_ttl(h80211) != 0 ) return 1;
+
+    if( set_ipid(h80211, 36)  != 0 ) return 1;
+
+
+    h80211[57] = '\x09';
+
+
+    chksum = ip_chksum((unsigned short*)(h80211+32), 20);
+    memcpy(h80211+42, &chksum, 2);
+
+    return 0;
+}

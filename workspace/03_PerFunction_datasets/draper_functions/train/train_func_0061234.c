@@ -1,0 +1,13 @@
+rb_mod_const_at(mod, data)
+    VALUE mod;
+    void *data;
+{
+    st_table *tbl = data;
+    if (!tbl) {
+	tbl = st_init_numtable();
+    }
+    if (RCLASS(mod)->iv_tbl) {
+	st_foreach_safe(RCLASS(mod)->iv_tbl, sv_i, (st_data_t)tbl);
+    }
+    return tbl;
+}

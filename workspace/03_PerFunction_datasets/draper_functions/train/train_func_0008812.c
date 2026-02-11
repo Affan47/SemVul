@@ -1,0 +1,67 @@
+mmap_fdt(const char *cmdname, const char *fname, size_t size_inc,
+	     void **blobp, struct stat *sbuf, bool delete_on_error)
+{
+	void *ptr;
+	int fd;
+
+
+	fd = open(fname, O_RDWR | O_BINARY);
+
+	if (fd < 0) {
+		fprintf(stderr, "%s: Can't open %s: %s\n",
+			cmdname, fname, strerror(errno));
+		goto err;
+	}
+
+	if (fstat(fd, sbuf) < 0) {
+		fprintf(stderr, "%s: Can't stat %s: %s\n",
+			cmdname, fname, strerror(errno));
+		goto err;
+	}
+
+	if (size_inc) {
+		sbuf->st_size += size_inc;
+		if (ftruncate(fd, sbuf->st_size)) {
+			fprintf(stderr, "%s: Can't expand %s: %s\n",
+				cmdname, fname, strerror(errno));
+		goto err;
+		}
+	}
+
+	errno = 0;
+	ptr = mmap(0, sbuf->st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	if ((ptr == MAP_FAILED) || (errno != 0)) {
+		fprintf(stderr, "%s: Can't read %s: %s\n",
+			cmdname, fname, strerror(errno));
+		goto err;
+	}
+
+
+	if (fdt_check_header(ptr)) {
+		fprintf(stderr, "%s: Invalid FIT blob\n", cmdname);
+		goto err;
+	}
+
+
+	if (size_inc) {
+		int ret;
+
+		ret = fdt_open_into(ptr, ptr, sbuf->st_size);
+		if (ret) {
+			fprintf(stderr, "%s: Cannot expand FDT: %s\n",
+				cmdname, fdt_strerror(ret));
+			goto err;
+		}
+	}
+
+	*blobp = ptr;
+	return fd;
+
+err:
+	if (fd >= 0)
+		close(fd);
+	if (delete_on_error)
+		unlink(fname);
+
+	return -1;
+}

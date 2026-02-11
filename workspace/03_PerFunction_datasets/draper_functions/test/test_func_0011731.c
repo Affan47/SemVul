@@ -1,0 +1,10 @@
+temp_to_s8(long val)
+{
+	if (val <= -128000)
+		return -128;
+	if (val >= 127000)
+		return 127;
+	if (val < 0)
+		return (val - 500) / 1000;
+	return (val + 500) / 1000;
+}

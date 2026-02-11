@@ -1,0 +1,7 @@
+__ecereMethod___ecereNameSpace__eda__TableDropBox_EditNotifyCharsAdded(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__eda__TableDropBox * __ecerePointer___ecereNameSpace__eda__TableDropBox = (struct __ecereNameSpace__eda__TableDropBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__eda__TableDropBox->offset) : 0);
+
+if(!__ecereProp___ecereNameSpace__ecere__gui__controls__DropBox_Get_editBox(this)->_vTbl[__ecereVMethodID___ecereNameSpace__ecere__gui__controls__EditBox_NotifyUpdate] || __ecereProp___ecereNameSpace__ecere__gui__controls__DropBox_Get_editBox(this)->_vTbl[__ecereVMethodID___ecereNameSpace__ecere__gui__controls__EditBox_NotifyUpdate] == ((void (*)(struct __ecereNameSpace__ecere__com__Instance *, struct __ecereNameSpace__ecere__com__Instance * editBox))__ecereClass___ecereNameSpace__ecere__gui__controls__EditBox->_vTbl[__ecereVMethodID___ecereNameSpace__ecere__gui__controls__EditBox_NotifyUpdate]))
+__ecereNameSpace__ecere__com__eInstance_SetMethod(__ecereProp___ecereNameSpace__ecere__gui__controls__DropBox_Get_editBox(this), "NotifyUpdate", __ecereMethod___ecereNameSpace__eda__TableDropBox_EditNotifyUpdate);
+}

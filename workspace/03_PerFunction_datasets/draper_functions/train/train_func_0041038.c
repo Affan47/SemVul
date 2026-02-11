@@ -1,0 +1,13 @@
+find_line_note (insn)
+     rtx insn;
+{
+  if (no_line_numbers)
+    return 0;
+
+  for (; insn; insn = PREV_INSN (insn))
+    if (GET_CODE (insn) == NOTE
+	&& NOTE_LINE_NUMBER (insn) >= 0)
+      break;
+
+  return insn;
+}

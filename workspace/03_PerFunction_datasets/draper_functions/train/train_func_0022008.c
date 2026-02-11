@@ -1,0 +1,9 @@
+__ecereProp___ecereNameSpace__ecere__gui__controls__ListBox_Set_typingTimeout(struct __ecereNameSpace__ecere__com__Instance * this, double value)
+{
+struct __ecereNameSpace__ecere__gui__controls__ListBox * __ecerePointer___ecereNameSpace__ecere__gui__controls__ListBox = (struct __ecereNameSpace__ecere__gui__controls__ListBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__ListBox->offset) : 0);
+
+__ecerePointer___ecereNameSpace__ecere__gui__controls__ListBox->typedString[0] = '\0';
+__ecereProp___ecereNameSpace__ecere__gui__Timer_Set_delay(__ecerePointer___ecereNameSpace__ecere__gui__controls__ListBox->typingTimer, value);
+__ecerePointer___ecereNameSpace__ecere__gui__controls__ListBox->typingTimeOut = (double)value;
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__ecere__gui__controls__ListBox_typingTimeout), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__ecere__gui__controls__ListBox_typingTimeout);
+}

@@ -1,0 +1,32 @@
+data_hub_constructor (GType type, guint n_construct_properties, GObjectConstructParam * construct_properties) {
+	GObject * obj;
+	GObjectClass * parent_class;
+	DataHub * self;
+	GPtrArray* _tmp0_ = NULL;
+	GMainLoop* _tmp1_ = NULL;
+	ZeitgeistLog* _tmp2_ = NULL;
+	ZeitgeistLog* _tmp3_ = NULL;
+	ZeitgeistDataSourceRegistry* _tmp4_ = NULL;
+	parent_class = G_OBJECT_CLASS (data_hub_parent_class);
+	obj = parent_class->constructor (type, n_construct_properties, construct_properties);
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, TYPE_DATA_HUB, DataHub);
+	__g_list_free__g_object_unref0_0 (self->priv->providers);
+	self->priv->providers = NULL;
+	__g_list_free__g_object_unref0_0 (self->priv->sources_info);
+	self->priv->sources_info = NULL;
+	_tmp0_ = g_ptr_array_new_with_free_func (_g_object_unref0_);
+	_g_ptr_array_unref0 (self->priv->queued_events);
+	self->priv->queued_events = _tmp0_;
+	_tmp1_ = g_main_loop_new (NULL, FALSE);
+	_g_main_loop_unref0 (self->priv->main_loop);
+	self->priv->main_loop = _tmp1_;
+	_tmp2_ = zeitgeist_log_new ();
+	_g_object_unref0 (self->priv->zg_log);
+	self->priv->zg_log = _tmp2_;
+	_tmp3_ = self->priv->zg_log;
+	g_signal_connect_object ((GObject*) _tmp3_, "notify::connected", (GCallback) __data_hub___lambda9__g_object_notify, self, 0);
+	_tmp4_ = zeitgeist_data_source_registry_new ();
+	_g_object_unref0 (self->priv->registry);
+	self->priv->registry = _tmp4_;
+	return obj;
+}

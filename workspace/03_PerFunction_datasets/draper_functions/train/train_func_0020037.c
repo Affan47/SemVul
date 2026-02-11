@@ -1,0 +1,29 @@
+delete_for_peephole (from, to)
+     rtx from, to;
+{
+  rtx insn = from;
+
+  while (1)
+    {
+      rtx next = NEXT_INSN (insn);
+      rtx prev = PREV_INSN (insn);
+
+      if (GET_CODE (insn) != NOTE)
+	{
+	  INSN_DELETED_P (insn) = 1;
+
+
+	  if (prev)
+	    NEXT_INSN (prev) = next;
+
+	  if (next)
+	    PREV_INSN (next) = prev;
+	}
+
+      if (insn == to)
+	break;
+      insn = next;
+    }
+
+
+}

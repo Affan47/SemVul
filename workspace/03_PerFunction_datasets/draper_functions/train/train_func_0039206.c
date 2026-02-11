@@ -1,0 +1,11 @@
+PyMem_SetAllocator(PyMemAllocatorDomain domain, PyMemAllocator *allocator)
+{
+    switch(domain)
+    {
+    case PYMEM_DOMAIN_RAW: _PyMem_Raw = *allocator; break;
+    case PYMEM_DOMAIN_MEM: _PyMem = *allocator; break;
+    case PYMEM_DOMAIN_OBJ: _PyObject = *allocator; break;
+
+    }
+
+}

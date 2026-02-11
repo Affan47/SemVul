@@ -1,0 +1,32 @@
+gee_array_queue_real_offer_tail (GeeDeque* base, gconstpointer element) {
+	GeeArrayQueue * self;
+	gboolean result = FALSE;
+	gpointer* _tmp0_ = NULL;
+	gint _tmp0__length1 = 0;
+	gint _tmp1_ = 0;
+	gint _tmp2_ = 0;
+	gpointer* _tmp3_ = NULL;
+	gint _tmp3__length1 = 0;
+	gconstpointer _tmp4_ = NULL;
+	gpointer _tmp5_ = NULL;
+	gpointer _tmp6_ = NULL;
+	gint _tmp7_ = 0;
+	self = (GeeArrayQueue*) base;
+	gee_array_queue_grow_if_needed (self);
+	_tmp0_ = self->priv->_items;
+	_tmp0__length1 = self->priv->_items_length1;
+	_tmp1_ = self->priv->_start;
+	_tmp2_ = self->priv->_length;
+	self->priv->_length = _tmp2_ + 1;
+	_tmp3_ = self->priv->_items;
+	_tmp3__length1 = self->priv->_items_length1;
+	_tmp4_ = element;
+	_tmp5_ = ((_tmp4_ != NULL) && (self->priv->g_dup_func != NULL)) ? self->priv->g_dup_func ((gpointer) _tmp4_) : ((gpointer) _tmp4_);
+	((_tmp0_[(_tmp1_ + _tmp2_) % _tmp3__length1] == NULL) || (self->priv->g_destroy_func == NULL)) ? NULL : (_tmp0_[(_tmp1_ + _tmp2_) % _tmp3__length1] = (self->priv->g_destroy_func (_tmp0_[(_tmp1_ + _tmp2_) % _tmp3__length1]), NULL));
+	_tmp0_[(_tmp1_ + _tmp2_) % _tmp3__length1] = _tmp5_;
+	_tmp6_ = _tmp0_[(_tmp1_ + _tmp2_) % _tmp3__length1];
+	_tmp7_ = self->priv->_stamp;
+	self->priv->_stamp = _tmp7_ + 1;
+	result = TRUE;
+	return result;
+}

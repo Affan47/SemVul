@@ -1,0 +1,25 @@
+cgiDoSearch(void       *search,
+            const char *text)
+{
+  int		i;
+  regmatch_t	matches[100];
+
+
+  if (!search || !text)
+    return (0);
+
+
+  if (!regexec((regex_t *)search, text, sizeof(matches) / sizeof(matches[0]),
+               matches, 0))
+  {
+
+
+    for (i = 0; i < (int)(sizeof(matches) / sizeof(matches[0])); i ++)
+      if (matches[i].rm_so < 0)
+	break;
+
+    return (i);
+  }
+  else
+    return (0);
+}

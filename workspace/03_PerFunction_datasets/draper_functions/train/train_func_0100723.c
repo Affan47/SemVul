@@ -1,0 +1,5 @@
+FExp(float *vec, int n)
+{
+  int x;
+  for (x = 0; x < n; x++) vec[x] = exp(vec[x]);
+}

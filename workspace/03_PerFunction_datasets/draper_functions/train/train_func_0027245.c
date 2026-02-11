@@ -1,0 +1,23 @@
+mlx4_GEN_QP_wrapper(struct mlx4_dev *dev, int slave,
+			struct mlx4_vhcr *vhcr,
+			struct mlx4_cmd_mailbox *inbox,
+			struct mlx4_cmd_mailbox *outbox,
+			struct mlx4_cmd_info *cmd)
+{
+	int err;
+	int qpn = vhcr->in_modifier & 0x7fffff;
+	struct res_qp *qp;
+
+	err = get_res(dev, slave, qpn, RES_QP, &qp);
+	if (err)
+		return err;
+	if (qp->com.from_state != RES_QP_HW) {
+		err = -EBUSY;
+		goto out;
+	}
+
+	err = mlx4_DMA_wrapper(dev, slave, vhcr, inbox, outbox, cmd);
+out:
+	put_res(dev, slave, qpn, RES_QP);
+	return err;
+}

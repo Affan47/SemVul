@@ -1,0 +1,31 @@
+filter_def_set_attrs(git_filter_def *fdef)
+{
+	char *scan = fdef->attrdata;
+	size_t i;
+
+	for (i = 0; i < fdef->nattrs; ++i) {
+		const char *name, *value;
+
+		switch (*scan) {
+		case '=':
+			name = scan + 1;
+			for (scan++; *scan != '='; scan++) ;
+			*scan++ = '\0';
+			value = scan;
+			break;
+		case '-':
+			name = scan + 1; value = git_attr__false; break;
+		case '+':
+			name = scan + 1; value = git_attr__true;  break;
+		case '!':
+			name = scan + 1; value = git_attr__unset; break;
+		default:
+			name = scan;     value = NULL; break;
+		}
+
+		fdef->attrs[i] = name;
+		fdef->attrs[i + fdef->nattrs] = value;
+
+		scan += strlen(scan) + 1;
+	}
+}

@@ -1,0 +1,19 @@
+push_srcloc (file, line)
+     const char *file;
+     int line;
+{
+  struct file_stack *fs;
+
+  if (input_file_stack)
+    {
+      input_file_stack->name = input_filename;
+      input_file_stack->line = lineno;
+    }
+
+  fs = (struct file_stack *) xmalloc (sizeof (struct file_stack));
+  fs->name = input_filename = file;
+  fs->line = lineno = line;
+  fs->next = input_file_stack;
+  input_file_stack = fs;
+  input_file_stack_tick++;
+}

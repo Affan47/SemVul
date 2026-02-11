@@ -1,0 +1,28 @@
+fm10k_tlv_attr_put_value(u32 *msg, u16 attr_id, s64 value, u32 len)
+{
+	u32 *attr;
+
+
+	if (!msg || !len || len > 8 || (len & (len - 1)))
+		return FM10K_ERR_PARAM;
+
+	attr = &msg[FM10K_TLV_DWORD_LEN(*msg)];
+
+	if (len < 4) {
+		attr[1] = (u32)value & ((0x1ul << (8 * len)) - 1);
+	} else {
+		attr[1] = (u32)value;
+		if (len > 4)
+			attr[2] = (u32)(value >> 32);
+	}
+
+
+	len <<= FM10K_TLV_LEN_SHIFT;
+	attr[0] = len | attr_id;
+
+
+	len += FM10K_TLV_HDR_LEN << FM10K_TLV_LEN_SHIFT;
+	*msg += FM10K_TLV_LEN_ALIGN(len);
+
+	return 0;
+}

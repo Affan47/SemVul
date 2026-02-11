@@ -1,0 +1,81 @@
+ep_config_from_table(struct musb *musb)
+{
+	const struct musb_fifo_cfg	*cfg;
+	unsigned		i, n;
+	int			offset;
+	struct musb_hw_ep	*hw_ep = musb->endpoints;
+
+	if (musb->config->fifo_cfg) {
+		cfg = musb->config->fifo_cfg;
+		n = musb->config->fifo_cfg_size;
+		goto done;
+	}
+
+	switch (fifo_mode) {
+	default:
+		fifo_mode = 0;
+
+	case 0:
+		cfg = mode_0_cfg;
+		n = ARRAY_SIZE(mode_0_cfg);
+		break;
+	case 1:
+		cfg = mode_1_cfg;
+		n = ARRAY_SIZE(mode_1_cfg);
+		break;
+	case 2:
+		cfg = mode_2_cfg;
+		n = ARRAY_SIZE(mode_2_cfg);
+		break;
+	case 3:
+		cfg = mode_3_cfg;
+		n = ARRAY_SIZE(mode_3_cfg);
+		break;
+	case 4:
+		cfg = mode_4_cfg;
+		n = ARRAY_SIZE(mode_4_cfg);
+		break;
+	case 5:
+		cfg = mode_5_cfg;
+		n = ARRAY_SIZE(mode_5_cfg);
+		break;
+	}
+
+	printk(KERN_DEBUG "%s: setup fifo_mode %d\n",
+			musb_driver_name, fifo_mode);
+
+
+done:
+	offset = fifo_setup(musb, hw_ep, &ep0_cfg, 0);
+
+
+	for (i = 0; i < n; i++) {
+		u8	epn = cfg->hw_ep_num;
+
+		if (epn >= musb->config->num_eps) {
+			pr_debug("%s: invalid ep %d\n",
+					musb_driver_name, epn);
+			return -EINVAL;
+		}
+		offset = fifo_setup(musb, hw_ep + epn, cfg++, offset);
+		if (offset < 0) {
+			pr_debug("%s: mem overrun, ep %d\n",
+					musb_driver_name, epn);
+			return offset;
+		}
+		epn++;
+		musb->nr_endpoints = max(epn, musb->nr_endpoints);
+	}
+
+	printk(KERN_DEBUG "%s: %d/%d max ep, %d/%d memory\n",
+			musb_driver_name,
+			n + 1, musb->config->num_eps * 2 - 1,
+			offset, (1 << (musb->config->ram_bits + 2)));
+
+	if (!musb->bulk_ep) {
+		pr_debug("%s: missing bulk\n", musb_driver_name);
+		return -EINVAL;
+	}
+
+	return 0;
+}

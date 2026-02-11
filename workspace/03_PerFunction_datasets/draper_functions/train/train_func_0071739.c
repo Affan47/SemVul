@@ -1,0 +1,17 @@
+cpp_handle_options (pfile, argc, argv)
+     cpp_reader *pfile;
+     int argc;
+     char **argv;
+{
+  int i;
+  int strings_processed;
+
+  for (i = 0; i < argc; i += strings_processed)
+    {
+      strings_processed = cpp_handle_option (pfile, argc - i, argv + i);
+      if (strings_processed == 0)
+	break;
+    }
+
+  return i;
+}

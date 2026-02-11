@@ -1,0 +1,29 @@
+skipTo(const int32_t target) {
+	if (!haveSkipped) {
+
+		loadSkipLevels();
+		haveSkipped = true;
+	}
+
+
+	int32_t level = 0;
+	while (level < numberOfSkipLevels - 1 && target > skipDoc[level + 1]) {
+		level++;
+	}
+
+	while (level >= 0) {
+		if (target > skipDoc[level]) {
+			if (!loadNextSkip(level)) {
+				continue;
+			}
+		} else {
+
+			if (level > 0 && lastChildPointer > skipStream[level - 1]->getFilePointer()) {
+				seekChild(level - 1);
+			}
+			level--;
+		}
+	}
+
+	return numSkipped[0] - skipInterval[0] - 1;
+}

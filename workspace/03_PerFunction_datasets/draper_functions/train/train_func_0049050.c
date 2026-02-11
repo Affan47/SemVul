@@ -1,0 +1,24 @@
+tick_nohz_idle_exit(void)
+{
+	struct tick_sched *ts = this_cpu_ptr(&tick_cpu_sched);
+	ktime_t now;
+
+	local_irq_disable();
+
+	WARN_ON_ONCE(!ts->inidle);
+
+	ts->inidle = 0;
+
+	if (ts->idle_active || ts->tick_stopped)
+		now = ktime_get();
+
+	if (ts->idle_active)
+		tick_nohz_stop_idle(ts, now);
+
+	if (ts->tick_stopped) {
+		tick_nohz_restart_sched_tick(ts, now);
+		tick_nohz_account_idle_ticks(ts);
+	}
+
+	local_irq_enable();
+}

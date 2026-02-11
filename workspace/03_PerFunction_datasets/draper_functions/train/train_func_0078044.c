@@ -1,0 +1,9 @@
+createToolBars()
+{
+    toolBar()->addAction(m_stopAct);
+    toolBar()->addSeparator();
+    toolBar()->addAction(m_continueAct);
+    toolBar()->addAction(m_stepOverAct);
+    toolBar()->addAction(m_stepIntoAct);
+    toolBar()->addAction(m_stepOutAct);
+}

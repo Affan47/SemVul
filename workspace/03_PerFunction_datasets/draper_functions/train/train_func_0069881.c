@@ -1,0 +1,19 @@
+main(void)
+{
+
+	if (wakeup_header.real_magic != 0x12345678)
+		while (1)
+			;
+
+	if (wakeup_header.realmode_flags & 4)
+		send_morse("...-");
+
+	if (wakeup_header.realmode_flags & 1)
+		asm volatile("lcallw   $0xc000,$3");
+
+	if (wakeup_header.realmode_flags & 2) {
+
+		probe_cards(0);
+		set_mode(wakeup_header.video_mode);
+	}
+}

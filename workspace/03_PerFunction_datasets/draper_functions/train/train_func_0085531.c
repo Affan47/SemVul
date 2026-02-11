@@ -1,0 +1,7 @@
+argf_set_lineno(argf, val)
+    VALUE argf, val;
+{
+    gets_lineno = NUM2INT(val);
+    lineno = INT2FIX(gets_lineno);
+    return Qnil;
+}

@@ -1,0 +1,30 @@
+save_parser_client() {
+  __continuation_prompt = _continuation_prompt;
+  __continuation_prompt_disabled = _continuation_prompt_disabled;
+  __skip_shell_comments = _skip_shell_comments;
+  __oneshot_infunc = _oneshot_infunc;
+  __detail_matched_delims = _detail_matched_delims;
+  __ignore_numerics = _ignore_numerics;
+  __angle_brackets  = _angle_brackets ;
+  __token_state_save = _token_state_save;
+  _expecting = expecting;
+  _ParenStack = ParenStack;
+  _TopOfParenStack = TopOfParenStack;
+  _SizeOfParenStack = SizeOfParenStack;
+  _OperStack = OperStack;
+  _TopOfOperStack = TopOfOperStack;
+  _SizeOfOperStack = SizeOfOperStack;
+  _NextBufptr = NextBufptr;
+  _NextToken = NextToken;
+  _NextToklen = NextToklen;
+  _NextToktype = NextToktype;
+  _NextTokstart = NextTokstart;
+  _NextLinenum = NextLinenum;
+  for (int i=0; i<OPTYPE_NUM; i++)
+    _NextOp_ids[i] = NextOp_ids[i];
+  _opr_tbl_ptr = opr_tbl_ptr_get();
+  _opr_tbl_numop = opr_tbl_numop_get();
+  _opr_tbl_maxop = opr_tbl_maxop_get();
+  _opr_tbl_maxpri = opr_tbl_maxpri_get();
+  _opr_tbl_lastop = opr_tbl_lastop_get();
+}

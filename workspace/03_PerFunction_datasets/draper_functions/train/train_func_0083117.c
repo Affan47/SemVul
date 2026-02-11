@@ -1,0 +1,29 @@
+bnx2x_func_send_tx_start(struct bnx2x *bp,
+				       struct bnx2x_func_state_params *params)
+{
+	struct bnx2x_func_sp_obj *o = params->f_obj;
+	struct flow_control_configuration *rdata =
+		(struct flow_control_configuration *)o->rdata;
+	dma_addr_t data_mapping = o->rdata_mapping;
+	struct bnx2x_func_tx_start_params *tx_start_params =
+		&params->params.tx_start;
+	int i;
+
+	memset(rdata, 0, sizeof(*rdata));
+
+	rdata->dcb_enabled = tx_start_params->dcb_enabled;
+	rdata->dcb_version = tx_start_params->dcb_version;
+	rdata->dont_add_pri_0_en = tx_start_params->dont_add_pri_0_en;
+
+	for (i = 0; i < ARRAY_SIZE(rdata->traffic_type_to_priority_cos); i++)
+		rdata->traffic_type_to_priority_cos[i] =
+			tx_start_params->traffic_type_to_priority_cos[i];
+
+	for (i = 0; i < MAX_TRAFFIC_TYPES; i++)
+		rdata->dcb_outer_pri[i] = tx_start_params->dcb_outer_pri[i];
+
+
+	return bnx2x_sp_post(bp, RAMROD_CMD_ID_COMMON_START_TRAFFIC, 0,
+			     U64_HI(data_mapping),
+			     U64_LO(data_mapping), NONE_CONNECTION_TYPE);
+}

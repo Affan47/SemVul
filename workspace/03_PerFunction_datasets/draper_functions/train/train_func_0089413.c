@@ -1,0 +1,42 @@
+test_iterator_sci0_mark_loop()
+{
+	song_iterator_t *it = songit_new (loop_song, LOOP_SONG_SIZE, SCI_SONG_ITERATOR_TYPE_SCI0, 0l);
+	unsigned char data[4];
+	int result;
+	SIMSG_SEND(it, SIMSG_SET_PLAYMASK(0x0001));
+	SIMSG_SEND(it, SIMSG_SET_LOOPS(3));
+
+	puts("[TEST] SCI0-style song with loop mark, looping");
+	ASSERT_NEXT(42);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x90, 60, 0x7f);
+	ASSERT_NEXT(13);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x80, 60, 0x00);
+
+	ASSERT_NEXT(2);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x90, 64, 0x42);
+	ASSERT_NEXT(3);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x80, 64, 0x00);
+
+	ASSERT_NEXT(SI_LOOP);
+	ASSERT_NEXT(2);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x90, 64, 0x42);
+	ASSERT_NEXT(3);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x80, 64, 0x00);
+
+	ASSERT_NEXT(SI_LOOP);
+	ASSERT_NEXT(2);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x90, 64, 0x42);
+	ASSERT_NEXT(3);
+	ASSERT_NEXT(0);
+	ASSERT_MIDI3(0x80, 64, 0x00);
+
+	ASSERT_NEXT(SI_FINISHED);
+	puts("[TEST] Test OK.");
+}

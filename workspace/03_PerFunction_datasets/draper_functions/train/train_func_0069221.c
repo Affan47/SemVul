@@ -1,0 +1,30 @@
+qce_dma_request(struct device *dev, struct qce_dma_data *dma)
+{
+	int ret;
+
+	dma->txchan = dma_request_slave_channel_reason(dev, "tx");
+	if (IS_ERR(dma->txchan))
+		return PTR_ERR(dma->txchan);
+
+	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
+	if (IS_ERR(dma->rxchan)) {
+		ret = PTR_ERR(dma->rxchan);
+		goto error_rx;
+	}
+
+	dma->result_buf = kmalloc(QCE_RESULT_BUF_SZ + QCE_IGNORE_BUF_SZ,
+				  GFP_KERNEL);
+	if (!dma->result_buf) {
+		ret = -ENOMEM;
+		goto error_nomem;
+	}
+
+	dma->ignore_buf = dma->result_buf + QCE_RESULT_BUF_SZ;
+
+	return 0;
+error_nomem:
+	dma_release_channel(dma->rxchan);
+error_rx:
+	dma_release_channel(dma->txchan);
+	return ret;
+}

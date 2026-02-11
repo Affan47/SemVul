@@ -1,0 +1,17 @@
+setupCLK(void) {
+
+    SET_REG(RCC_CR, GET_REG(RCC_CR) | 0x00010001);
+    while ((GET_REG(RCC_CR) & 0x00020000) == 0);
+
+
+    SET_REG(FLASH_ACR, 0x00000012);
+
+
+    SET_REG(RCC_CFGR, GET_REG(RCC_CFGR) | 0x001D0400);
+    SET_REG(RCC_CR, GET_REG(RCC_CR)     | 0x01000000);
+    while ((GET_REG(RCC_CR) & 0x03000000) == 0);
+
+
+    SET_REG(RCC_CFGR, GET_REG(RCC_CFGR) | 0x00000002);
+    while ((GET_REG(RCC_CFGR) & 0x00000008) == 0);
+}

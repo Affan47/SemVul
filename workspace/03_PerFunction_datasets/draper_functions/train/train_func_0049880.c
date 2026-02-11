@@ -1,0 +1,29 @@
+btsdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+{
+	struct btsdio_data *data = hci_get_drvdata(hdev);
+
+	BT_DBG("%s", hdev->name);
+
+	switch (bt_cb(skb)->pkt_type) {
+	case HCI_COMMAND_PKT:
+		hdev->stat.cmd_tx++;
+		break;
+
+	case HCI_ACLDATA_PKT:
+		hdev->stat.acl_tx++;
+		break;
+
+	case HCI_SCODATA_PKT:
+		hdev->stat.sco_tx++;
+		break;
+
+	default:
+		return -EILSEQ;
+	}
+
+	skb_queue_tail(&data->txq, skb);
+
+	schedule_work(&data->work);
+
+	return 0;
+}

@@ -1,0 +1,95 @@
+inet_pton6(const char *src, u_char *dst)
+{
+	static const char xdigits[] = "0123456789abcdef";
+	u_char tmp[IN6ADDRSZ], *tp, *endp, *colonp;
+	const char *curtok;
+	int ch, saw_xdigit;
+	u_int val;
+
+	tp = memset(tmp, '\0', IN6ADDRSZ);
+	endp = tp + IN6ADDRSZ;
+	colonp = NULL;
+
+	if(*src == ':')
+		if(*++src != ':')
+			return (0);
+	curtok = src;
+	saw_xdigit = 0;
+	val = 0;
+	while((ch = tolower(*src++)) != '\0')
+	{
+		const char *pch;
+
+		pch = strchr(xdigits, ch);
+		if(pch != NULL)
+		{
+			val <<= 4;
+			val |= (pch - xdigits);
+			if(val > 0xffff)
+				return (0);
+			saw_xdigit = 1;
+			continue;
+		}
+		if(ch == ':')
+		{
+			curtok = src;
+			if(!saw_xdigit)
+			{
+				if(colonp)
+					return (0);
+				colonp = tp;
+				continue;
+			}
+			else if(*src == '\0')
+			{
+				return (0);
+			}
+			if(tp + INT16SZ > endp)
+				return (0);
+			*tp++ = (u_char) (val >> 8) & 0xff;
+			*tp++ = (u_char) val & 0xff;
+			saw_xdigit = 0;
+			val = 0;
+			continue;
+		}
+		if(*src != '\0' && ch == '.')
+		{
+			if(((tp + INADDRSZ) <= endp) && inet_pton4(curtok, tp) > 0)
+			{
+				tp += INADDRSZ;
+				saw_xdigit = 0;
+				break;
+			}
+		}
+		else
+			continue;
+		return (0);
+	}
+	if(saw_xdigit)
+	{
+		if(tp + INT16SZ > endp)
+			return (0);
+		*tp++ = (u_char) (val >> 8) & 0xff;
+		*tp++ = (u_char) val & 0xff;
+	}
+	if(colonp != NULL)
+	{
+
+
+		const int n = tp - colonp;
+		int i;
+
+		if(tp == endp)
+			return (0);
+		for(i = 1; i <= n; i++)
+		{
+			endp[-i] = colonp[n - i];
+			colonp[n - i] = 0;
+		}
+		tp = endp;
+	}
+	if(tp != endp)
+		return (0);
+	memcpy(dst, tmp, IN6ADDRSZ);
+	return (1);
+}

@@ -1,0 +1,11 @@
+is_integer(char * str)
+{
+  int i;
+  if (str==0) return 0;
+  for (i=0;i<strlen(str);i++) {
+    if ((str[i]<'0') || (str[i]>'9')) {
+      return 0;
+    }
+  }
+  return 1;
+}

@@ -1,0 +1,11 @@
+time_hour(time)
+    VALUE time;
+{
+    struct time_object *tobj;
+
+    GetTimeval(time, tobj);
+    if (tobj->tm_got == 0) {
+	time_get_tm(time, tobj->gmt);
+    }
+    return INT2FIX(tobj->tm.tm_hour);
+}

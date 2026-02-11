@@ -1,0 +1,10 @@
+__ecereProp___ecereNameSpace__ecere__sys__BufferedFile_Set_bufferSize(struct __ecereNameSpace__ecere__com__Instance * this, unsigned int value)
+{
+struct __ecereNameSpace__ecere__sys__BufferedFile * __ecerePointer___ecereNameSpace__ecere__sys__BufferedFile = (struct __ecereNameSpace__ecere__sys__BufferedFile *)(this ? (((char *)this) + 40) : 0);
+
+__ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->bufferSize = value;
+__ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->buffer = __ecereNameSpace__ecere__com__eSystem_Renew(__ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->buffer, sizeof(unsigned char) * (value));
+if(__ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->bufferCount > __ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->bufferSize)
+__ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->bufferCount = __ecerePointer___ecereNameSpace__ecere__sys__BufferedFile->bufferSize;
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__ecere__sys__BufferedFile_bufferSize), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__ecere__sys__BufferedFile_bufferSize);
+}

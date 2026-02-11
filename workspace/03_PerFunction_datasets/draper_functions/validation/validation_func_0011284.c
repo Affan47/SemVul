@@ -1,0 +1,8 @@
+__ecereMethod___ecereNameSpace__ecere__gui__drivers__XInterface_ClearClipboard(void)
+{
+if(__ecereNameSpace__ecere__gui__drivers__clipBoardData)
+{
+(__ecereNameSpace__ecere__com__eSystem_Delete(__ecereNameSpace__ecere__gui__drivers__clipBoardData), __ecereNameSpace__ecere__gui__drivers__clipBoardData = 0);
+XSetSelectionOwner(__ecereNameSpace__ecere__gui__drivers__xGlobalDisplay, __ecereNameSpace__ecere__gui__drivers__atoms[0], 0L, 0L);
+}
+}

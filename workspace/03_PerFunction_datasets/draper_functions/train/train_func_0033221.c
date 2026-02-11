@@ -1,0 +1,5 @@
+mklower(int ch) {
+	if (ch >= 0x41 && ch <= 0x5A)
+		return (ch + 0x20);
+	return (ch);
+}

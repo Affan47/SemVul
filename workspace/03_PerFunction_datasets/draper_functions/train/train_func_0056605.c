@@ -1,0 +1,29 @@
+apprentice_list(struct mlist *mlist, int mode)
+{
+	uint32_t magindex = 0;
+	struct mlist *ml;
+	for (ml = mlist->next; ml != mlist; ml = ml->next) {
+		for (magindex = 0; magindex < ml->nmagic; magindex++) {
+			struct magic *m = &ml->magic[magindex];
+			if ((m->flag & mode) != mode) {
+
+				while (magindex + 1 < ml->nmagic &&
+				       ml->magic[magindex + 1].cont_level != 0)
+					++magindex;
+				continue;
+			}
+
+
+			while (magindex + 1 < ml->nmagic &&
+			       ml->magic[magindex + 1].cont_level != 0 &&
+			       *ml->magic[magindex].desc == '\0' &&
+			       *ml->magic[magindex].mimetype == '\0')
+				magindex++;
+
+			printf("Strength = %3" SIZE_T_FORMAT "u : %s [%s]\n",
+			    apprentice_magic_strength(m),
+			    ml->magic[magindex].desc,
+			    ml->magic[magindex].mimetype);
+		}
+	}
+}

@@ -1,0 +1,11 @@
+btd_register_adapter_driver(struct btd_adapter_driver *driver)
+{
+	adapter_drivers = g_slist_append(adapter_drivers, driver);
+
+	if (driver->probe == NULL)
+		return 0;
+
+	manager_foreach_adapter(probe_driver, driver);
+
+	return 0;
+}

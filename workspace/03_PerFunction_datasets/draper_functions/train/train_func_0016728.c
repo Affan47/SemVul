@@ -1,0 +1,33 @@
+__pyx_tp_clear_6Cython_8Compiler_8Scanning_PyrexScanner(PyObject *o) {
+  PyObject* tmp;
+  struct __pyx_obj_6Cython_8Compiler_8Scanning_PyrexScanner *p = (struct __pyx_obj_6Cython_8Compiler_8Scanning_PyrexScanner *)o;
+  if (likely(__pyx_ptype_6Cython_4Plex_8Scanners_Scanner)) { if (__pyx_ptype_6Cython_4Plex_8Scanners_Scanner->tp_clear) __pyx_ptype_6Cython_4Plex_8Scanners_Scanner->tp_clear(o); } else __Pyx_call_next_tp_clear(o, __pyx_tp_clear_6Cython_8Compiler_8Scanning_PyrexScanner);
+  tmp = ((PyObject*)p->context);
+  p->context = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->included_files);
+  p->included_files = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->compile_time_env);
+  p->compile_time_env = ((struct __pyx_obj_6Cython_8Compiler_8Scanning_CompileTimeScope *)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->source_encoding);
+  p->source_encoding = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->keywords);
+  p->keywords = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->indentation_stack);
+  p->indentation_stack = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->indentation_char);
+  p->indentation_char = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->sy);
+  p->sy = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->systring);
+  p->systring = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  return 0;
+}

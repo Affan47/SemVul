@@ -1,0 +1,14 @@
+remove_index_entry_at(struct index_state *istate, int pos)
+{
+	struct cache_entry *ce = istate->cache[pos];
+
+	remove_name_hash(ce);
+	istate->cache_changed = 1;
+	istate->cache_nr--;
+	if (pos >= istate->cache_nr)
+		return 0;
+	memmove(istate->cache + pos,
+		istate->cache + pos + 1,
+		(istate->cache_nr - pos) * sizeof(struct cache_entry *));
+	return 1;
+}

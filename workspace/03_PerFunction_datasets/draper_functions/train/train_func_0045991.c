@@ -1,0 +1,43 @@
+isdn_audio_xlaw2adpcm(adpcm_state *s, int fmt, unsigned char *in,
+		      unsigned char *out, int len)
+{
+	int a = s->a;
+	int d = s->d;
+	int nbits = s->nbits;
+	int olen = 0;
+
+	while (len--) {
+		int e = 0,
+			nmax = 1 << (nbits - 1);
+		int sign,
+			delta;
+
+		if (fmt)
+			delta = (isdn_audio_alaw_to_s16[*in++] >> 2) - a;
+		else
+			delta = (isdn_audio_ulaw_to_s16[*in++] >> 2) - a;
+		if (delta < 0) {
+			e = nmax;
+			delta = -delta;
+		}
+		while (--nmax && delta > d) {
+			delta -= d;
+			e++;
+		}
+		if (nbits == 4 && ((e & 0x0f) == 0))
+			e = 8;
+		isdn_audio_put_bits(e, nbits, s, &out, &olen);
+		sign = (e >> (nbits - 1)) ? -1 : 1;
+		e &= bitmask[nbits - 1];
+
+		a += sign * ((e << 1) + 1) * d >> 1;
+		if (d & 1)
+			a++;
+		d = (d * Mx[nbits - 2][e] + 0x2000) >> 14;
+		if (d < 5)
+			d = 5;
+	}
+	s->a = a;
+	s->d = d;
+	return olen;
+}

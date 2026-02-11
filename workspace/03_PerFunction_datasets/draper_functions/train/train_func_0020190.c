@@ -1,0 +1,38 @@
+async_run_entry_fn(struct work_struct *work)
+{
+	struct async_entry *entry =
+		container_of(work, struct async_entry, work);
+	unsigned long flags;
+	ktime_t uninitialized_var(calltime), delta, rettime;
+
+
+	if (initcall_debug && system_state == SYSTEM_BOOTING) {
+		pr_debug("calling  %lli_%pF @ %i\n",
+			(long long)entry->cookie,
+			entry->func, task_pid_nr(current));
+		calltime = ktime_get();
+	}
+	entry->func(entry->data, entry->cookie);
+	if (initcall_debug && system_state == SYSTEM_BOOTING) {
+		rettime = ktime_get();
+		delta = ktime_sub(rettime, calltime);
+		pr_debug("initcall %lli_%pF returned 0 after %lld usecs\n",
+			(long long)entry->cookie,
+			entry->func,
+			(long long)ktime_to_ns(delta) >> 10);
+	}
+
+
+	spin_lock_irqsave(&async_lock, flags);
+	list_del_init(&entry->domain_list);
+	list_del_init(&entry->global_list);
+
+
+	kfree(entry);
+	atomic_dec(&entry_count);
+
+	spin_unlock_irqrestore(&async_lock, flags);
+
+
+	wake_up(&async_done);
+}

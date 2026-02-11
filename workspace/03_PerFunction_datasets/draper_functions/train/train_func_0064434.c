@@ -1,0 +1,11 @@
+init_value_data (struct value_data *vd)
+{
+  int i;
+  for (i = 0; i < FIRST_PSEUDO_REGISTER; ++i)
+    {
+      vd->e[i].mode = VOIDmode;
+      vd->e[i].oldest_regno = i;
+      vd->e[i].next_regno = INVALID_REGNUM;
+    }
+  vd->max_value_regs = 0;
+}

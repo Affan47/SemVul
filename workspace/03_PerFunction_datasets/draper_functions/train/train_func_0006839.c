@@ -1,0 +1,34 @@
+add_depends(struct buffer *b, struct module *mod,
+			struct module *modules)
+{
+	struct symbol *s;
+	struct module *m;
+	int first = 1;
+
+	for (m = modules; m; m = m->next)
+		m->seen = is_vmlinux(m->name);
+
+	buf_printf(b, "\n");
+	buf_printf(b, "static const char __module_depends[]\n");
+	buf_printf(b, "__used\n");
+	buf_printf(b, "__attribute__((section(\".modinfo\"))) =\n");
+	buf_printf(b, "\"depends=");
+	for (s = mod->unres; s; s = s->next) {
+		const char *p;
+		if (!s->module)
+			continue;
+
+		if (s->module->seen)
+			continue;
+
+		s->module->seen = 1;
+		p = strrchr(s->module->name, '/');
+		if (p)
+			p++;
+		else
+			p = s->module->name;
+		buf_printf(b, "%s%s", first ? "" : ",", p);
+		first = 0;
+	}
+	buf_printf(b, "\";\n");
+}

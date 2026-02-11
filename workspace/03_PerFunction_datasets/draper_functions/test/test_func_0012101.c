@@ -1,0 +1,10 @@
+sig_list(void)
+{
+    VALUE h = rb_hash_new();
+    const struct signals *sigs;
+
+    for (sigs = siglist; sigs->signm; sigs++) {
+	rb_hash_aset(h, rb_str_new2(sigs->signm), INT2FIX(sigs->signo));
+    }
+    return h;
+}

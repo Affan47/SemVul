@@ -1,0 +1,12 @@
+record_builtin_type (rid_index, name, type)
+     enum rid rid_index;
+     const char *name;
+     tree type;
+{
+  tree id;
+  if (name == 0)
+    id = ridpointers[(int) rid_index];
+  else
+    id = get_identifier (name);
+  pushdecl (build_decl (TYPE_DECL, id, type));
+}

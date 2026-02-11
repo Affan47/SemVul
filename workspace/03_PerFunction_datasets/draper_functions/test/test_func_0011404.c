@@ -1,0 +1,13 @@
+match_fds(dst, src, max)
+    fd_set *dst, *src;
+    int max;
+{
+    int i;
+
+    for (i=0; i<=max; i++) {
+	if (FD_ISSET(i, src) && FD_ISSET(i, dst)) {
+	    return Qtrue;
+	}
+    }
+    return Qfalse;
+}

@@ -1,0 +1,12 @@
+rb_num2fix(val)
+    VALUE val;
+{
+    long v;
+
+    if (FIXNUM_P(val)) return val;
+
+    v = rb_num2long(val);
+    if (!FIXABLE(v))
+	rb_raise(rb_eRangeError, "integer %ld out of range of fixnum", v);
+    return LONG2FIX(v);
+}

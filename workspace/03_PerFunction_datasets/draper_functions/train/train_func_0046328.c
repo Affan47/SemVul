@@ -1,0 +1,12 @@
+ovl_show_options(struct seq_file *m, struct dentry *dentry)
+{
+	struct super_block *sb = dentry->d_sb;
+	struct ovl_fs *ufs = sb->s_fs_info;
+
+	seq_show_option(m, "lowerdir", ufs->config.lowerdir);
+	if (ufs->config.upperdir) {
+		seq_show_option(m, "upperdir", ufs->config.upperdir);
+		seq_show_option(m, "workdir", ufs->config.workdir);
+	}
+	return 0;
+}

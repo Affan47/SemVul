@@ -1,0 +1,39 @@
+hdac_ext_link_stream_assign(struct hdac_ext_bus *ebus,
+				struct snd_pcm_substream *substream)
+{
+	struct hdac_ext_stream *res = NULL;
+	struct hdac_stream *stream = NULL;
+	struct hdac_bus *hbus = &ebus->bus;
+
+	if (!ebus->ppcap) {
+		dev_err(hbus->dev, "stream type not supported\n");
+		return NULL;
+	}
+
+	list_for_each_entry(stream, &hbus->stream_list, list) {
+		struct hdac_ext_stream *hstream = container_of(stream,
+						struct hdac_ext_stream,
+						hstream);
+		if (stream->direction != substream->stream)
+			continue;
+
+
+		if (hstream->decoupled && !hstream->link_locked) {
+			res = hstream;
+			break;
+		}
+
+		if (!hstream->link_locked) {
+			snd_hdac_ext_stream_decouple(ebus, hstream, true);
+			res = hstream;
+			break;
+		}
+	}
+	if (res) {
+		spin_lock_irq(&hbus->reg_lock);
+		res->link_locked = 1;
+		res->link_substream = substream;
+		spin_unlock_irq(&hbus->reg_lock);
+	}
+	return res;
+}

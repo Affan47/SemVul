@@ -1,0 +1,9 @@
+debug_candidates (int trg)
+{
+  int i;
+
+  fprintf (sched_dump, "----------- candidate table: target: b=%d bb=%d ---\n",
+	   BB_TO_BLOCK (trg), trg);
+  for (i = trg + 1; i < current_nr_blocks; i++)
+    debug_candidate (i);
+}

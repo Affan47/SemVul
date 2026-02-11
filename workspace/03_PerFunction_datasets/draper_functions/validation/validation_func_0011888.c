@@ -1,0 +1,8 @@
+__ecereProp___ecereNameSpace__ecere__gui__controls__DropBox_Set_showButton(struct __ecereNameSpace__ecere__com__Instance * this, unsigned int value)
+{
+struct __ecereNameSpace__ecere__gui__controls__DropBox * __ecerePointer___ecereNameSpace__ecere__gui__controls__DropBox = (struct __ecereNameSpace__ecere__gui__controls__DropBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__DropBox->offset) : 0);
+
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_visible(__ecerePointer___ecereNameSpace__ecere__gui__controls__DropBox->button, value);
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_borderStyle(__ecerePointer___ecereNameSpace__ecere__gui__controls__DropBox->listBox, value ? 0x1 : 0x0);
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__ecere__gui__controls__DropBox_showButton), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__ecere__gui__controls__DropBox_showButton);
+}

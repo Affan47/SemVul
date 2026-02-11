@@ -1,0 +1,60 @@
+hauppauge_eeprom(struct cx88_core *core, u8 *eeprom_data)
+{
+	struct tveeprom tv;
+
+	tveeprom_hauppauge_analog(&core->i2c_client, &tv, eeprom_data);
+	core->board.tuner_type = tv.tuner_type;
+	core->tuner_formats = tv.tuner_formats;
+	core->board.radio.type = tv.has_radio ? CX88_RADIO : 0;
+	core->model = tv.model;
+
+
+	switch (tv.model)
+	{
+	case 14009:
+	case 14019:
+	case 14029:
+	case 14109:
+	case 14129:
+	case 14559:
+	case 14569:
+	case 14659:
+	case 14669:
+	case 28552:
+	case 34519:
+	case 69009:
+
+	case 69100:
+	case 69500:
+	case 69559:
+
+	case 69569:
+	case 90002:
+	case 92001:
+	case 92002:
+	case 90003:
+	case 90500:
+	case 90501:
+	case 92000:
+	case 92900:
+	case 94009:
+	case 94501:
+	case 96009:
+	case 96019:
+	case 96559:
+	case 96569:
+	case 96659:
+	case 98559:
+
+		break;
+	case CX88_BOARD_SAMSUNG_SMT_7020:
+		cx_set(MO_GP0_IO, 0x008989FF);
+		break;
+	default:
+		warn_printk(core, "warning: unknown hauppauge model #%d\n",
+			    tv.model);
+		break;
+	}
+
+	info_printk(core, "hauppauge eeprom: model=%d\n", tv.model);
+}

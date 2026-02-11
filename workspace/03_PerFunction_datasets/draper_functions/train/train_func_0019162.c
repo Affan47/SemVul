@@ -1,0 +1,14 @@
+utf_ptr2len(p)
+    char_u	*p;
+{
+    int		len;
+    int		i;
+
+    if (*p == NUL)
+	return 0;
+    len = utf8len_tab[*p];
+    for (i = 1; i < len; ++i)
+	if ((p[i] & 0xc0) != 0x80)
+	    return 1;
+    return len;
+}

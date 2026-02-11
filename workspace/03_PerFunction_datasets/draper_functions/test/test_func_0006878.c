@@ -1,0 +1,40 @@
+do_jump_by_parts_equality_rtx (op0, if_false_label, if_true_label)
+     rtx op0;
+     rtx if_false_label, if_true_label;
+{
+  int nwords = GET_MODE_SIZE (GET_MODE (op0)) / UNITS_PER_WORD;
+  rtx part;
+  int i;
+  rtx drop_through_label = 0;
+
+
+  part = gen_reg_rtx (word_mode);
+  emit_move_insn (part, operand_subword_force (op0, 0, GET_MODE (op0)));
+  for (i = 1; i < nwords && part != 0; i++)
+    part = expand_binop (word_mode, ior_optab, part,
+			 operand_subword_force (op0, i, GET_MODE (op0)),
+			 part, 1, OPTAB_WIDEN);
+
+  if (part != 0)
+    {
+      do_compare_rtx_and_jump (part, const0_rtx, EQ, 1, word_mode,
+			       NULL_RTX, if_false_label, if_true_label);
+
+      return;
+    }
+
+
+  if (! if_false_label)
+    drop_through_label = if_false_label = gen_label_rtx ();
+
+  for (i = 0; i < nwords; i++)
+    do_compare_rtx_and_jump (operand_subword_force (op0, i, GET_MODE (op0)),
+			     const0_rtx, EQ, 1, word_mode, NULL_RTX,
+			     if_false_label, NULL_RTX);
+
+  if (if_true_label)
+    emit_jump (if_true_label);
+
+  if (drop_through_label)
+    emit_label (drop_through_label);
+}

@@ -1,0 +1,19 @@
+slotGameVarEnter()
+{
+    if(game().variationCount(game().currentMove()))
+    {
+        game().moveToId(game().variations().first());
+        if(m_training->isChecked())
+        {
+            slotGameChanged();
+        }
+        else
+        {
+            slotMoveChanged();
+        }
+    }
+    else
+    {
+        slotGameMoveNext();
+    }
+}

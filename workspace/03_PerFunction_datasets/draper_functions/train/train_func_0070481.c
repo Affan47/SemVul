@@ -1,0 +1,15 @@
+__ecereDestructor___ecereNameSpace__ecere__gui__controls__Stacker(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__ecere__gui__controls__Stacker * __ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker = (struct __ecereNameSpace__ecere__gui__controls__Stacker *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__Stacker->offset) : 0);
+
+{
+((void (*)(struct __ecereNameSpace__ecere__com__Instance *))__extension__ ({
+struct __ecereNameSpace__ecere__com__Instance * __internal_ClassInst = __ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->controls;
+
+__internal_ClassInst ? __internal_ClassInst->_vTbl : __ecereClass___ecereNameSpace__ecere__com__Array->_vTbl;
+})[__ecereVMethodID___ecereNameSpace__ecere__com__Container_Free])(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->controls);
+}
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->controls), __ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->controls = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->left), __ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->left = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->right), __ecerePointer___ecereNameSpace__ecere__gui__controls__Stacker->right = 0);
+}

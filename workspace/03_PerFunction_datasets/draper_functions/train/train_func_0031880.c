@@ -1,0 +1,11 @@
+has_non_ascii(s)
+    char_u	*s;
+{
+    char_u	*p;
+
+    if (s != NULL)
+	for (p = s; *p != NUL; ++p)
+	    if (*p >= 128)
+		return TRUE;
+    return FALSE;
+}

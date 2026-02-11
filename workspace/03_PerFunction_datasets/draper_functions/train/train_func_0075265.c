@@ -1,0 +1,59 @@
+read_section (bfd *           abfd,
+	      const struct dwarf_debug_section *sec,
+	      asymbol **      syms,
+	      bfd_uint64_t    offset,
+	      bfd_byte **     section_buffer,
+	      bfd_size_type * section_size)
+{
+  asection *msec;
+  const char *section_name = sec->uncompressed_name;
+
+
+  if (!*section_buffer)
+    {
+      msec = bfd_get_section_by_name (abfd, section_name);
+      if (! msec)
+	{
+	  section_name = sec->compressed_name;
+          if (section_name != NULL)
+            msec = bfd_get_section_by_name (abfd, section_name);
+	}
+      if (! msec)
+	{
+	  (*_bfd_error_handler) (_("Dwarf Error: Can't find %s section."),
+                                 sec->uncompressed_name);
+	  bfd_set_error (bfd_error_bad_value);
+	  return FALSE;
+	}
+
+      *section_size = msec->rawsize ? msec->rawsize : msec->size;
+      if (syms)
+	{
+	  *section_buffer
+	    = bfd_simple_get_relocated_section_contents (abfd, msec, NULL, syms);
+	  if (! *section_buffer)
+	    return FALSE;
+	}
+      else
+	{
+	  *section_buffer = (bfd_byte *) bfd_malloc (*section_size);
+	  if (! *section_buffer)
+	    return FALSE;
+	  if (! bfd_get_section_contents (abfd, msec, *section_buffer,
+					  0, *section_size))
+	    return FALSE;
+	}
+    }
+
+
+  if (offset != 0 && offset >= *section_size)
+    {
+      (*_bfd_error_handler) (_("Dwarf Error: Offset (%lu)"
+			       " greater than or equal to %s size (%lu)."),
+			     (long) offset, section_name, *section_size);
+      bfd_set_error (bfd_error_bad_value);
+      return FALSE;
+    }
+
+  return TRUE;
+}

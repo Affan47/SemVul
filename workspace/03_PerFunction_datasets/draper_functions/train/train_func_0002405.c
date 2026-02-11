@@ -1,0 +1,15 @@
+jpeg_start_output (j_decompress_ptr cinfo, int scan_number)
+{
+  if (cinfo->global_state != DSTATE_BUFIMAGE &&
+      cinfo->global_state != DSTATE_PRESCAN)
+    ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
+
+  if (scan_number <= 0)
+    scan_number = 1;
+  if (cinfo->inputctl->eoi_reached &&
+      scan_number > cinfo->input_scan_number)
+    scan_number = cinfo->input_scan_number;
+  cinfo->output_scan_number = scan_number;
+
+  return output_pass_setup(cinfo);
+}

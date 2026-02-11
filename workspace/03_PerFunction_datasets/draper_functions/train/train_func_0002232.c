@@ -1,0 +1,7 @@
+__ecereProp___ecereNameSpace__ecere__gfx3D__meshes__SkyBox_Set_size(struct __ecereNameSpace__ecere__com__Instance * this, struct __ecereNameSpace__ecere__gfx3D__Vector3Df * value)
+{
+struct __ecereNameSpace__ecere__gfx3D__meshes__SkyBox * __ecerePointer___ecereNameSpace__ecere__gfx3D__meshes__SkyBox = (struct __ecereNameSpace__ecere__gfx3D__meshes__SkyBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gfx3D__meshes__SkyBox->offset) : 0);
+
+__ecerePointer___ecereNameSpace__ecere__gfx3D__meshes__SkyBox->size = *value;
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__ecere__gfx3D__meshes__SkyBox_size), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__ecere__gfx3D__meshes__SkyBox_size);
+}

@@ -1,0 +1,4 @@
+Perl_PerlIO_seek(pTHX_ PerlIO *f, Off_t offset, int whence)
+{
+     Perl_PerlIO_or_fail(f, Seek, -1, (aTHX_ f, offset, whence));
+}

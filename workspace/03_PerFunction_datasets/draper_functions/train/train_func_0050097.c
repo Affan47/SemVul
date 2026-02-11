@@ -1,0 +1,14 @@
+profile_discard_flip_buffers(void)
+{
+	int i, cpu;
+
+	mutex_lock(&profile_flip_mutex);
+	i = per_cpu(cpu_profile_flip, get_cpu());
+	put_cpu();
+	on_each_cpu(__profile_flip_buffers, NULL, 1);
+	for_each_online_cpu(cpu) {
+		struct profile_hit *hits = per_cpu(cpu_profile_hits, cpu)[i];
+		memset(hits, 0, NR_PROFILE_HIT*sizeof(struct profile_hit));
+	}
+	mutex_unlock(&profile_flip_mutex);
+}

@@ -1,0 +1,7 @@
+verbose_setter(val, id, variable)
+    VALUE val;
+    ID id;
+    VALUE *variable;
+{
+    ruby_verbose = RTEST(val) ? Qtrue : val;
+}

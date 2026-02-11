@@ -1,0 +1,27 @@
+rb_str_to_inum(str, base, badcheck)
+    VALUE str;
+    int base;
+    int badcheck;
+{
+    char *s;
+    long len;
+
+    StringValue(str);
+    if (badcheck) {
+	s = StringValueCStr(str);
+    }
+    else {
+	s = RSTRING(str)->ptr;
+    }
+    if (s) {
+	len = RSTRING(str)->len;
+	if (s[len]) {
+	    char *p = ALLOCA_N(char, len+1);
+
+	    MEMCPY(p, s, char, len);
+	    p[len] = '\0';
+	    s = p;
+	}
+    }
+    return rb_cstr_to_inum(s, base, badcheck);
+}

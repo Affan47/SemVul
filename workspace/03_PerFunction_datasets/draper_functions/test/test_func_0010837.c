@@ -1,0 +1,9 @@
+databuf_lo_before_commit(struct gfs2_sbd *sdp, struct gfs2_trans *tr)
+{
+	unsigned int limit = databuf_limit(sdp);
+	unsigned int nbuf;
+	if (tr == NULL)
+		return;
+	nbuf = tr->tr_num_databuf_new - tr->tr_num_databuf_rm;
+	gfs2_before_commit(sdp, limit, nbuf, &tr->tr_databuf, 1);
+}

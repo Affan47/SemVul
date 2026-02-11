@@ -1,0 +1,21 @@
+convert_network_type(struct connman_network *network)
+{
+	enum connman_network_type type = connman_network_get_type(network);
+
+	switch (type) {
+	case CONNMAN_NETWORK_TYPE_UNKNOWN:
+	case CONNMAN_NETWORK_TYPE_VENDOR:
+		break;
+	case CONNMAN_NETWORK_TYPE_ETHERNET:
+		return CONNMAN_SERVICE_TYPE_ETHERNET;
+	case CONNMAN_NETWORK_TYPE_WIFI:
+		return CONNMAN_SERVICE_TYPE_WIFI;
+	case CONNMAN_NETWORK_TYPE_BLUETOOTH_PAN:
+	case CONNMAN_NETWORK_TYPE_BLUETOOTH_DUN:
+		return CONNMAN_SERVICE_TYPE_BLUETOOTH;
+	case CONNMAN_NETWORK_TYPE_CELLULAR:
+		return CONNMAN_SERVICE_TYPE_CELLULAR;
+	}
+
+	return CONNMAN_SERVICE_TYPE_UNKNOWN;
+}

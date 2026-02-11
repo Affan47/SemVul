@@ -1,0 +1,10 @@
+rb_str_each_byte(str)
+    VALUE str;
+{
+    long i;
+
+    for (i=0; i<RSTRING(str)->len; i++) {
+	rb_yield(INT2FIX(RSTRING(str)->ptr[i] & 0xff));
+    }
+    return str;
+}

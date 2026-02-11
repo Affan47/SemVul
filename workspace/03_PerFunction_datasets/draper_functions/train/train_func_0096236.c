@@ -1,0 +1,100 @@
+ips_erase_bios(ips_ha_t * ha)
+{
+	int timeout;
+	uint8_t status = 0;
+
+	METHOD_TRACE("ips_erase_bios", 1);
+
+	status = 0;
+
+
+	outl(0, ha->io_addr + IPS_REG_FLAP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+	outb(0x50, ha->io_addr + IPS_REG_FLDP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+
+	outb(0x20, ha->io_addr + IPS_REG_FLDP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+
+	outb(0xD0, ha->io_addr + IPS_REG_FLDP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+
+	outb(0x70, ha->io_addr + IPS_REG_FLDP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+	timeout = 80000;
+
+	while (timeout > 0) {
+		if (ha->pcidev->revision == IPS_REVID_TROMBONE64) {
+			outl(0, ha->io_addr + IPS_REG_FLAP);
+			udelay(25);
+		}
+
+		status = inb(ha->io_addr + IPS_REG_FLDP);
+
+		if (status & 0x80)
+			break;
+
+		MDELAY(1);
+		timeout--;
+	}
+
+
+	if (timeout <= 0) {
+
+
+		outb(0xB0, ha->io_addr + IPS_REG_FLDP);
+		if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+			udelay(25);
+
+
+		timeout = 10000;
+		while (timeout > 0) {
+			if (ha->pcidev->revision == IPS_REVID_TROMBONE64) {
+				outl(0, ha->io_addr + IPS_REG_FLAP);
+				udelay(25);
+			}
+
+			status = inb(ha->io_addr + IPS_REG_FLDP);
+
+			if (status & 0xC0)
+				break;
+
+			MDELAY(1);
+			timeout--;
+		}
+
+		return (1);
+	}
+
+
+	if (status & 0x08)
+
+		return (1);
+
+
+	if (status & 0x30)
+
+		return (1);
+
+
+	outb(0x50, ha->io_addr + IPS_REG_FLDP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+
+	outb(0xFF, ha->io_addr + IPS_REG_FLDP);
+	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
+		udelay(25);
+
+	return (0);
+}

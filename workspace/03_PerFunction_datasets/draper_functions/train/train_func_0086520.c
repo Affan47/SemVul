@@ -1,0 +1,39 @@
+inf_user_table_add_user_handler(InfUserTable* user_table,
+                                InfUser* user)
+{
+  InfUserTablePrivate* priv;
+  guint id;
+
+  priv = INF_USER_TABLE_PRIVATE(user_table);
+  id = inf_user_get_id(user);
+
+  g_assert(id > 0);
+  g_assert(g_hash_table_lookup(priv->table, GUINT_TO_POINTER(id)) == NULL);
+
+  g_hash_table_insert(priv->table, GUINT_TO_POINTER(id), user);
+  g_object_ref(user);
+
+  g_signal_connect(
+    G_OBJECT(user),
+    "notify::status",
+    G_CALLBACK(inf_user_table_check_local_cb),
+    user_table
+  );
+
+  g_signal_connect(
+    G_OBJECT(user),
+    "notify::flags",
+    G_CALLBACK(inf_user_table_check_local_cb),
+    user_table
+  );
+
+  if(inf_user_table_is_local(user))
+  {
+    g_signal_emit(
+      G_OBJECT(user_table),
+      user_table_signals[ADD_LOCAL_USER],
+      0,
+      user
+    );
+  }
+}

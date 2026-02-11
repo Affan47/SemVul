@@ -1,0 +1,37 @@
+low_level_openmoko_constructor (GType type, guint n_construct_properties, GObjectConstructParam * construct_properties) {
+	GObject * obj;
+	GObjectClass * parent_class;
+	LowLevelOpenmoko * self;
+	FsoFrameworkSmartKeyFile* _tmp0_ = NULL;
+	gchar* _tmp1_ = NULL;
+	FsoFrameworkSmartKeyFile* _tmp2_ = NULL;
+	gchar* _tmp3_ = NULL;
+	gchar* modem_config = NULL;
+	FsoFrameworkSmartKeyFile* _tmp4_ = NULL;
+	gchar* _tmp5_ = NULL;
+	const gchar* _tmp6_ = NULL;
+	FsoFrameworkTransportSpec* _tmp7_ = NULL;
+	FsoFrameworkLogger* _tmp8_ = NULL;
+	parent_class = G_OBJECT_CLASS (low_level_openmoko_parent_class);
+	obj = parent_class->constructor (type, n_construct_properties, construct_properties);
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, LOW_LEVEL_TYPE_OPENMOKO, LowLevelOpenmoko);
+	_tmp0_ = ((FsoFrameworkAbstractObject*) self)->config;
+	_tmp1_ = fso_framework_smart_key_file_stringValue (_tmp0_, LOW_LEVEL_OPENMOKO_MODULE_NAME, "power_node", "unknown");
+	_g_free0 (self->priv->powerNode);
+	self->priv->powerNode = _tmp1_;
+	_tmp2_ = ((FsoFrameworkAbstractObject*) self)->config;
+	_tmp3_ = fso_framework_smart_key_file_stringValue (_tmp2_, LOW_LEVEL_OPENMOKO_MODULE_NAME, "fc_node", "unknown");
+	_g_free0 (self->priv->fcNode);
+	self->priv->fcNode = _tmp3_;
+	_tmp4_ = ((FsoFrameworkAbstractObject*) self)->config;
+	_tmp5_ = fso_framework_smart_key_file_stringValue (_tmp4_, "fsogsm", "modem_access", "invalid:invalid:-1");
+	modem_config = _tmp5_;
+	_tmp6_ = modem_config;
+	_tmp7_ = fso_framework_transport_spec_parse (_tmp6_);
+	_fso_framework_transport_spec_unref0 (self->priv->modem_transport_spec);
+	self->priv->modem_transport_spec = _tmp7_;
+	_tmp8_ = ((FsoFrameworkAbstractObject*) self)->logger;
+	fso_framework_logger_info (_tmp8_, "Registering openmoko low level poweron/poweroff handling");
+	_g_free0 (modem_config);
+	return obj;
+}

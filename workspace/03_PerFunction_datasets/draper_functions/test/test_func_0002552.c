@@ -1,0 +1,69 @@
+addStandardProperties(void)
+{
+    addProperty(&d_alphaProperty);
+    addProperty(&d_alwaysOnTopProperty);
+    addProperty(&d_clippedByParentProperty);
+    addProperty(&d_destroyedByParentProperty);
+    addProperty(&d_disabledProperty);
+    addProperty(&d_fontProperty);
+    addProperty(&d_IDProperty);
+    addProperty(&d_inheritsAlphaProperty);
+    addProperty(&d_mouseCursorProperty);
+    addProperty(&d_restoreOldCaptureProperty);
+    addProperty(&d_textProperty);
+    addProperty(&d_visibleProperty);
+    addProperty(&d_zOrderChangeProperty);
+    addProperty(&d_wantsMultiClicksProperty);
+    addProperty(&d_autoRepeatProperty);
+    addProperty(&d_autoRepeatDelayProperty);
+    addProperty(&d_autoRepeatRateProperty);
+    addProperty(&d_distInputsProperty);
+    addProperty(&d_tooltipTypeProperty);
+    addProperty(&d_tooltipProperty);
+    addProperty(&d_inheritsTooltipProperty);
+    addProperty(&d_riseOnClickProperty);
+    addProperty(&d_vertAlignProperty);
+    addProperty(&d_horzAlignProperty);
+    addProperty(&d_unifiedAreaRectProperty);
+    addProperty(&d_unifiedPositionProperty);
+    addProperty(&d_unifiedXPositionProperty);
+    addProperty(&d_unifiedYPositionProperty);
+    addProperty(&d_unifiedSizeProperty);
+    addProperty(&d_unifiedWidthProperty);
+    addProperty(&d_unifiedHeightProperty);
+    addProperty(&d_unifiedMinSizeProperty);
+    addProperty(&d_unifiedMaxSizeProperty);
+    addProperty(&d_mousePassThroughEnabledProperty);
+    addProperty(&d_windowRendererProperty);
+    addProperty(&d_lookNFeelProperty);
+    addProperty(&d_dragDropTargetProperty);
+    addProperty(&d_autoRenderingSurfaceProperty);
+    addProperty(&d_rotationProperty);
+    addProperty(&d_xRotationProperty);
+    addProperty(&d_yRotationProperty);
+    addProperty(&d_zRotationProperty);
+    addProperty(&d_nonClientProperty);
+    addProperty(&d_textParsingEnabledProperty);
+    addProperty(&d_marginProperty);
+    addProperty(&d_updateModeProperty);
+    addProperty(&d_mouseInputPropagationProperty);
+
+
+    if (isAutoWindow())
+    {
+        banPropertyFromXML(&d_destroyedByParentProperty);
+        banPropertyFromXML(&d_vertAlignProperty);
+        banPropertyFromXML(&d_horzAlignProperty);
+        banPropertyFromXML(&d_unifiedAreaRectProperty);
+        banPropertyFromXML(&d_unifiedPositionProperty);
+        banPropertyFromXML(&d_unifiedXPositionProperty);
+        banPropertyFromXML(&d_unifiedYPositionProperty);
+        banPropertyFromXML(&d_unifiedSizeProperty);
+        banPropertyFromXML(&d_unifiedWidthProperty);
+        banPropertyFromXML(&d_unifiedHeightProperty);
+        banPropertyFromXML(&d_unifiedMinSizeProperty);
+        banPropertyFromXML(&d_unifiedMaxSizeProperty);
+        banPropertyFromXML(&d_windowRendererProperty);
+        banPropertyFromXML(&d_lookNFeelProperty);
+    }
+}

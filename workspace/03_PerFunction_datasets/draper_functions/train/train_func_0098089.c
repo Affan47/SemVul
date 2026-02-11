@@ -1,0 +1,40 @@
+jacobiansPoseComposition(
+	const CPose2D &x,
+	const CPose2D &u,
+	CMatrixDouble33			 &df_dx,
+	CMatrixDouble33			 &df_du,
+	const bool compute_df_dx,
+	const bool compute_df_du )
+
+{
+	const double   spx = sin(x.phi());
+	const double   cpx = cos(x.phi());
+	if (compute_df_dx)
+	{
+
+
+		df_dx.unit(3,1.0);
+
+		const double   xu = u.x();
+		const double   yu = u.y();
+
+		df_dx.get_unsafe(0,2) = -spx*xu-cpx*yu;
+		df_dx.get_unsafe(1,2) =  cpx*xu-spx*yu;
+	}
+
+	if (compute_df_du)
+	{
+
+
+		df_du.get_unsafe(0,2) =
+		df_du.get_unsafe(1,2) =
+		df_du.get_unsafe(2,0) =
+		df_du.get_unsafe(2,1) = 0;
+		df_du.get_unsafe(2,2) = 1;
+
+		df_du.get_unsafe(0,0) =  cpx;
+		df_du.get_unsafe(0,1) = -spx;
+		df_du.get_unsafe(1,0) =  spx;
+		df_du.get_unsafe(1,1) =  cpx;
+	}
+}

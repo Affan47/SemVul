@@ -1,0 +1,11 @@
+free_contenttype(content_t ** con)
+{
+
+	if (*con)
+	{
+		if((*con)->params)
+			free_params((*con)->params);
+		pkg_free(*con);
+	}
+	*con = 0;
+}

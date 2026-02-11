@@ -1,0 +1,34 @@
+tds_model_render (TDSModel* self) {
+	GLfloat* _tmp0_;
+	gint _tmp0__length1;
+	GLfloat* _tmp1_;
+	gint _tmp1__length1;
+	GLfloat* _tmp2_;
+	gint _tmp2__length1;
+	GLushort* _tmp3_;
+	gint _tmp3__length1;
+	GLushort* _tmp4_;
+	gint _tmp4__length1;
+	g_return_if_fail (self != NULL);
+	glEnable (GL_CULL_FACE);
+	glEnableClientState (GL_VERTEX_ARRAY);
+	glEnableClientState (GL_NORMAL_ARRAY);
+	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	_tmp0_ = self->priv->vertices;
+	_tmp0__length1 = self->priv->vertices_length1;
+	glVertexPointer ((GLint) 3, GL_FLOAT, (GLsizei) 0, _tmp0_);
+	_tmp1_ = self->priv->normals;
+	_tmp1__length1 = self->priv->normals_length1;
+	glNormalPointer (GL_FLOAT, (GLsizei) 0, _tmp1_);
+	_tmp2_ = self->priv->texture_coords;
+	_tmp2__length1 = self->priv->texture_coords_length1;
+	glTexCoordPointer ((GLint) 2, GL_FLOAT, (GLsizei) 0, _tmp2_);
+	_tmp3_ = self->priv->triangles;
+	_tmp3__length1 = self->priv->triangles_length1;
+	_tmp4_ = self->priv->triangles;
+	_tmp4__length1 = self->priv->triangles_length1;
+	glDrawElements (GL_TRIANGLES, (GLsizei) _tmp3__length1, GL_UNSIGNED_SHORT, _tmp4_);
+	glDisableClientState (GL_VERTEX_ARRAY);
+	glDisableClientState (GL_NORMAL_ARRAY);
+	glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+}

@@ -1,0 +1,10 @@
+__ecereProp___ecereNameSpace__ecere__gui__dialogs__GoToDialog_Set_line(struct __ecereNameSpace__ecere__com__Instance * this, int value)
+{
+struct __ecereNameSpace__ecere__gui__dialogs__GoToDialog * __ecerePointer___ecereNameSpace__ecere__gui__dialogs__GoToDialog = (struct __ecereNameSpace__ecere__gui__dialogs__GoToDialog *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__dialogs__GoToDialog->offset) : 0);
+
+if(value)
+__ecereMethod___ecereNameSpace__ecere__gui__controls__EditBox_Printf(__ecerePointer___ecereNameSpace__ecere__gui__dialogs__GoToDialog->lineBox, "%d", value);
+else
+__ecereMethod___ecereNameSpace__ecere__gui__controls__EditBox_Clear(__ecerePointer___ecereNameSpace__ecere__gui__dialogs__GoToDialog->lineBox);
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__ecere__gui__dialogs__GoToDialog_line), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__ecere__gui__dialogs__GoToDialog_line);
+}

@@ -1,0 +1,22 @@
+handle_condition(THD *,
+                                            uint sql_errno,
+                                            const char*,
+                                            MYSQL_ERROR::enum_warning_level,
+                                            const char*,
+                                            MYSQL_ERROR ** cond_hdl)
+{
+  *cond_hdl= NULL;
+  if (! m_is_active && sql_errno == ER_LOCK_DEADLOCK)
+  {
+
+    m_is_active= TRUE;
+    (void) m_ot_ctx->request_backoff_action(
+             Open_table_context::OT_BACKOFF_AND_RETRY,
+             NULL);
+    m_is_active= FALSE;
+
+
+    return TRUE;
+  }
+  return FALSE;
+}

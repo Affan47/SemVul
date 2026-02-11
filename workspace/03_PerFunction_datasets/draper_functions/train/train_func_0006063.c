@@ -1,0 +1,27 @@
+Plan7FSConfig(struct plan7_s *hmm, float pentry, float pexit)
+{
+  float basep;
+  int   k;
+
+
+  hmm->xt[XTN][MOVE] = 1-hmm->p1;
+  hmm->xt[XTN][LOOP] = hmm->p1;
+  hmm->xt[XTE][MOVE] = 0.5;
+  hmm->xt[XTE][LOOP] = 0.5;
+  hmm->xt[XTC][MOVE] = 1-hmm->p1;
+  hmm->xt[XTC][LOOP] = hmm->p1;
+  hmm->xt[XTJ][MOVE] = 1.-hmm->p1;
+  hmm->xt[XTJ][LOOP] = hmm->p1;
+
+
+  hmm->begin[1] = (1. - pentry) * (1. - hmm->tbd1);
+  FSet(hmm->begin+2, hmm->M-1, (pentry * (1.-hmm->tbd1)) / (float)(hmm->M-1));
+
+
+  hmm->end[hmm->M] = 1.0;
+  basep = pexit / (float) (hmm->M-1);
+  for (k = 1; k < hmm->M; k++)
+    hmm->end[k] = basep / (1. - basep * (float) (k-1));
+  Plan7RenormalizeExits(hmm);
+  hmm->flags       &= ~PLAN7_HASBITS;
+}

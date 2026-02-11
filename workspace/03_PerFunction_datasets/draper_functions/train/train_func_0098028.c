@@ -1,0 +1,18 @@
+printdfas(grammar *g, FILE *fp)
+{
+    dfa *d;
+    int i, j;
+
+    printstates(g, fp);
+    fprintf(fp, "static dfa dfas[%d] = {\n", g->g_ndfas);
+    d = g->g_dfa;
+    for (i = 0; i < g->g_ndfas; i++, d++) {
+        fprintf(fp, "    {%d, \"%s\", %d, %d, states_%d,\n",
+            d->d_type, d->d_name, d->d_initial, d->d_nstates, i);
+        fprintf(fp, "     \"");
+        for (j = 0; j < NBYTES(g->g_ll.ll_nlabels); j++)
+            fprintf(fp, "\\%03o", d->d_first[j] & 0xff);
+        fprintf(fp, "\"},\n");
+    }
+    fprintf(fp, "};\n");
+}

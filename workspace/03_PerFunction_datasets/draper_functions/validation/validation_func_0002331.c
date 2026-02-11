@@ -1,0 +1,12 @@
+free_pending_lists (void)
+{
+  int bb;
+
+  for (bb = 0; bb < current_nr_blocks; bb++)
+    {
+      free_INSN_LIST_list (&bb_deps[bb].pending_read_insns);
+      free_INSN_LIST_list (&bb_deps[bb].pending_write_insns);
+      free_EXPR_LIST_list (&bb_deps[bb].pending_read_mems);
+      free_EXPR_LIST_list (&bb_deps[bb].pending_write_mems);
+    }
+}

@@ -1,0 +1,48 @@
+manageMpr(Mpr *mpr, int flags)
+{
+    if (flags & MPR_MANAGE_MARK) {
+        mprMark(mpr->logPath);
+        mprMark(mpr->logFile);
+        mprMark(mpr->mimeTypes);
+        mprMark(mpr->timeTokens);
+        mprMark(mpr->pathEnv);
+        mprMark(mpr->name);
+        mprMark(mpr->title);
+        mprMark(mpr->version);
+        mprMark(mpr->domainName);
+        mprMark(mpr->hostName);
+        mprMark(mpr->ip);
+        mprMark(mpr->stdError);
+        mprMark(mpr->stdInput);
+        mprMark(mpr->stdOutput);
+        mprMark(mpr->serverName);
+        mprMark(mpr->appPath);
+        mprMark(mpr->appDir);
+        mprMark(mpr->cmdService);
+        mprMark(mpr->eventService);
+        mprMark(mpr->fileSystem);
+        mprMark(mpr->moduleService);
+        mprMark(mpr->osService);
+        mprMark(mpr->signalService);
+        mprMark(mpr->socketService);
+        mprMark(mpr->threadService);
+        mprMark(mpr->workerService);
+        mprMark(mpr->waitService);
+        mprMark(mpr->dispatcher);
+        mprMark(mpr->nonBlock);
+        mprMark(mpr->appwebService);
+        mprMark(mpr->ediService);
+        mprMark(mpr->ejsService);
+        mprMark(mpr->espService);
+        mprMark(mpr->httpService);
+        mprMark(mpr->testService);
+        mprMark(mpr->terminators);
+        mprMark(mpr->mutex);
+        mprMark(mpr->spin);
+        mprMark(mpr->dtoaSpin[0]);
+        mprMark(mpr->dtoaSpin[1]);
+        mprMark(mpr->cond);
+        mprMark(mpr->emptyString);
+        mprMark(mpr->markerCond);
+    }
+}

@@ -1,0 +1,11 @@
+trace_ev(data)
+    struct trace_data *data;
+{
+    struct trace_var *trace = data->trace;
+
+    while (trace) {
+	(*trace->func)(trace->data, data->val);
+	trace = trace->next;
+    }
+    return Qnil;
+}

@@ -1,0 +1,17 @@
+genrtl_return_stmt (stmt)
+     tree stmt;
+{
+  tree expr;
+
+  expr = RETURN_STMT_EXPR (stmt);
+
+  emit_line_note (input_filename, lineno);
+  if (!expr)
+    expand_null_return ();
+  else
+    {
+      expand_start_target_temps ();
+      expand_return (expr);
+      expand_end_target_temps ();
+    }
+}

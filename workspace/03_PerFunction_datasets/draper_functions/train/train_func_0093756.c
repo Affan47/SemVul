@@ -1,0 +1,19 @@
+store_frontswap_inertia(struct device *dev,
+				       struct device_attribute *attr,
+				       const char *buf,
+				       size_t count)
+{
+	unsigned long val;
+	int err;
+
+	if (!capable(CAP_SYS_ADMIN))
+		return -EPERM;
+	err = kstrtoul(buf, 10, &val);
+	if (err)
+		return err;
+	if (val == 0)
+		return -EINVAL;
+	frontswap_inertia = val;
+	frontswap_inertia_counter = val;
+	return count;
+}

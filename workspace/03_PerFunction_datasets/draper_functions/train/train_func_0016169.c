@@ -1,0 +1,26 @@
+slc_xmit(struct sk_buff *skb, struct net_device *dev)
+{
+	struct slcan *sl = netdev_priv(dev);
+
+	if (skb->len != sizeof(struct can_frame))
+		goto out;
+
+	spin_lock(&sl->lock);
+	if (!netif_running(dev))  {
+		spin_unlock(&sl->lock);
+		printk(KERN_WARNING "%s: xmit: iface is down\n", dev->name);
+		goto out;
+	}
+	if (sl->tty == NULL) {
+		spin_unlock(&sl->lock);
+		goto out;
+	}
+
+	netif_stop_queue(sl->dev);
+	slc_encaps(sl, (struct can_frame *) skb->data);
+	spin_unlock(&sl->lock);
+
+out:
+	kfree_skb(skb);
+	return NETDEV_TX_OK;
+}

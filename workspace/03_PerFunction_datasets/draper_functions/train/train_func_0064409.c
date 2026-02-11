@@ -1,0 +1,19 @@
+__ecereMethod___ecereNameSpace__ecere__gui__controls__EditBox_SetSelectCursor(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__ecere__gui__controls__EditBox * __ecerePointer___ecereNameSpace__ecere__gui__controls__EditBox = (struct __ecereNameSpace__ecere__gui__controls__EditBox *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__EditBox->offset) : 0);
+
+if(!__ecereProp___ecereNameSpace__ecere__gui__Window_Get_inactive(this) || !((unsigned int)((__ecerePointer___ecereNameSpace__ecere__gui__controls__EditBox->style & 0x400) >> 10)))
+{
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__EditBox->mouseMove)
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_cursor(this, __ecereMethod___ecereNameSpace__ecere__gui__GuiApplication_GetCursor(__ecereNameSpace__ecere__gui__guiApp, 0));
+else if(__ecerePointer___ecereNameSpace__ecere__gui__controls__EditBox->mouseSelect)
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_cursor(this, __ecereMethod___ecereNameSpace__ecere__gui__GuiApplication_GetCursor(__ecereNameSpace__ecere__gui__guiApp, 1));
+else
+{
+if(__ecereMethod___ecereNameSpace__ecere__gui__controls__EditBox_IsMouseOnSelection(this))
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_cursor(this, __ecereMethod___ecereNameSpace__ecere__gui__GuiApplication_GetCursor(__ecereNameSpace__ecere__gui__guiApp, 0));
+else
+__ecereProp___ecereNameSpace__ecere__gui__Window_Set_cursor(this, __ecereMethod___ecereNameSpace__ecere__gui__GuiApplication_GetCursor(__ecereNameSpace__ecere__gui__guiApp, 1));
+}
+}
+}

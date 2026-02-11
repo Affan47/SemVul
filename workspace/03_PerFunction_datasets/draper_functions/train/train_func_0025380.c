@@ -1,0 +1,28 @@
+trinity_mg_clockgating_enable(struct radeon_device *rdev,
+					  bool enable)
+{
+	u32 local0;
+	u32 local1;
+
+	if (enable) {
+		local0 = RREG32_CG(CG_CGTT_LOCAL_0);
+		local1 = RREG32_CG(CG_CGTT_LOCAL_1);
+
+		WREG32_CG(CG_CGTT_LOCAL_0,
+			  (0x00380000 & CGCG_CGTT_LOCAL0_MASK) | (local0 & ~CGCG_CGTT_LOCAL0_MASK) );
+		WREG32_CG(CG_CGTT_LOCAL_1,
+			  (0x0E000000 & CGCG_CGTT_LOCAL1_MASK) | (local1 & ~CGCG_CGTT_LOCAL1_MASK) );
+
+		WREG32(CGTS_SM_CTRL_REG, CGTS_SM_CTRL_REG_ENABLE);
+	} else {
+		WREG32(CGTS_SM_CTRL_REG, CGTS_SM_CTRL_REG_DISABLE);
+
+		local0 = RREG32_CG(CG_CGTT_LOCAL_0);
+		local1 = RREG32_CG(CG_CGTT_LOCAL_1);
+
+		WREG32_CG(CG_CGTT_LOCAL_0,
+			  CGCG_CGTT_LOCAL0_MASK | (local0 & ~CGCG_CGTT_LOCAL0_MASK) );
+		WREG32_CG(CG_CGTT_LOCAL_1,
+			  CGCG_CGTT_LOCAL1_MASK | (local1 & ~CGCG_CGTT_LOCAL1_MASK) );
+	}
+}

@@ -1,0 +1,11 @@
+__ecereMethod___ecereNameSpace__ecere__gui__controls__Label_OnDestroy(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__ecere__gui__controls__Label * __ecerePointer___ecereNameSpace__ecere__gui__controls__Label = (struct __ecereNameSpace__ecere__gui__controls__Label *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__Label->offset) : 0);
+
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window && (__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window == __ecereProp___ecereNameSpace__ecere__gui__Window_Get_master(this) || __ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window == __ecereProp___ecereNameSpace__ecere__gui__Window_Get_parent(this)))
+{
+__ecereNameSpace__ecere__com__eInstance_StopWatching(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window, __ecereProp___ecereNameSpace__ecere__gui__Window_text, this);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window), __ecerePointer___ecereNameSpace__ecere__gui__controls__Label->window = 0);
+}
+((void (*)(struct __ecereNameSpace__ecere__com__Instance *))__ecereClass___ecereNameSpace__ecere__gui__CommonControl->_vTbl[__ecereVMethodID___ecereNameSpace__ecere__gui__Window_OnDestroy])(this);
+}

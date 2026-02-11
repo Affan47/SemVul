@@ -1,0 +1,13 @@
+syncConsume() {
+	while (numToConsume > 0) {
+		if (nMarkers > 0)
+		{
+
+			markerOffset++;
+		} else {
+
+			queue.removeFirst();
+		}
+		numToConsume--;
+	}
+}

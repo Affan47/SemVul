@@ -1,0 +1,57 @@
+f_spellsuggest(argvars, rettv)
+    typval_T	*argvars;
+    typval_T	*rettv;
+{
+#ifdef FEAT_SPELL
+    char_u	*str;
+    int		typeerr = FALSE;
+    int		maxcount;
+    garray_T	ga;
+    int		i;
+    listitem_T	*li;
+    int		need_capital = FALSE;
+#endif
+
+    if (rettv_list_alloc(rettv) == FAIL)
+	return;
+
+#ifdef FEAT_SPELL
+    if (curwin->w_p_spell && *curbuf->b_p_spl != NUL)
+    {
+	str = get_tv_string(&argvars[0]);
+	if (argvars[1].v_type != VAR_UNKNOWN)
+	{
+	    maxcount = get_tv_number_chk(&argvars[1], &typeerr);
+	    if (maxcount <= 0)
+		return;
+	    if (argvars[2].v_type != VAR_UNKNOWN)
+	    {
+		need_capital = get_tv_number_chk(&argvars[2], &typeerr);
+		if (typeerr)
+		    return;
+	    }
+	}
+	else
+	    maxcount = 25;
+
+	spell_suggest_list(&ga, str, maxcount, need_capital, FALSE);
+
+	for (i = 0; i < ga.ga_len; ++i)
+	{
+	    str = ((char_u **)ga.ga_data)[i];
+
+	    li = listitem_alloc();
+	    if (li == NULL)
+		vim_free(str);
+	    else
+	    {
+		li->li_tv.v_type = VAR_STRING;
+		li->li_tv.v_lock = 0;
+		li->li_tv.vval.v_string = str;
+		list_append(rettv->vval.v_list, li);
+	    }
+	}
+	ga_clear(&ga);
+    }
+#endif
+}

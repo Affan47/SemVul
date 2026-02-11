@@ -1,0 +1,12 @@
+compare_aliseses(krb5_context context,
+		 krb5_keytab_entry *entry,
+		 krb5_const_principal principal)
+{
+    unsigned int i;
+    if (entry->aliases == NULL)
+	return FALSE;
+    for (i = 0; i < entry->aliases->len; i++)
+	if (krb5_principal_compare(context, &entry->aliases->val[i], principal))
+	    return TRUE;
+    return FALSE;
+}

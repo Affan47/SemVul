@@ -1,0 +1,15 @@
+ath9k_hw_resume_interrupts(struct ath_hw *ah)
+{
+	struct ath_common *common = ath9k_hw_common(ah);
+
+	if (!(ah->imask & ATH9K_INT_GLOBAL))
+		return;
+
+	if (atomic_read(&ah->intr_ref_cnt) != 0) {
+		ath_dbg(common, INTERRUPT, "Do not enable IER ref count %d\n",
+			atomic_read(&ah->intr_ref_cnt));
+		return;
+	}
+
+	__ath9k_hw_enable_interrupts(ah);
+}

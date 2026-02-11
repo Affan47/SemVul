@@ -1,0 +1,50 @@
+vibrator_omap_vibe_construct (GType object_type, FsoFrameworkSubsystem* subsystem, const gchar* sysfsnode) {
+	VibratorOmapVibe * self = NULL;
+	FsoFrameworkSubsystem* _tmp0_ = NULL;
+	FsoFrameworkSubsystem* _tmp1_ = NULL;
+	const gchar* _tmp2_ = NULL;
+	gchar* _tmp3_ = NULL;
+	const gchar* _tmp4_ = NULL;
+	gchar* _tmp5_ = NULL;
+	const gchar* _tmp6_ = NULL;
+	gboolean _tmp7_ = FALSE;
+	FsoFrameworkSubsystem* _tmp13_ = NULL;
+	FsoFrameworkLogger* _tmp14_ = NULL;
+	g_return_val_if_fail (subsystem != NULL, NULL);
+	g_return_val_if_fail (sysfsnode != NULL, NULL);
+	self = (VibratorOmapVibe*) fso_framework_abstract_object_construct (object_type);
+	_tmp0_ = subsystem;
+	_tmp1_ = _g_object_ref0 (_tmp0_);
+	_g_object_unref0 (self->priv->subsystem);
+	self->priv->subsystem = _tmp1_;
+	_tmp2_ = sysfsnode;
+	_tmp3_ = g_strdup (_tmp2_);
+	_g_free0 (self->priv->sysfsnode);
+	self->priv->sysfsnode = _tmp3_;
+	_tmp4_ = sysfsnode;
+	_tmp5_ = g_strconcat (_tmp4_, "/direction", NULL);
+	_g_free0 (self->priv->direction);
+	self->priv->direction = _tmp5_;
+	_tmp6_ = self->priv->direction;
+	_tmp7_ = fso_framework_file_handling_isPresent (_tmp6_);
+	if (!_tmp7_) {
+		FsoFrameworkLogger* _tmp8_ = NULL;
+		const gchar* _tmp9_ = NULL;
+		const gchar* _tmp10_ = NULL;
+		gchar* _tmp11_ = NULL;
+		gchar* _tmp12_ = NULL;
+		_tmp8_ = ((FsoFrameworkAbstractObject*) self)->logger;
+		_tmp9_ = self->priv->direction;
+		_tmp10_ = string_to_string (_tmp9_);
+		_tmp11_ = g_strconcat ("sysfs class is damaged, missing ", _tmp10_, "; skipping.", NULL);
+		_tmp12_ = _tmp11_;
+		fso_framework_logger_error (_tmp8_, _tmp12_);
+		_g_free0 (_tmp12_);
+		return self;
+	}
+	_tmp13_ = subsystem;
+	fso_framework_subsystem_registerObjectForService (_tmp13_, FREE_SMARTPHONE_DEVICE_TYPE_VIBRATOR, (GBoxedCopyFunc) g_object_ref, g_object_unref, FSO_FRAMEWORK_DEVICE_ServiceDBusName, FSO_FRAMEWORK_DEVICE_VibratorServicePath, (FreeSmartphoneDeviceVibrator*) self);
+	_tmp14_ = ((FsoFrameworkAbstractObject*) self)->logger;
+	fso_framework_logger_info (_tmp14_, "Created");
+	return self;
+}

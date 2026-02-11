@@ -1,0 +1,13 @@
+process_rmpp_stop(struct ib_mad_agent_private *agent,
+			      struct ib_mad_recv_wc *mad_recv_wc)
+{
+	struct ib_rmpp_mad *rmpp_mad;
+
+	rmpp_mad = (struct ib_rmpp_mad *)mad_recv_wc->recv_buf.mad;
+
+	if (rmpp_mad->rmpp_hdr.rmpp_status != IB_MGMT_RMPP_STATUS_RESX) {
+		abort_send(agent, mad_recv_wc, IB_MGMT_RMPP_STATUS_BAD_STATUS);
+		nack_recv(agent, mad_recv_wc, IB_MGMT_RMPP_STATUS_BAD_STATUS);
+	} else
+		abort_send(agent, mad_recv_wc, rmpp_mad->rmpp_hdr.rmpp_status);
+}

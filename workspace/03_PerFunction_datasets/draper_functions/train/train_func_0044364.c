@@ -1,0 +1,32 @@
+minefield_view_redraw_sector_cb (MinefieldView* self, guint x, guint y) {
+	guint _tmp0_ = 0U;
+	guint _tmp1_ = 0U;
+	guint _tmp2_ = 0U;
+	guint _tmp3_ = 0U;
+	guint _tmp4_ = 0U;
+	guint _tmp5_ = 0U;
+	guint _tmp6_ = 0U;
+	guint _tmp7_ = 0U;
+	guint _tmp8_ = 0U;
+	guint _tmp9_ = 0U;
+	guint _tmp10_ = 0U;
+	guint _tmp11_ = 0U;
+	guint _tmp12_ = 0U;
+	guint _tmp13_ = 0U;
+	g_return_if_fail (self != NULL);
+	_tmp0_ = minefield_view_get_x_offset (self);
+	_tmp1_ = _tmp0_;
+	_tmp2_ = x;
+	_tmp3_ = minefield_view_get_mine_size (self);
+	_tmp4_ = _tmp3_;
+	_tmp5_ = minefield_view_get_y_offset (self);
+	_tmp6_ = _tmp5_;
+	_tmp7_ = y;
+	_tmp8_ = minefield_view_get_mine_size (self);
+	_tmp9_ = _tmp8_;
+	_tmp10_ = minefield_view_get_mine_size (self);
+	_tmp11_ = _tmp10_;
+	_tmp12_ = minefield_view_get_mine_size (self);
+	_tmp13_ = _tmp12_;
+	gtk_widget_queue_draw_area ((GtkWidget*) self, (gint) (_tmp1_ + (_tmp2_ * _tmp4_)), (gint) (_tmp6_ + (_tmp7_ * _tmp9_)), (gint) _tmp11_, (gint) _tmp13_);
+}

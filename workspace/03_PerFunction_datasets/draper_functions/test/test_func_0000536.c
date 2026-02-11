@@ -1,0 +1,54 @@
+create_params(input_options *options)
+{
+	ts_params *params;
+	if(!((params=MALLOC(ts_params))==NULL))
+	{
+		if(options->tabu_list_length==0)
+		{
+			params->tabu_list_length=DEFAULT_TABU_LIST_LENGTH;
+		}
+		else
+		{
+			params->tabu_list_length=options->tabu_list_length;
+
+		}
+		if(options->tabu_iterations==0)
+		{
+			params->tabu_iterations=DEFAULT_TABU_CYCLES;
+		}
+		else
+		{
+			params->tabu_iterations=options->tabu_iterations;
+		}
+		if(options->tabu_max_decrease==0)
+		{
+			params->tabu_max_decrease=DEFAULT_TABU_RESTART_LIMIT;
+		}
+		else
+		{
+			params->tabu_max_decrease=options->tabu_max_decrease;
+		}
+		if(options->change_move_limit==0)
+		{
+			params->change_move_limit=CHANGE_MOVE_LIMIT;
+		}
+		else
+		{
+			params->change_move_limit=options->change_move_limit;
+		}
+		if(options->key_eval_percent==0)
+		{
+			params->key_eval_percent=PERCENT_MULTI;
+		}
+		else
+		{
+			params->key_eval_percent=options->key_eval_percent;
+		}
+	}
+	else
+	{
+		fprintf(stderr,"ERROR: FAILED TO ALLOCATE MEMORY\n");
+		exit(1);
+	}
+	return(params);
+}

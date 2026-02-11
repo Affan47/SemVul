@@ -1,0 +1,6 @@
+rdbLoadObjectType(rio *rdb) {
+    int type;
+    if ((type = rdbLoadType(rdb)) == -1) return -1;
+    if (!rdbIsObjectType(type)) return -1;
+    return type;
+}

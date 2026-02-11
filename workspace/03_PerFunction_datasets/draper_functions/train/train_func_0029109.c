@@ -1,0 +1,15 @@
+csio_get_rnode(struct csio_lnode *ln, uint32_t flowid)
+{
+	struct csio_rnode *rn;
+
+	rn = csio_rn_lookup(ln, flowid);
+	if (!rn) {
+		rn = csio_alloc_rnode(ln);
+		if (!rn)
+			return NULL;
+
+		rn->flowid = flowid;
+	}
+
+	return rn;
+}

@@ -1,0 +1,80 @@
+isci_task_execute_task(struct sas_task *task, gfp_t gfp_flags)
+{
+	struct isci_host *ihost = dev_to_ihost(task->dev);
+	struct isci_remote_device *idev;
+	unsigned long flags;
+	enum sci_status status = SCI_FAILURE;
+	bool io_ready;
+	u16 tag;
+
+	spin_lock_irqsave(&ihost->scic_lock, flags);
+	idev = isci_lookup_device(task->dev);
+	io_ready = isci_device_io_ready(idev, task);
+	tag = isci_alloc_tag(ihost);
+	spin_unlock_irqrestore(&ihost->scic_lock, flags);
+
+	dev_dbg(&ihost->pdev->dev,
+		"task: %p, dev: %p idev: %p:%#lx cmd = %p\n",
+		task, task->dev, idev, idev ? idev->flags : 0,
+		task->uldd_task);
+
+	if (!idev) {
+		isci_task_refuse(ihost, task, SAS_TASK_UNDELIVERED,
+				 SAS_DEVICE_UNKNOWN);
+	} else if (!io_ready || tag == SCI_CONTROLLER_INVALID_IO_TAG) {
+
+
+		isci_task_refuse(ihost, task, SAS_TASK_COMPLETE,
+				 SAS_QUEUE_FULL);
+	} else {
+
+		spin_lock_irqsave(&task->task_state_lock, flags);
+
+		if (task->task_state_flags & SAS_TASK_STATE_ABORTED) {
+
+			spin_unlock_irqrestore(&task->task_state_lock, flags);
+
+			isci_task_refuse(ihost, task,
+					 SAS_TASK_UNDELIVERED,
+					 SAM_STAT_TASK_ABORTED);
+		} else {
+			task->task_state_flags |= SAS_TASK_AT_INITIATOR;
+			spin_unlock_irqrestore(&task->task_state_lock, flags);
+
+
+			status = isci_request_execute(ihost, idev, task, tag);
+
+			if (status != SCI_SUCCESS) {
+				spin_lock_irqsave(&task->task_state_lock, flags);
+
+				task->task_state_flags &= ~SAS_TASK_AT_INITIATOR;
+				spin_unlock_irqrestore(&task->task_state_lock, flags);
+
+				if (test_bit(IDEV_GONE, &idev->flags)) {
+
+
+					isci_task_refuse(ihost, task,
+						SAS_TASK_UNDELIVERED,
+						SAS_DEVICE_UNKNOWN);
+				} else {
+
+
+					isci_task_refuse(ihost, task,
+						SAS_TASK_COMPLETE,
+						SAS_QUEUE_FULL);
+				}
+			}
+		}
+	}
+
+	if (status != SCI_SUCCESS && tag != SCI_CONTROLLER_INVALID_IO_TAG) {
+		spin_lock_irqsave(&ihost->scic_lock, flags);
+
+
+		isci_tci_free(ihost, ISCI_TAG_TCI(tag));
+		spin_unlock_irqrestore(&ihost->scic_lock, flags);
+	}
+
+	isci_put_device(idev);
+	return 0;
+}

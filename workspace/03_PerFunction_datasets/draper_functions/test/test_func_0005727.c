@@ -1,0 +1,2 @@
+rubberBand(void)
+{ activateCallback("rubberband"); }

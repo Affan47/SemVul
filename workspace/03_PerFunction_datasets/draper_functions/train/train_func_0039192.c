@@ -1,0 +1,60 @@
+mines_cleared_cb (Mines* self, Minefield* minefield) {
+	GtkImage* _tmp0_ = NULL;
+	GDateTime* date = NULL;
+	GDateTime* _tmp1_ = NULL;
+	guint duration = 0U;
+	Minefield* _tmp2_ = NULL;
+	gdouble _tmp3_ = 0.0;
+	gdouble _tmp4_ = 0.0;
+	HistoryEntry* entry = NULL;
+	GDateTime* _tmp5_ = NULL;
+	Minefield* _tmp6_ = NULL;
+	guint _tmp7_ = 0U;
+	Minefield* _tmp8_ = NULL;
+	guint _tmp9_ = 0U;
+	Minefield* _tmp10_ = NULL;
+	guint _tmp11_ = 0U;
+	guint _tmp12_ = 0U;
+	HistoryEntry* _tmp13_ = NULL;
+	History* _tmp14_ = NULL;
+	HistoryEntry* _tmp15_ = NULL;
+	History* _tmp16_ = NULL;
+	HistoryEntry* _tmp17_ = NULL;
+	gint _tmp18_ = 0;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (minefield != NULL);
+	_tmp0_ = self->priv->win_face_image;
+	mines_set_face_image (self, _tmp0_);
+	_tmp1_ = g_date_time_new_now_local ();
+	date = _tmp1_;
+	_tmp2_ = minefield;
+	_tmp3_ = minefield_get_elapsed (_tmp2_);
+	_tmp4_ = _tmp3_;
+	duration = (guint) (_tmp4_ + 0.5);
+	_tmp5_ = date;
+	_tmp6_ = minefield;
+	_tmp7_ = _tmp6_->width;
+	_tmp8_ = minefield;
+	_tmp9_ = _tmp8_->height;
+	_tmp10_ = minefield;
+	_tmp11_ = _tmp10_->n_mines;
+	_tmp12_ = duration;
+	_tmp13_ = history_entry_new (_tmp5_, _tmp7_, _tmp9_, _tmp11_, _tmp12_);
+	entry = _tmp13_;
+	_tmp14_ = self->priv->history;
+	_tmp15_ = entry;
+	history_add (_tmp14_, _tmp15_);
+	_tmp16_ = self->priv->history;
+	history_save (_tmp16_);
+	_tmp17_ = entry;
+	_tmp18_ = mines_show_scores (self, _tmp17_, TRUE);
+	if (_tmp18_ == ((gint) GTK_RESPONSE_CLOSE)) {
+		GtkWindow* _tmp19_ = NULL;
+		_tmp19_ = self->priv->window;
+		gtk_widget_destroy ((GtkWidget*) _tmp19_);
+	} else {
+		mines_show_new_game_screen (self);
+	}
+	_history_entry_unref0 (entry);
+	_g_date_time_unref0 (date);
+}

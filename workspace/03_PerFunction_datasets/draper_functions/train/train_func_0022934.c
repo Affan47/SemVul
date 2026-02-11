@@ -1,0 +1,33 @@
+rtl_cam_get_free_entry(struct ieee80211_hw *hw, u8 *sta_addr)
+{
+	struct rtl_priv *rtlpriv = rtl_priv(hw);
+	u32 bitmap = (rtlpriv->sec.hwsec_cam_bitmap) >> 4;
+	u8 entry_idx = 0;
+	u8 i, *addr;
+
+	if (NULL == sta_addr) {
+		RT_TRACE(rtlpriv, COMP_SEC, DBG_EMERG,
+			 "sta_addr is NULL.\n");
+		return TOTAL_CAM_ENTRY;
+	}
+
+	for (i = 4; i < TOTAL_CAM_ENTRY; i++) {
+		addr = rtlpriv->sec.hwsec_cam_sta_addr[i];
+		if (ether_addr_equal_unaligned(addr, sta_addr))
+			return i;
+	}
+
+	for (entry_idx = 4; entry_idx < TOTAL_CAM_ENTRY; entry_idx++) {
+		if ((bitmap & BIT(0)) == 0) {
+			RT_TRACE(rtlpriv, COMP_SEC, DBG_EMERG,
+				 "-----hwsec_cam_bitmap: 0x%x entry_idx=%d\n",
+				 rtlpriv->sec.hwsec_cam_bitmap, entry_idx);
+			rtlpriv->sec.hwsec_cam_bitmap |= BIT(0) << entry_idx;
+			memcpy(rtlpriv->sec.hwsec_cam_sta_addr[entry_idx],
+			       sta_addr, ETH_ALEN);
+			return entry_idx;
+		}
+		bitmap = bitmap >> 1;
+	}
+	return TOTAL_CAM_ENTRY;
+}

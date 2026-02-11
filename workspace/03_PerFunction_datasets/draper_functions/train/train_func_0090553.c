@@ -1,0 +1,82 @@
+mpris2_controller_clean_metadata (Mpris2Controller* self) {
+	GHashTable* result = NULL;
+	GHashTable* changed_updates = NULL;
+	MprisPlayer* _tmp0_ = NULL;
+	GHashTable* _tmp1_ = NULL;
+	GHashTable* _tmp2_ = NULL;
+	GVariant* artist_v = NULL;
+	MprisPlayer* _tmp3_ = NULL;
+	GHashTable* _tmp4_ = NULL;
+	GHashTable* _tmp5_ = NULL;
+	GHashTable* _tmp6_ = NULL;
+	gconstpointer _tmp7_ = NULL;
+	GVariant* _tmp8_ = NULL;
+	GVariant* _tmp9_ = NULL;
+	GVariant* _tmp10_ = NULL;
+	g_return_val_if_fail (self != NULL, NULL);
+	_tmp0_ = self->priv->_player;
+	_tmp1_ = mpris_player_get_Metadata (_tmp0_);
+	_tmp2_ = _tmp1_;
+	changed_updates = _tmp2_;
+	_tmp3_ = self->priv->_player;
+	_tmp4_ = mpris_player_get_Metadata (_tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = _tmp5_;
+	_tmp7_ = g_hash_table_lookup (_tmp6_, "xesam:artist");
+	_tmp8_ = _g_variant_ref0 ((GVariant*) _tmp7_);
+	_tmp9_ = _tmp8_;
+	_g_hash_table_unref0 (_tmp6_);
+	artist_v = _tmp9_;
+	_tmp10_ = artist_v;
+	if (_tmp10_ != NULL) {
+		gchar* display_artists = NULL;
+		GVariant* _tmp11_ = NULL;
+		const gchar* _tmp12_ = NULL;
+		GHashTable* _tmp21_ = NULL;
+		gchar* _tmp22_ = NULL;
+		const gchar* _tmp23_ = NULL;
+		GVariant* _tmp24_ = NULL;
+		_tmp11_ = artist_v;
+		_tmp12_ = g_variant_get_type_string (_tmp11_);
+		if (g_strcmp0 (_tmp12_, "s") == 0) {
+			GVariant* _tmp13_ = NULL;
+			const gchar* _tmp14_ = NULL;
+			gchar* _tmp15_ = NULL;
+			_tmp13_ = artist_v;
+			_tmp14_ = g_variant_get_string (_tmp13_, NULL);
+			_tmp15_ = g_strdup (_tmp14_);
+			_g_free0 (display_artists);
+			display_artists = _tmp15_;
+		} else {
+			gchar** artists = NULL;
+			GVariant* _tmp16_ = NULL;
+			size_t _tmp17_;
+			gchar** _tmp18_ = NULL;
+			gint artists_length1 = 0;
+			gint _artists_size_ = 0;
+			gchar** _tmp19_ = NULL;
+			gint _tmp19__length1 = 0;
+			gchar* _tmp20_ = NULL;
+			_tmp16_ = artist_v;
+			_tmp18_ = g_variant_dup_strv (_tmp16_, &_tmp17_);
+			artists = _tmp18_;
+			artists_length1 = _tmp17_;
+			_artists_size_ = artists_length1;
+			_tmp19_ = artists;
+			_tmp19__length1 = artists_length1;
+			_tmp20_ = g_strjoinv (", ", _tmp19_);
+			_g_free0 (display_artists);
+			display_artists = _tmp20_;
+			artists = (_vala_array_free (artists, artists_length1, (GDestroyNotify) g_free), NULL);
+		}
+		_tmp21_ = changed_updates;
+		_tmp22_ = g_strdup ("xesam:artist");
+		_tmp23_ = display_artists;
+		_tmp24_ = _variant_new1 (_tmp23_);
+		g_hash_table_replace (_tmp21_, _tmp22_, _tmp24_);
+		_g_free0 (display_artists);
+	}
+	result = changed_updates;
+	_g_variant_unref0 (artist_v);
+	return result;
+}

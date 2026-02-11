@@ -1,0 +1,8 @@
+equals(const Envelope* other) const
+{
+	if (isNull() || other->isNull()) { return false; }
+	return  other->getMinX() == minx &&
+			other->getMaxX() == maxx &&
+			other->getMinY() == miny &&
+			other->getMaxY() == maxy;
+}

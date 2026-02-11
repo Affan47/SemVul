@@ -1,0 +1,54 @@
+gee_tree_set_iterator_real_remove (GeeIterator* base) {
+	GeeTreeSetIterator * self;
+	gint _tmp0_ = 0;
+	GeeTreeSet* _tmp1_ = NULL;
+	gint _tmp2_ = 0;
+	GeeTreeSetNode* _tmp3_ = NULL;
+	gboolean success = FALSE;
+	GeeTreeSet* _tmp4_ = NULL;
+	GeeTreeSet* _tmp5_ = NULL;
+	GeeTreeSetNode* _tmp6_ = NULL;
+	gconstpointer _tmp7_ = NULL;
+	GeeTreeSetNode* _tmp8_ = NULL;
+	GeeTreeSetNode* _tmp9_ = NULL;
+	gboolean _tmp10_ = FALSE;
+	gboolean _tmp11_ = FALSE;
+	GeeTreeSet* _tmp12_ = NULL;
+	GeeTreeSetNode* _tmp13_ = NULL;
+	gint _tmp16_ = 0;
+	GeeTreeSet* _tmp17_ = NULL;
+	gint _tmp18_ = 0;
+	self = (GeeTreeSetIterator*) base;
+	_tmp0_ = self->priv->stamp;
+	_tmp1_ = self->priv->_set;
+	_tmp2_ = _tmp1_->priv->stamp;
+	_vala_assert (_tmp0_ == _tmp2_, "stamp == _set.stamp");
+	_tmp3_ = self->priv->_current;
+	_vala_assert (_tmp3_ != NULL, "_current != null");
+	_tmp4_ = self->priv->_set;
+	_tmp5_ = self->priv->_set;
+	_tmp6_ = self->priv->_current;
+	_tmp7_ = _tmp6_->key;
+	_tmp10_ = gee_tree_set_remove_from_node (_tmp4_, &_tmp5_->priv->root, _tmp7_, &_tmp8_, &_tmp9_);
+	self->priv->_prev = _tmp8_;
+	self->priv->_next = _tmp9_;
+	success = _tmp10_;
+	_tmp11_ = success;
+	_vala_assert (_tmp11_, "success");
+	_tmp12_ = self->priv->_set;
+	_tmp13_ = _tmp12_->priv->root;
+	if (_tmp13_ != NULL) {
+		GeeTreeSet* _tmp14_ = NULL;
+		GeeTreeSetNode* _tmp15_ = NULL;
+		_tmp14_ = self->priv->_set;
+		_tmp15_ = _tmp14_->priv->root;
+		_tmp15_->color = GEE_TREE_SET_NODE_COLOR_BLACK;
+	}
+	self->priv->_current = NULL;
+	_tmp16_ = self->priv->stamp;
+	self->priv->stamp = _tmp16_ + 1;
+	_tmp17_ = self->priv->_set;
+	_tmp18_ = _tmp17_->priv->stamp;
+	_tmp17_->priv->stamp = _tmp18_ + 1;
+	_vala_assert (_tmp16_ == _tmp18_, "stamp++ == _set.stamp++");
+}

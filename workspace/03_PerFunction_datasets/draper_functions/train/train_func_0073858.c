@@ -1,0 +1,23 @@
+Teles_card_msg(struct IsdnCardState *cs, int mt, void *arg)
+{
+	u_long flags;
+
+	switch (mt) {
+	case CARD_RESET:
+		spin_lock_irqsave(&cs->lock, flags);
+		reset_teles3(cs);
+		spin_unlock_irqrestore(&cs->lock, flags);
+		return (0);
+	case CARD_RELEASE:
+		release_io_teles3(cs);
+		return (0);
+	case CARD_INIT:
+		spin_lock_irqsave(&cs->lock, flags);
+		inithscxisac(cs, 3);
+		spin_unlock_irqrestore(&cs->lock, flags);
+		return (0);
+	case CARD_TEST:
+		return (0);
+	}
+	return (0);
+}

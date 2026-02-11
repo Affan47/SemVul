@@ -1,0 +1,23 @@
+__ecereInstMeth___ecereNameSpace__ecere__gui__Timer_DelayExpired__00000005(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__ecere__gui__controls__ScrollBar * __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar = (struct __ecereNameSpace__ecere__gui__controls__ScrollBar *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gui__controls__ScrollBar->offset) : 0);
+
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action != 1 && __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action != 2)
+{
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->inside)
+{
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->mousePosition < __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->thumbPos)
+__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action = 4;
+else if(__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->mousePosition >= __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->thumbPos + __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->thumbSize)
+__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action = 3;
+else
+__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action = 0;
+if(__ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action)
+__ecereMethod___ecereNameSpace__ecere__gui__controls__ScrollBar_Action(this, __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action, 0, 0);
+__ecereMethod___ecereNameSpace__ecere__gui__Window_Update(this, (((void *)0)));
+}
+}
+else
+__ecereMethod___ecereNameSpace__ecere__gui__controls__ScrollBar_Action(this, __ecerePointer___ecereNameSpace__ecere__gui__controls__ScrollBar->action, 0, 0);
+return 0x1;
+}

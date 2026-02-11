@@ -1,0 +1,34 @@
+gee_test_case_adaptor_construct (GType object_type, const gchar* name, GeeTestCaseTestMethod test, void* test_target, GDestroyNotify test_target_destroy_notify, GeeTestCase* test_case) {
+	GeeTestCaseAdaptor* self = NULL;
+	const gchar* _tmp0_ = NULL;
+	GeeTestCaseTestMethod _tmp1_ = NULL;
+	void* _tmp1__target = NULL;
+	GDestroyNotify _tmp1__target_destroy_notify = NULL;
+	GeeTestCase* _tmp2_ = NULL;
+	GeeTestCase* _tmp3_ = NULL;
+	g_return_val_if_fail (name != NULL, NULL);
+	g_return_val_if_fail (test_case != NULL, NULL);
+	self = (GeeTestCaseAdaptor*) g_type_create_instance (object_type);
+	_tmp0_ = name;
+	gee_test_case_adaptor_set_name (self, _tmp0_);
+	_tmp1_ = test;
+	_tmp1__target = test_target;
+	_tmp1__target_destroy_notify = test_target_destroy_notify;
+	test_target_destroy_notify = NULL;
+	(self->priv->test_target_destroy_notify == NULL) ? NULL : (self->priv->test_target_destroy_notify (self->priv->test_target), NULL);
+	self->priv->test = NULL;
+	self->priv->test_target = NULL;
+	self->priv->test_target_destroy_notify = NULL;
+	self->priv->test = _tmp1_;
+	self->priv->test_target = _tmp1__target;
+	self->priv->test_target_destroy_notify = _tmp1__target_destroy_notify;
+	_tmp2_ = test_case;
+	_tmp3_ = _g_object_ref0 (_tmp2_);
+	_g_object_unref0 (self->priv->test_case);
+	self->priv->test_case = _tmp3_;
+	(test_target_destroy_notify == NULL) ? NULL : (test_target_destroy_notify (test_target), NULL);
+	test = NULL;
+	test_target = NULL;
+	test_target_destroy_notify = NULL;
+	return self;
+}

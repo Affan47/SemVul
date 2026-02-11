@@ -1,0 +1,11 @@
+memref_used_between_p (rtx memref, rtx start, rtx end)
+{
+  rtx insn;
+
+  for (insn = NEXT_INSN (start); insn != NEXT_INSN (end);
+       insn = NEXT_INSN (insn))
+    if (INSN_P (insn) && memref_referenced_p (memref, PATTERN (insn)))
+      return 1;
+
+  return 0;
+}

@@ -1,0 +1,75 @@
+ap_session_load(request_rec * r, session_rec ** z)
+{
+
+    session_dir_conf *dconf = ap_get_module_config(r->per_dir_config,
+                                                   &session_module);
+    apr_time_t now;
+    session_rec *zz = NULL;
+    int rv = 0;
+
+
+    if (!dconf || !dconf->enabled) {
+        return APR_SUCCESS;
+    }
+
+
+    if (!session_included(r, dconf)) {
+        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(01814)
+                      "excluded by configuration for: %s", r->uri);
+        return APR_SUCCESS;
+    }
+
+
+    rv = ap_run_session_load(r, &zz);
+    if (DECLINED == rv) {
+        ap_log_rerror(APLOG_MARK, APLOG_WARNING, 0, r, APLOGNO(01815)
+                      "session is enabled but no session modules have been configured, "
+                      "session not loaded: %s", r->uri);
+        return APR_EGENERAL;
+    }
+    else if (OK != rv) {
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r, APLOGNO(01816)
+                      "error while loading the session, "
+                      "session not loaded: %s", r->uri);
+        return rv;
+    }
+
+
+    now = apr_time_now();
+    if (zz) {
+        if (zz->expiry && zz->expiry < now) {
+            zz = NULL;
+        }
+        else {
+
+
+            rv = ap_run_session_decode(r, zz);
+            if (OK != rv) {
+                ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r, APLOGNO(01817)
+                              "error while decoding the session, "
+                              "session not loaded: %s", r->uri);
+                zz = NULL;
+            }
+        }
+    }
+
+
+    if (!zz) {
+        zz = (session_rec *) apr_pcalloc(r->pool, sizeof(session_rec));
+        zz->pool = r->pool;
+        zz->entries = apr_table_make(zz->pool, 10);
+    }
+
+
+    if (dconf->maxage) {
+        if (!zz->expiry) {
+            zz->expiry = now + dconf->maxage * APR_USEC_PER_SEC;
+        }
+        zz->maxage = dconf->maxage;
+    }
+
+    *z = zz;
+
+    return APR_SUCCESS;
+
+}

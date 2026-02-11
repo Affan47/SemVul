@@ -1,0 +1,63 @@
+audio_out_callback(struct urb *urb)
+{
+	int i, index, length = 0, shutdown = 0;
+	unsigned long flags;
+	struct snd_line6_pcm *line6pcm = (struct snd_line6_pcm *)urb->context;
+	struct snd_pcm_substream *substream =
+	    get_substream(line6pcm, SNDRV_PCM_STREAM_PLAYBACK);
+
+#if USE_CLEAR_BUFFER_WORKAROUND
+	memset(urb->transfer_buffer, 0, urb->transfer_buffer_length);
+#endif
+
+	line6pcm->out.last_frame = urb->start_frame;
+
+
+	for (index = 0; index < LINE6_ISO_BUFFERS; index++)
+		if (urb == line6pcm->out.urbs[index])
+			break;
+
+	if (index >= LINE6_ISO_BUFFERS)
+		return;
+
+	for (i = 0; i < LINE6_ISO_PACKETS; i++)
+		length += urb->iso_frame_desc[i].length;
+
+	spin_lock_irqsave(&line6pcm->out.lock, flags);
+
+	if (test_bit(LINE6_STREAM_PCM, &line6pcm->out.running)) {
+		struct snd_pcm_runtime *runtime = substream->runtime;
+
+		line6pcm->out.pos_done +=
+		    length / line6pcm->properties->bytes_per_frame;
+
+		if (line6pcm->out.pos_done >= runtime->buffer_size)
+			line6pcm->out.pos_done -= runtime->buffer_size;
+	}
+
+	clear_bit(index, &line6pcm->out.active_urbs);
+
+	for (i = 0; i < LINE6_ISO_PACKETS; i++)
+		if (urb->iso_frame_desc[i].status == -EXDEV) {
+			shutdown = 1;
+			break;
+		}
+
+	if (test_and_clear_bit(index, &line6pcm->out.unlink_urbs))
+		shutdown = 1;
+
+	if (!shutdown) {
+		submit_audio_out_urb(line6pcm);
+
+		if (test_bit(LINE6_STREAM_PCM, &line6pcm->out.running)) {
+			line6pcm->out.bytes += length;
+			if (line6pcm->out.bytes >= line6pcm->out.period) {
+				line6pcm->out.bytes %= line6pcm->out.period;
+				spin_unlock(&line6pcm->out.lock);
+				snd_pcm_period_elapsed(substream);
+				spin_lock(&line6pcm->out.lock);
+			}
+		}
+	}
+	spin_unlock_irqrestore(&line6pcm->out.lock, flags);
+}

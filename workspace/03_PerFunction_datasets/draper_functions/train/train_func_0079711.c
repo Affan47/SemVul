@@ -1,0 +1,6 @@
+initnode(Agraph_t * g, Agnode_t * n)
+{
+    if (agroot(g)->desc.has_attrs)
+	agnodeattr_init(g,n);
+    agmethod_init(g, n);
+}

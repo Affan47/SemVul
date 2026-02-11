@@ -1,0 +1,41 @@
+__ecereDestructor___ecereNameSpace__eda__TableEditor(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__eda__TableEditor * __ecerePointer___ecereNameSpace__eda__TableEditor = (struct __ecereNameSpace__eda__TableEditor *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__eda__TableEditor->offset) : 0);
+
+{
+__ecereNameSpace__eda__DebugLn(__ecereClass_char__PTR_, "TableEditor::~()", (void *)0);
+((void (*)(struct __ecereNameSpace__ecere__com__Instance *))__extension__ ({
+struct __ecereNameSpace__ecere__com__Instance * __internal_ClassInst = __ecerePointer___ecereNameSpace__eda__TableEditor->fieldsBoxes;
+
+__internal_ClassInst ? __internal_ClassInst->_vTbl : __ecereClass___ecereNameSpace__ecere__com__Array->_vTbl;
+})[__ecereVMethodID___ecereNameSpace__ecere__com__Container_Free])(__ecerePointer___ecereNameSpace__eda__TableEditor->fieldsBoxes);
+(__ecereNameSpace__ecere__com__eSystem_Delete(__ecerePointer___ecereNameSpace__eda__TableEditor->searchString), __ecerePointer___ecereNameSpace__eda__TableEditor->searchString = 0);
+__ecereMethod___ecereNameSpace__ecere__sys__BinaryTree_Free(&__ecerePointer___ecereNameSpace__eda__TableEditor->wordTree);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->listFields), __ecerePointer___ecereNameSpace__eda__TableEditor->listFields = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->lookups), __ecerePointer___ecereNameSpace__eda__TableEditor->lookups = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->dynamicLookupEditors), __ecerePointer___ecereNameSpace__eda__TableEditor->dynamicLookupEditors = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->dynamicLookupTableEditors), __ecerePointer___ecereNameSpace__eda__TableEditor->dynamicLookupTableEditors = 0);
+if(__ecerePointer___ecereNameSpace__eda__TableEditor->searchTables)
+((void (*)(struct __ecereNameSpace__ecere__com__Instance *))__extension__ ({
+struct __ecereNameSpace__ecere__com__Instance * __internal_ClassInst = __ecerePointer___ecereNameSpace__eda__TableEditor->searchTables;
+
+__internal_ClassInst ? __internal_ClassInst->_vTbl : __ecereClass___ecereNameSpace__ecere__com__Array->_vTbl;
+})[__ecereVMethodID___ecereNameSpace__ecere__com__Container_Free])(__ecerePointer___ecereNameSpace__eda__TableEditor->searchTables);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->searchTables), __ecerePointer___ecereNameSpace__eda__TableEditor->searchTables = 0);
+if(__ecerePointer___ecereNameSpace__eda__TableEditor->sqliteSearchTables)
+((void (*)(struct __ecereNameSpace__ecere__com__Instance *))__extension__ ({
+struct __ecereNameSpace__ecere__com__Instance * __internal_ClassInst = __ecerePointer___ecereNameSpace__eda__TableEditor->sqliteSearchTables;
+
+__internal_ClassInst ? __internal_ClassInst->_vTbl : __ecereClass___ecereNameSpace__ecere__com__Array->_vTbl;
+})[__ecereVMethodID___ecereNameSpace__ecere__com__Container_Free])(__ecerePointer___ecereNameSpace__eda__TableEditor->sqliteSearchTables);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->sqliteSearchTables), __ecerePointer___ecereNameSpace__eda__TableEditor->sqliteSearchTables = 0);
+}
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->fieldsBoxes), __ecerePointer___ecereNameSpace__eda__TableEditor->fieldsBoxes = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->tableEditors), __ecerePointer___ecereNameSpace__eda__TableEditor->tableEditors = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->dynamicLookupTableEditors), __ecerePointer___ecereNameSpace__eda__TableEditor->dynamicLookupTableEditors = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->editRow), __ecerePointer___ecereNameSpace__eda__TableEditor->editRow = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->filterRow), __ecerePointer___ecereNameSpace__eda__TableEditor->filterRow = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->searchCI), __ecerePointer___ecereNameSpace__eda__TableEditor->searchCI = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->listEnumerationTimer), __ecerePointer___ecereNameSpace__eda__TableEditor->listEnumerationTimer = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__eda__TableEditor->wordListPrepTimer), __ecerePointer___ecereNameSpace__eda__TableEditor->wordListPrepTimer = 0);
+}

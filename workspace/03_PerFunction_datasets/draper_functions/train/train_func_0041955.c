@@ -1,0 +1,10 @@
+safe_rshift_func_int16_t_s_u)(short left, unsigned int right )
+{
+
+  return
+
+    ((left < 0) || (((unsigned int)right) >= 32)) ?
+    ((left)) :
+
+    (left >> ((unsigned int)right));
+}

@@ -1,0 +1,20 @@
+ResetRequestData()
+{
+   body_size=-1;
+   bytes_received=0;
+   real_pos=no_ranges?0:-1;
+   status.set(0);
+   status_consumed=0;
+   line.set(0);
+   sent_eot=false;
+   keep_alive=false;
+   keep_alive_max=-1;
+   array_send=fileset_for_info?fileset_for_info->curr_index():0;
+   chunked=false;
+   chunk_size=CHUNK_SIZE_UNKNOWN;
+   chunk_pos=0;
+   chunked_trailer=false;
+   propfind=0;
+   inflate=0;
+   seen_ranges_bytes=false;
+}

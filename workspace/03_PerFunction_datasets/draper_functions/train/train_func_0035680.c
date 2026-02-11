@@ -1,0 +1,21 @@
+iscsi_target_set_sock_callbacks(struct iscsi_conn *conn)
+{
+	struct sock *sk;
+
+	if (!conn->sock)
+		return;
+
+	sk = conn->sock->sk;
+	pr_debug("Entering iscsi_target_set_sock_callbacks: conn: %p\n", conn);
+
+	write_lock_bh(&sk->sk_callback_lock);
+	sk->sk_user_data = conn;
+	conn->orig_data_ready = sk->sk_data_ready;
+	conn->orig_state_change = sk->sk_state_change;
+	sk->sk_data_ready = iscsi_target_sk_data_ready;
+	sk->sk_state_change = iscsi_target_sk_state_change;
+	write_unlock_bh(&sk->sk_callback_lock);
+
+	sk->sk_sndtimeo = TA_LOGIN_TIMEOUT * HZ;
+	sk->sk_rcvtimeo = TA_LOGIN_TIMEOUT * HZ;
+}

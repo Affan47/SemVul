@@ -1,0 +1,11 @@
+__ecereMethod___ecereNameSpace__ecere__gfx__Display_IsObjectVisible(struct __ecereNameSpace__ecere__com__Instance * this, struct __ecereNameSpace__ecere__com__Instance * object)
+{
+struct __ecereNameSpace__ecere__gfx__Display * __ecerePointer___ecereNameSpace__ecere__gfx__Display = (struct __ecereNameSpace__ecere__gfx__Display *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__gfx__Display->offset) : 0);
+struct __ecereNameSpace__ecere__gfx3D__Plane * planes;
+
+if(((struct __ecereNameSpace__ecere__gfx__Display3D *)(((char *)__ecerePointer___ecereNameSpace__ecere__gfx__Display->display3D + __ecereClass___ecereNameSpace__ecere__gfx__Display3D->offset)))->selection || !((struct __ecereNameSpace__ecere__gfx__Display3D *)(((char *)__ecerePointer___ecereNameSpace__ecere__gfx__Display->display3D + __ecereClass___ecereNameSpace__ecere__gfx__Display3D->offset)))->camera)
+planes = ((unsigned int)((__ecereProp___ecereNameSpace__ecere__gfx3D__Object_Get_flags(object) & 0x2) >> 1)) ? ((struct __ecereNameSpace__ecere__gfx__Display3D *)(((char *)__ecerePointer___ecereNameSpace__ecere__gfx__Display->display3D + __ecereClass___ecereNameSpace__ecere__gfx__Display3D->offset)))->viewPickingPlanes : ((struct __ecereNameSpace__ecere__gfx__Display3D *)(((char *)__ecerePointer___ecereNameSpace__ecere__gfx__Display->display3D + __ecereClass___ecereNameSpace__ecere__gfx__Display3D->offset)))->worldPickingPlanes;
+else
+planes = ((unsigned int)((__ecereProp___ecereNameSpace__ecere__gfx3D__Object_Get_flags(object) & 0x2) >> 1)) ? ((struct __ecereNameSpace__ecere__gfx3D__Camera *)(((char *)((struct __ecereNameSpace__ecere__gfx__Display3D *)(((char *)__ecerePointer___ecereNameSpace__ecere__gfx__Display->display3D + __ecereClass___ecereNameSpace__ecere__gfx__Display3D->offset)))->camera + __ecereClass___ecereNameSpace__ecere__gfx3D__Camera->offset)))->viewClippingPlanes : ((struct __ecereNameSpace__ecere__gfx3D__Camera *)(((char *)((struct __ecereNameSpace__ecere__gfx__Display3D *)(((char *)__ecerePointer___ecereNameSpace__ecere__gfx__Display->display3D + __ecereClass___ecereNameSpace__ecere__gfx__Display3D->offset)))->camera + __ecereClass___ecereNameSpace__ecere__gfx3D__Camera->offset)))->worldClippingPlanes;
+return __ecereMethod___ecereNameSpace__ecere__gfx3D__Object_InsideFrustum(object, planes) != 0;
+}

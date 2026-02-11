@@ -1,0 +1,36 @@
+gee_array_list_iterator_real_insert (GeeListIterator* base, gconstpointer item) {
+	GeeArrayListIterator * self;
+	gint _tmp0_ = 0;
+	GeeArrayList* _tmp1_ = NULL;
+	gint _tmp2_ = 0;
+	gint _tmp3_ = 0;
+	gint _tmp4_ = 0;
+	GeeArrayList* _tmp5_ = NULL;
+	gint _tmp6_ = 0;
+	GeeArrayList* _tmp7_ = NULL;
+	gint _tmp8_ = 0;
+	gconstpointer _tmp9_ = NULL;
+	gint _tmp10_ = 0;
+	GeeArrayList* _tmp11_ = NULL;
+	gint _tmp12_ = 0;
+	self = (GeeArrayListIterator*) base;
+	_tmp0_ = self->priv->_stamp;
+	_tmp1_ = self->priv->_list;
+	_tmp2_ = _tmp1_->priv->_stamp;
+	_vala_assert (_tmp0_ == _tmp2_, "_stamp == _list._stamp");
+	_tmp3_ = self->priv->_index;
+	_vala_assert (_tmp3_ >= 0, "_index >= 0");
+	_tmp4_ = self->priv->_index;
+	_tmp5_ = self->priv->_list;
+	_tmp6_ = _tmp5_->_size;
+	_vala_assert (_tmp4_ < _tmp6_, "_index < _list._size");
+	_tmp7_ = self->priv->_list;
+	_tmp8_ = self->priv->_index;
+	_tmp9_ = item;
+	gee_abstract_list_insert ((GeeAbstractList*) _tmp7_, _tmp8_, _tmp9_);
+	_tmp10_ = self->priv->_index;
+	self->priv->_index = _tmp10_ + 1;
+	_tmp11_ = self->priv->_list;
+	_tmp12_ = _tmp11_->priv->_stamp;
+	self->priv->_stamp = _tmp12_;
+}

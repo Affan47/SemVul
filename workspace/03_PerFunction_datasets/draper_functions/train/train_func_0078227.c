@@ -1,0 +1,7 @@
+extract_constrain_insn_cached (rtx insn)
+{
+  extract_insn_cached (insn);
+  if (which_alternative == -1
+      && !constrain_operands (reload_completed))
+    fatal_insn_not_found (insn);
+}

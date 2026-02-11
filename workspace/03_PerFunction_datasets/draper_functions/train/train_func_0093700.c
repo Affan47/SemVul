@@ -1,0 +1,23 @@
+eval7 (bool evaluate)
+{
+  VALUE *v;
+
+#ifdef EVAL_TRACE
+  trace ("eval7");
+#endif
+  if (nomoreargs ())
+    syntax_error ();
+
+  if (nextarg ("("))
+    {
+      v = eval (evaluate);
+      if (!nextarg (")"))
+        syntax_error ();
+      return v;
+    }
+
+  if (nextarg (")"))
+    syntax_error ();
+
+  return str_value (*args++);
+}

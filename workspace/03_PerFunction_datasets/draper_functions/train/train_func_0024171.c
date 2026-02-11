@@ -1,0 +1,21 @@
+vga_switcheroo_enable(void)
+{
+	int ret;
+	struct vga_switcheroo_client *client;
+
+
+	if (vgasr_priv.handler->init)
+		vgasr_priv.handler->init();
+
+	list_for_each_entry(client, &vgasr_priv.clients, list) {
+		if (client->id != VGA_SWITCHEROO_UNKNOWN_ID)
+			continue;
+		ret = vgasr_priv.handler->get_client_id(client->pdev);
+		if (ret < 0)
+			return;
+
+		client->id = ret;
+	}
+	vga_switcheroo_debugfs_init(&vgasr_priv);
+	vgasr_priv.active = true;
+}

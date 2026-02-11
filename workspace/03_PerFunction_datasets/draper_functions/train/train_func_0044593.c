@@ -1,0 +1,41 @@
+lp3972_i2c_probe(struct i2c_client *i2c,
+			    const struct i2c_device_id *id)
+{
+	struct lp3972 *lp3972;
+	struct lp3972_platform_data *pdata = dev_get_platdata(&i2c->dev);
+	int ret;
+	u16 val;
+
+	if (!pdata) {
+		dev_dbg(&i2c->dev, "No platform init data supplied\n");
+		return -ENODEV;
+	}
+
+	lp3972 = devm_kzalloc(&i2c->dev, sizeof(struct lp3972), GFP_KERNEL);
+	if (!lp3972)
+		return -ENOMEM;
+
+	lp3972->i2c = i2c;
+	lp3972->dev = &i2c->dev;
+
+	mutex_init(&lp3972->io_lock);
+
+
+	ret = lp3972_i2c_read(i2c, LP3972_SYS_CONTROL1_REG, 1, &val);
+	if (ret == 0 &&
+		(val & SYS_CONTROL1_INIT_MASK) != SYS_CONTROL1_INIT_VAL) {
+		ret = -ENODEV;
+		dev_err(&i2c->dev, "chip reported: val = 0x%x\n", val);
+	}
+	if (ret < 0) {
+		dev_err(&i2c->dev, "failed to detect device. ret = %d\n", ret);
+		return ret;
+	}
+
+	ret = setup_regulators(lp3972, pdata);
+	if (ret < 0)
+		return ret;
+
+	i2c_set_clientdata(i2c, lp3972);
+	return 0;
+}

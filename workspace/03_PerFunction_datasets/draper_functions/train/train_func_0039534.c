@@ -1,0 +1,33 @@
+get_memory_rtx (exp)
+     tree exp;
+{
+  rtx addr = expand_expr (exp, NULL_RTX, ptr_mode, EXPAND_SUM);
+  rtx mem;
+
+#ifdef POINTERS_EXTEND_UNSIGNED
+  if (GET_MODE (addr) != Pmode)
+    addr = convert_memory_address (Pmode, addr);
+#endif
+
+  mem = gen_rtx_MEM (BLKmode, memory_address (BLKmode, addr));
+
+
+  while ((TREE_CODE (exp) == NOP_EXPR || TREE_CODE (exp) == CONVERT_EXPR
+	  || TREE_CODE (exp) == NON_LVALUE_EXPR)
+	 && POINTER_TYPE_P (TREE_TYPE (TREE_OPERAND (exp, 0))))
+    exp = TREE_OPERAND (exp, 0);
+
+  if (TREE_CODE (exp) == ADDR_EXPR)
+    {
+      exp = TREE_OPERAND (exp, 0);
+      set_mem_attributes (mem, exp, 0);
+    }
+  else if (POINTER_TYPE_P (TREE_TYPE (exp)))
+    {
+      exp = build1 (INDIRECT_REF, TREE_TYPE (TREE_TYPE (exp)), exp);
+
+      set_mem_alias_set (mem, 0);
+    }
+
+  return mem;
+}

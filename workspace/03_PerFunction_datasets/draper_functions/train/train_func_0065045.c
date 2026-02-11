@@ -1,0 +1,29 @@
+ocrdma_mbx_reg_mr_cont(struct ocrdma_dev *dev,
+				  struct ocrdma_hw_mr *hwmr, u32 pbl_cnt,
+				  u32 pbl_offset, u32 last)
+{
+	int status = -ENOMEM;
+	int i;
+	struct ocrdma_reg_nsmr_cont *cmd;
+
+	cmd = ocrdma_init_emb_mqe(OCRDMA_CMD_REGISTER_NSMR_CONT, sizeof(*cmd));
+	if (!cmd)
+		return -ENOMEM;
+	cmd->lrkey = hwmr->lkey;
+	cmd->num_pbl_offset = (pbl_cnt << OCRDMA_REG_NSMR_CONT_NUM_PBL_SHIFT) |
+	    (pbl_offset & OCRDMA_REG_NSMR_CONT_PBL_SHIFT_MASK);
+	cmd->last = last << OCRDMA_REG_NSMR_CONT_LAST_SHIFT;
+
+	for (i = 0; i < pbl_cnt; i++) {
+		cmd->pbl[i].lo =
+		    (u32) (hwmr->pbl_table[i + pbl_offset].pa & 0xffffffff);
+		cmd->pbl[i].hi =
+		    upper_32_bits(hwmr->pbl_table[i + pbl_offset].pa);
+	}
+	status = ocrdma_mbx_cmd(dev, (struct ocrdma_mqe *)cmd);
+	if (status)
+		goto mbx_err;
+mbx_err:
+	kfree(cmd);
+	return status;
+}

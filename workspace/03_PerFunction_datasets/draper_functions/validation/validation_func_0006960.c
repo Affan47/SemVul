@@ -1,0 +1,30 @@
+init(void)
+{
+  if(server()->defaultValueBackground()==0)
+   {
+     server()->defaultValueBackground(server()->colorName(server()->defaultBackground()));
+   }
+  freeze();
+  _clipMode=MSNoClipping;
+  _fieldValue=new FieldValue(this);
+  _labelAlignment=MSLeft;
+  _labelJustification=MSRight;
+  _valueAlignment=MSLeft;
+  _labelSpacing=MSCompositeFieldDefaultSpacing;
+  _shadowThickness=MSCompositeFieldDefaultShadowThickness;
+  _highlightThickness=MSCompositeFieldDefaultHighlightThickness;
+  _valueWidth=MSCompositeFieldDefaultValueWidth;
+  _editWidth=MSCompositeFieldDefaultEditWidth;
+  _marginHeight=0;
+  _clipIndicatorForeground=foreground();
+  shadowStyle(MSSunken);
+  resizeConstraints(At::Top|At::MaintainHeight);
+  addToFocusList();
+  if (server()->defaultValueBackground()!=server()->defaultBackground())
+   {
+     _fieldValue->background(server()->defaultValueBackground());
+   }
+  _drawGC=XCreateGC(display(),window(),0,0);
+  XSetFont(display(),drawGC(),font());
+  XSetStipple(display(),drawGC(),_fieldValue->textMSGC().stipple());
+}

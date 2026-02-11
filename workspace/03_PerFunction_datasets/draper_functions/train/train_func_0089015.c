@@ -1,0 +1,4 @@
+lua_iscfunction (lua_State *L, int idx) {
+  StkId o = index2addr(L, idx);
+  return (ttislcf(o) || (ttisCclosure(o)));
+}

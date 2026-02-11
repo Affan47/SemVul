@@ -1,0 +1,31 @@
+dvb_terrestrial_scanner_add_scanning_data (DVBTerrestrialScanner* self, guint frequency, guint hierarchy, guint bandwidth, const gchar* transmode, const gchar* code_rate_hp, const gchar* code_rate_lp, const gchar* constellation, guint guard) {
+	GstStructure* tuning_params = NULL;
+	guint _tmp0_ = 0U;
+	guint _tmp1_ = 0U;
+	guint _tmp2_ = 0U;
+	const gchar* _tmp3_ = NULL;
+	const gchar* _tmp4_ = NULL;
+	const gchar* _tmp5_ = NULL;
+	const gchar* _tmp6_ = NULL;
+	guint _tmp7_ = 0U;
+	GstStructure* _tmp8_ = NULL;
+	GstStructure* _tmp9_ = NULL;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (transmode != NULL);
+	g_return_if_fail (code_rate_hp != NULL);
+	g_return_if_fail (code_rate_lp != NULL);
+	g_return_if_fail (constellation != NULL);
+	_tmp0_ = frequency;
+	_tmp1_ = hierarchy;
+	_tmp2_ = bandwidth;
+	_tmp3_ = transmode;
+	_tmp4_ = code_rate_hp;
+	_tmp5_ = code_rate_lp;
+	_tmp6_ = constellation;
+	_tmp7_ = guard;
+	_tmp8_ = gst_structure_new ("tuning_params", "frequency", G_TYPE_UINT, _tmp0_, "hierarchy", G_TYPE_UINT, _tmp1_, "bandwidth", G_TYPE_UINT, _tmp2_, "transmission-mode", G_TYPE_STRING, _tmp3_, "code-rate-hp", G_TYPE_STRING, _tmp4_, "code-rate-lp", G_TYPE_STRING, _tmp5_, "constellation", G_TYPE_STRING, _tmp6_, "guard-interval", G_TYPE_UINT, _tmp7_, NULL);
+	tuning_params = _tmp8_;
+	_tmp9_ = _gst_structure_copy0 (tuning_params);
+	dvb_scanner_add_structure_to_scan (G_TYPE_CHECK_INSTANCE_CAST (self, DVB_TYPE_SCANNER, DVBScanner), _tmp9_);
+	_gst_structure_free0 (tuning_params);
+}

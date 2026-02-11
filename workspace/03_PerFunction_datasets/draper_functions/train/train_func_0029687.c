@@ -1,0 +1,14 @@
+remove_backslashes(p)
+    char *p;
+{
+    char *pend = p + strlen(p);
+    char *t = p;
+
+    while (p < pend) {
+	if (*p == '\\') {
+	    if (++p == pend) break;
+	}
+	*t++ = *p++;
+    }
+    *t = '\0';
+}

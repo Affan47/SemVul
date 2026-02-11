@@ -1,0 +1,16 @@
+__ecereDestructor___ecereNameSpace__ecere__net__DCOMServerObject(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__ecere__net__DCOMServerObject * __ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject = (struct __ecereNameSpace__ecere__net__DCOMServerObject *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__net__DCOMServerObject->offset) : 0);
+
+{
+((void (*)(struct __ecereNameSpace__ecere__com__Instance *))__extension__ ({
+struct __ecereNameSpace__ecere__com__Instance * __internal_ClassInst = __ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->acks;
+
+__internal_ClassInst ? __internal_ClassInst->_vTbl : __ecereClass___ecereNameSpace__ecere__com__List->_vTbl;
+})[__ecereVMethodID___ecereNameSpace__ecere__com__Container_Free])(__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->acks);
+}
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->argsBuffer), __ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->argsBuffer = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->returnBuffer), __ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->returnBuffer = 0);
+(__ecereNameSpace__ecere__com__eInstance_DecRef(__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->acks), __ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->acks = 0);
+((__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->mutex ? (__ecereClass___ecereNameSpace__ecere__sys__Mutex->Destructor ? __ecereClass___ecereNameSpace__ecere__sys__Mutex->Destructor(__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->mutex) : 0, __ecereNameSpace__ecere__com__eSystem_Delete(__ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->mutex)) : 0), __ecerePointer___ecereNameSpace__ecere__net__DCOMServerObject->mutex = 0);
+}

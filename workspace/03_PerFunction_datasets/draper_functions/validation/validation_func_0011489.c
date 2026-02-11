@@ -1,0 +1,17 @@
+fibnode_insert_after (fibnode_t a, fibnode_t b)
+{
+  if (a == a->right)
+    {
+      a->right = b;
+      a->left = b;
+      b->right = a;
+      b->left = a;
+    }
+  else
+    {
+      b->right = a->right;
+      a->right->left = b;
+      a->right = b;
+      b->left = a;
+    }
+}

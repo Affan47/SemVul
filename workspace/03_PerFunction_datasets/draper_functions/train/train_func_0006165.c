@@ -1,0 +1,36 @@
+ath5k_hw_set_fast_div(struct ath5k_hw *ah, u8 ee_mode, bool enable)
+{
+	switch (ee_mode) {
+	case AR5K_EEPROM_MODE_11G:
+
+
+	case AR5K_EEPROM_MODE_11A:
+		if (enable)
+			AR5K_REG_DISABLE_BITS(ah, AR5K_PHY_AGCCTL,
+					AR5K_PHY_AGCCTL_OFDM_DIV_DIS);
+		else
+			AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_AGCCTL,
+					AR5K_PHY_AGCCTL_OFDM_DIV_DIS);
+		break;
+	case AR5K_EEPROM_MODE_11B:
+		AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_AGCCTL,
+					AR5K_PHY_AGCCTL_OFDM_DIV_DIS);
+		break;
+	default:
+		return;
+	}
+
+	if (enable) {
+		AR5K_REG_WRITE_BITS(ah, AR5K_PHY_RESTART,
+				AR5K_PHY_RESTART_DIV_GC, 4);
+
+		AR5K_REG_ENABLE_BITS(ah, AR5K_PHY_FAST_ANT_DIV,
+					AR5K_PHY_FAST_ANT_DIV_EN);
+	} else {
+		AR5K_REG_WRITE_BITS(ah, AR5K_PHY_RESTART,
+				AR5K_PHY_RESTART_DIV_GC, 0);
+
+		AR5K_REG_DISABLE_BITS(ah, AR5K_PHY_FAST_ANT_DIV,
+					AR5K_PHY_FAST_ANT_DIV_EN);
+	}
+}

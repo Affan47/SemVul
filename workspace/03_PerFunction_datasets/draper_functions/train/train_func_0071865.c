@@ -1,0 +1,25 @@
+nemo_list_model_get_column_type (GtkTreeModel *tree_model, int index)
+{
+	switch (index) {
+	case NEMO_LIST_MODEL_FILE_COLUMN:
+		return NEMO_TYPE_FILE;
+	case NEMO_LIST_MODEL_SUBDIRECTORY_COLUMN:
+		return NEMO_TYPE_DIRECTORY;
+	case NEMO_LIST_MODEL_SMALLEST_ICON_COLUMN:
+	case NEMO_LIST_MODEL_SMALLER_ICON_COLUMN:
+	case NEMO_LIST_MODEL_SMALL_ICON_COLUMN:
+	case NEMO_LIST_MODEL_STANDARD_ICON_COLUMN:
+	case NEMO_LIST_MODEL_LARGE_ICON_COLUMN:
+	case NEMO_LIST_MODEL_LARGER_ICON_COLUMN:
+	case NEMO_LIST_MODEL_LARGEST_ICON_COLUMN:
+		return GDK_TYPE_PIXBUF;
+	case NEMO_LIST_MODEL_FILE_NAME_IS_EDITABLE_COLUMN:
+		return G_TYPE_BOOLEAN;
+	default:
+		if (index < NEMO_LIST_MODEL_NUM_COLUMNS + NEMO_LIST_MODEL (tree_model)->details->columns->len) {
+			return G_TYPE_STRING;
+		} else {
+			return G_TYPE_INVALID;
+		}
+	}
+}

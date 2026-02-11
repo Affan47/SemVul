@@ -1,0 +1,19 @@
+rb_big_divmod(VALUE x, VALUE y)
+{
+    VALUE div, mod;
+
+    switch (TYPE(y)) {
+      case T_FIXNUM:
+	y = rb_int2big(FIX2LONG(y));
+	break;
+
+      case T_BIGNUM:
+	break;
+
+      default:
+	return rb_num_coerce_bin(x, y, rb_intern("divmod"));
+    }
+    bigdivmod(x, y, &div, &mod);
+
+    return rb_assoc_new(bignorm(div), bignorm(mod));
+}

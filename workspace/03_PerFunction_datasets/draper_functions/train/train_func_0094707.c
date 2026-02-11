@@ -1,0 +1,43 @@
+dib0090_set_EFUSE(struct dib0090_state *state)
+{
+	u8 c, h, n;
+	u16 e2, e4;
+	u16 cal;
+
+	e2 = dib0090_read_reg(state, 0x26);
+	e4 = dib0090_read_reg(state, 0x28);
+
+	if ((state->identity.version == P1D_E_F) ||
+			(state->identity.version == P1G) || (e2 == 0xffff)) {
+
+		dib0090_write_reg(state, 0x22, 0x10);
+		cal = (dib0090_read_reg(state, 0x22) >> 6) & 0x3ff;
+
+		if ((cal < 670) || (cal == 1023))
+			cal = 850;
+		n = 165 - ((cal * 10)>>6) ;
+		e2 = e4 = (3<<12) | (34<<6) | (n);
+	}
+
+	if (e2 != e4)
+		e2 &= e4;
+
+	if (e2 != 0xffff) {
+		c = e2 & 0x3f;
+		n = (e2 >> 12) & 0xf;
+		h = (e2 >> 6) & 0x3f;
+
+		if ((c >= CAP_VALUE_MAX) || (c <= CAP_VALUE_MIN))
+			c = 32;
+		else
+			c += 14;
+		if ((h >= HR_MAX) || (h <= HR_MIN))
+			h = 34;
+		if ((n >= POLY_MAX) || (n <= POLY_MIN))
+			n = 3;
+
+		dib0090_write_reg(state, 0x13, (h << 10));
+		e2 = (n << 11) | ((h >> 2)<<6) | c;
+		dib0090_write_reg(state, 0x2, e2);
+	}
+}

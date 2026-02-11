@@ -1,0 +1,4 @@
+is_ok_load_info(ErlNifEnv* env, ERL_NIF_TERM load_info) {
+    int i;
+    return enif_get_int(env, load_info, &i) && i == 1;
+}

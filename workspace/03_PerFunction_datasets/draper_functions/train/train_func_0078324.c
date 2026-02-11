@@ -1,0 +1,61 @@
+do_cancel( Plustek_Scanner *scanner, SANE_Bool closepipe )
+{
+	struct SIGACTION act;
+	SANE_Pid         res;
+
+	DBG( _DBG_PROC,"do_cancel\n" );
+	scanner->scanning = SANE_FALSE;
+
+	if( scanner->reader_pid != -1 ) {
+
+		DBG( _DBG_PROC, ">>>>>>>> killing reader_process <<<<<<<<\n" );
+
+		cancelRead = SANE_TRUE;
+		scanner->calibrating = SANE_FALSE;
+
+		sigemptyset(&(act.sa_mask));
+		act.sa_flags = 0;
+
+		act.sa_handler = sigalarm_handler;
+		sigaction( SIGALRM, &act, 0 );
+
+
+		sanei_thread_sendsig( scanner->reader_pid, SIGUSR1 );
+
+
+		alarm(10);
+		res = sanei_thread_waitpid( scanner->reader_pid, 0 );
+		alarm(0);
+
+		if( res != scanner->reader_pid ) {
+			DBG( _DBG_PROC,"sanei_thread_waitpid() failed !\n");
+
+
+#ifdef USE_PTHREAD
+			sanei_thread_kill( scanner->reader_pid );
+#else
+			sanei_thread_sendsig( scanner->reader_pid, SIGKILL );
+#endif
+		}
+
+		scanner->reader_pid = -1;
+		DBG( _DBG_PROC,"reader_process killed\n");
+#ifndef HAVE_SETITIMER
+		usb_StartLampTimer( scanner->hw );
+#endif
+	}
+	scanner->calibrating = SANE_FALSE;
+
+	if( SANE_TRUE == closepipe ) {
+		close_pipe( scanner );
+	}
+
+	drvclose( scanner->hw );
+
+	if( tsecs != 0 ) {
+		DBG( _DBG_INFO, "TIME END 2: %lus\n", time(NULL)-tsecs);
+		tsecs = 0;
+	}
+
+	return SANE_STATUS_CANCELLED;
+}

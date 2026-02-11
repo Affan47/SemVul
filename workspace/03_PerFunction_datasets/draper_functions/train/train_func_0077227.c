@@ -1,0 +1,32 @@
+qla8044_minidump_process_l1cache(struct scsi_qla_host *vha,
+	struct qla8044_minidump_entry_hdr *entry_hdr, uint32_t **d_ptr)
+{
+	uint32_t addr, r_addr, c_addr, t_r_addr;
+	uint32_t i, k, loop_count, t_value, r_cnt, r_value;
+	uint32_t c_value_w;
+	struct qla8044_minidump_entry_cache *cache_hdr;
+	uint32_t *data_ptr = *d_ptr;
+
+	cache_hdr = (struct qla8044_minidump_entry_cache *)entry_hdr;
+	loop_count = cache_hdr->op_count;
+	r_addr = cache_hdr->read_addr;
+	c_addr = cache_hdr->control_addr;
+	c_value_w = cache_hdr->cache_ctrl.write_value;
+
+	t_r_addr = cache_hdr->tag_reg_addr;
+	t_value = cache_hdr->addr_ctrl.init_tag_value;
+	r_cnt = cache_hdr->read_ctrl.read_addr_cnt;
+
+	for (i = 0; i < loop_count; i++) {
+		qla8044_wr_reg_indirect(vha, t_r_addr, t_value);
+		qla8044_wr_reg_indirect(vha, c_addr, c_value_w);
+		addr = r_addr;
+		for (k = 0; k < r_cnt; k++) {
+			qla8044_rd_reg_indirect(vha, addr, &r_value);
+			*data_ptr++ = r_value;
+			addr += cache_hdr->read_ctrl.read_addr_stride;
+		}
+		t_value += cache_hdr->addr_ctrl.tag_value_stride;
+	}
+	*d_ptr = data_ptr;
+}

@@ -1,0 +1,60 @@
+latex_menu_insert_character_style (LatexMenu* self, const gchar* style) {
+	MainWindow* _tmp0_ = NULL;
+	DocumentTab* _tmp1_ = NULL;
+	DocumentTab* _tmp2_ = NULL;
+	MainWindow* _tmp3_ = NULL;
+	Document* _tmp4_ = NULL;
+	Document* _tmp5_ = NULL;
+	SelectionType _tmp6_ = 0;
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (style != NULL);
+	_tmp0_ = self->priv->main_window;
+	_tmp1_ = main_window_get_active_tab (_tmp0_);
+	_tmp2_ = _tmp1_;
+	g_return_if_fail (_tmp2_ != NULL);
+	_tmp3_ = self->priv->main_window;
+	_tmp4_ = main_window_get_active_document (_tmp3_);
+	_tmp5_ = _tmp4_;
+	_tmp6_ = document_get_selection_type (_tmp5_);
+	if (_tmp6_ == SELECTION_TYPE_MULTIPLE_LINES) {
+		const gchar* _tmp7_ = NULL;
+		const gchar* _tmp8_ = NULL;
+		gchar* _tmp9_ = NULL;
+		gchar* _tmp10_ = NULL;
+		const gchar* _tmp11_ = NULL;
+		const gchar* _tmp12_ = NULL;
+		gchar* _tmp13_ = NULL;
+		gchar* _tmp14_ = NULL;
+		_tmp7_ = style;
+		_tmp8_ = string_to_string (_tmp7_);
+		_tmp9_ = g_strconcat ("\\begin{", _tmp8_, "}\n", NULL);
+		_tmp10_ = _tmp9_;
+		_tmp11_ = style;
+		_tmp12_ = string_to_string (_tmp11_);
+		_tmp13_ = g_strconcat ("\n\\end{", _tmp12_, "}", NULL);
+		_tmp14_ = _tmp13_;
+		latex_menu_text_buffer_insert (self, _tmp10_, _tmp14_, NULL);
+		_g_free0 (_tmp14_);
+		_g_free0 (_tmp10_);
+	} else {
+		const gchar* _tmp15_ = NULL;
+		const gchar* _tmp16_ = NULL;
+		gchar* _tmp17_ = NULL;
+		gchar* _tmp18_ = NULL;
+		const gchar* _tmp19_ = NULL;
+		const gchar* _tmp20_ = NULL;
+		gchar* _tmp21_ = NULL;
+		gchar* _tmp22_ = NULL;
+		_tmp15_ = style;
+		_tmp16_ = string_to_string (_tmp15_);
+		_tmp17_ = g_strconcat ("{\\", _tmp16_, " ", NULL);
+		_tmp18_ = _tmp17_;
+		_tmp19_ = style;
+		_tmp20_ = string_to_string (_tmp19_);
+		_tmp21_ = g_strconcat ("\\", _tmp20_, " ", NULL);
+		_tmp22_ = _tmp21_;
+		latex_menu_text_buffer_insert (self, _tmp18_, "}", _tmp22_);
+		_g_free0 (_tmp22_);
+		_g_free0 (_tmp18_);
+	}
+}

@@ -1,0 +1,29 @@
+freeze_store(struct gfs2_sbd *sdp, const char *buf, size_t len)
+{
+	int error, n;
+
+	error = kstrtoint(buf, 0, &n);
+	if (error)
+		return error;
+
+	if (!capable(CAP_SYS_ADMIN))
+		return -EPERM;
+
+	switch (n) {
+	case 0:
+		error = thaw_super(sdp->sd_vfs);
+		break;
+	case 1:
+		error = freeze_super(sdp->sd_vfs);
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (error) {
+		fs_warn(sdp, "freeze %d error %d", n, error);
+		return error;
+	}
+
+	return len;
+}

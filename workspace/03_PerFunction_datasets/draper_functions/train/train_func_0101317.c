@@ -1,0 +1,7 @@
+pop_decl_scope ()
+{
+  if (VARRAY_ACTIVE_SIZE (decl_scope_table) <= 0)
+    abort ();
+
+  VARRAY_POP (decl_scope_table);
+}

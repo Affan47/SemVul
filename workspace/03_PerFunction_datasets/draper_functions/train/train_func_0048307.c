@@ -1,0 +1,37 @@
+rb_range_beg_len(range, begp, lenp, len, err)
+    VALUE range;
+    long *begp, *lenp;
+    long len;
+    int err;
+{
+    long beg, end, b, e;
+
+    if (!rb_obj_is_kind_of(range, rb_cRange)) return Qfalse;
+
+    beg = b = NUM2LONG(rb_ivar_get(range, id_beg));
+    end = e = NUM2LONG(rb_ivar_get(range, id_end));
+
+    if (beg < 0) {
+	beg += len;
+	if (beg < 0) goto out_of_range;
+    }
+    if (err == 0 || err == 2) {
+	if (beg > len) goto out_of_range;
+	if (end > len) end = len;
+    }
+    if (end < 0) end += len;
+    if (!EXCL(range)) end++;
+    len = end - beg;
+    if (len < 0) len = 0;
+
+    *begp = beg;
+    *lenp = len;
+    return Qtrue;
+
+  out_of_range:
+    if (err) {
+	rb_raise(rb_eRangeError, "%ld..%s%ld out of range",
+		 b, EXCL(range)? "." : "", e);
+    }
+    return Qnil;
+}

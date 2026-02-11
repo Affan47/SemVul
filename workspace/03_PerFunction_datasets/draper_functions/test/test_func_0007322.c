@@ -1,0 +1,7 @@
+isIdentifier( ushort c )
+{
+    return c == '_' ||
+          (c >= 'A' && c <= 'Z') ||
+          (c >= 'a' && c <= 'z') ||
+          (c >= '0' && c <= '9');
+}

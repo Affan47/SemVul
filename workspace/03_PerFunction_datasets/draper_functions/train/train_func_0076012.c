@@ -1,0 +1,51 @@
+createMesh(io::IReadFile* file)
+{
+	s32 type = core::isFileExtension ( file->getFileName(), "bsp", "shader", "cfg" );
+	CQ3LevelMesh* q = 0;
+
+	switch ( type )
+	{
+		case 1:
+			q = new CQ3LevelMesh(FileSystem, SceneManager, LoadParam);
+
+
+			if ( 0 == LoadParam.loadAllShaders )
+			{
+				q->getShader("scripts/common.shader");
+				q->getShader("scripts/sfx.shader");
+				q->getShader("scripts/gfx.shader");
+				q->getShader("scripts/liquid.shader");
+				q->getShader("scripts/models.shader");
+				q->getShader("scripts/walls.shader");
+
+			}
+
+			if ( q->loadFile(file) )
+				return q;
+
+			q->drop();
+			break;
+
+		case 2:
+			q = new CQ3LevelMesh(FileSystem, SceneManager,LoadParam);
+			q->getShader( file );
+			return q;
+			break;
+
+		case 3:
+
+			if ( file->getFileName() == "levelparameter.cfg" )
+			{
+				file->read ( &LoadParam, sizeof ( LoadParam ) );
+			}
+			else
+			{
+				q = new CQ3LevelMesh(FileSystem, SceneManager,LoadParam);
+				q->getConfiguration( file );
+				return q;
+			}
+			break;
+	}
+
+	return 0;
+}

@@ -1,0 +1,25 @@
+sysfs_remove_group(struct kobject *kobj,
+			const struct attribute_group *grp)
+{
+	struct kernfs_node *parent = kobj->sd;
+	struct kernfs_node *kn;
+
+	if (grp->name) {
+		kn = kernfs_find_and_get(parent, grp->name);
+		if (!kn) {
+			WARN(!kn, KERN_WARNING
+			     "sysfs group %p not found for kobject '%s'\n",
+			     grp, kobject_name(kobj));
+			return;
+		}
+	} else {
+		kn = parent;
+		kernfs_get(kn);
+	}
+
+	remove_files(kn, grp);
+	if (grp->name)
+		kernfs_remove(kn);
+
+	kernfs_put(kn);
+}

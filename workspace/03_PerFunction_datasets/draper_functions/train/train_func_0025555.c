@@ -1,0 +1,21 @@
+__ecereMethod___ecereNameSpace__ecere__sys__FileMonitor_StartMonitoring(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct __ecereNameSpace__ecere__sys__FileMonitor * __ecerePointer___ecereNameSpace__ecere__sys__FileMonitor = (struct __ecereNameSpace__ecere__sys__FileMonitor *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__ecere__sys__FileMonitor->offset) : 0);
+
+if(__ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->fileName && !__ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->active)
+{
+__ecereMethod___ecereNameSpace__ecere__sys__Mutex_Wait(__ecereNameSpace__ecere__sys__globalSystem.fileMonitorMutex);
+if(__ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->reentrant)
+{
+__ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->toBeFreed = 0x0;
+__ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->active = 0x1;
+}
+{
+if(__ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->directory)
+__ecereMethod___ecereNameSpace__ecere__sys__FileMonitor_MonitorDirectory(this, __ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->fileName);
+else
+__ecereMethod___ecereNameSpace__ecere__sys__FileMonitor_MonitorFile(this, __ecerePointer___ecereNameSpace__ecere__sys__FileMonitor->fileName);
+}
+__ecereMethod___ecereNameSpace__ecere__sys__Mutex_Release(__ecereNameSpace__ecere__sys__globalSystem.fileMonitorMutex);
+}
+}

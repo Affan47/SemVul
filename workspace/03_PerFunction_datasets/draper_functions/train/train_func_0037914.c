@@ -1,0 +1,21 @@
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__staload () {
+static int ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__staload_flag = 0 ;
+if (ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__staload_flag) return ;
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__staload_flag = 1 ;
+
+ATS_2d0_2e2_2e11_2libatsdoc_2SATS_2libatsdoc_filename_2esats__staload () ;
+ATS_2d0_2e2_2e11_2libatsdoc_2SATS_2libatsdoc_location_2esats__staload () ;
+ATS_2d0_2e2_2e11_2libatsdoc_2SATS_2libatsdoc_lexbuf_2esats__staload () ;
+
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__DE_STRING_unclose_0.tag = 0 ;
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__DE_EXTCODE_unclose_1.tag = 1 ;
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__DE_FUNARGLST_unclose_2.tag = 2 ;
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__DE_FUNRES_none_3.tag = 3 ;
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__DE_FUNRES_unclose_4.tag = 4 ;
+
+
+ATS_2d0_2e2_2e11_2utils_2atsdoc_2atsdoc_translate_2esats__FAnil_4.tag = 4 ;
+
+
+return ;
+}

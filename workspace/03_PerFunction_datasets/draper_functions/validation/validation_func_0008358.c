@@ -1,0 +1,10 @@
+m68k_op_trapne(void)
+{
+	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
+	{
+		if(COND_NE())
+			m68ki_exception_trap(EXCEPTION_TRAPV);
+		return;
+	}
+	m68ki_exception_illegal();
+}

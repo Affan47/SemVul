@@ -1,0 +1,4 @@
+TechAdapterSelectionItemFactory( ) : adapterForPlayer(NULL)
+   {
+      restart();
+   }

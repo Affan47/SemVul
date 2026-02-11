@@ -1,0 +1,28 @@
+c_expand_start_cond (cond, compstmt_count, if_stmt)
+     tree cond;
+     int compstmt_count;
+     tree if_stmt;
+{
+
+  if (if_stack_space == 0)
+    {
+      if_stack_space = 10;
+      if_stack = (if_elt *) xmalloc (10 * sizeof (if_elt));
+    }
+  else if (if_stack_space == if_stack_pointer)
+    {
+      if_stack_space += 10;
+      if_stack = (if_elt *) xrealloc (if_stack, if_stack_space * sizeof (if_elt));
+    }
+
+  IF_COND (if_stmt) = cond;
+  add_stmt (if_stmt);
+
+
+  if_stack[if_stack_pointer].compstmt_count = compstmt_count;
+  if_stack[if_stack_pointer].file = input_filename;
+  if_stack[if_stack_pointer].line = lineno;
+  if_stack[if_stack_pointer].needs_warning = 0;
+  if_stack[if_stack_pointer].if_stmt = if_stmt;
+  if_stack_pointer++;
+}

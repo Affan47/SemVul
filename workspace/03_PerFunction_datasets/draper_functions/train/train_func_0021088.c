@@ -1,0 +1,12 @@
+next_tokenrun (run)
+     tokenrun *run;
+{
+  if (run->next == NULL)
+    {
+      run->next = xnew (tokenrun);
+      run->next->prev = run;
+      _cpp_init_tokenrun (run->next, 250);
+    }
+
+  return run->next;
+}

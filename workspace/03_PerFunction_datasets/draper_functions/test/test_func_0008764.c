@@ -1,0 +1,42 @@
+init_dotfile(void)
+{
+    do_dot_log(DOT_PREFIX "digraph \"g\" {");
+    do_dot_log(DOT_PREFIX "	size = \"30,30\"");
+    do_dot_log(DOT_PREFIX "	graph [");
+    do_dot_log(DOT_PREFIX "		fontsize = \"12\"");
+    do_dot_log(DOT_PREFIX "		fontname = \"Times-Roman\"");
+    do_dot_log(DOT_PREFIX "		fontcolor = \"black\"");
+    do_dot_log(DOT_PREFIX "		bb = \"0,0,398.922306,478.927856\"");
+    do_dot_log(DOT_PREFIX "		color = \"black\"");
+    do_dot_log(DOT_PREFIX "	]");
+    do_dot_log(DOT_PREFIX "	node [");
+    do_dot_log(DOT_PREFIX "		fontsize = \"12\"");
+    do_dot_log(DOT_PREFIX "		fontname = \"Times-Roman\"");
+    do_dot_log(DOT_PREFIX "		fontcolor = \"black\"");
+    do_dot_log(DOT_PREFIX "		shape = \"ellipse\"");
+    do_dot_log(DOT_PREFIX "		color = \"black\"");
+    do_dot_log(DOT_PREFIX "	]");
+    do_dot_log(DOT_PREFIX "	edge [");
+    do_dot_log(DOT_PREFIX "		fontsize = \"12\"");
+    do_dot_log(DOT_PREFIX "		fontname = \"Times-Roman\"");
+    do_dot_log(DOT_PREFIX "		fontcolor = \"black\"");
+    do_dot_log(DOT_PREFIX "		color = \"black\"");
+    do_dot_log(DOT_PREFIX "	]");
+    do_dot_log(DOT_PREFIX "// special nodes");
+    do_dot_log(DOT_PREFIX "	\"S_PENDING\" ");
+    do_dot_log(DOT_PREFIX "	[");
+    do_dot_log(DOT_PREFIX "	 color = \"blue\"");
+    do_dot_log(DOT_PREFIX "	 fontcolor = \"blue\"");
+    do_dot_log(DOT_PREFIX "	 ]");
+    do_dot_log(DOT_PREFIX "	\"S_TERMINATE\" ");
+    do_dot_log(DOT_PREFIX "	[");
+    do_dot_log(DOT_PREFIX "	 color = \"red\"");
+    do_dot_log(DOT_PREFIX "	 fontcolor = \"red\"");
+    do_dot_log(DOT_PREFIX "	 ]");
+    do_dot_log(DOT_PREFIX "// DC only nodes");
+    do_dot_log(DOT_PREFIX "	\"S_INTEGRATION\" [ fontcolor = \"green\" ]");
+    do_dot_log(DOT_PREFIX "	\"S_POLICY_ENGINE\" [ fontcolor = \"green\" ]");
+    do_dot_log(DOT_PREFIX "	\"S_TRANSITION_ENGINE\" [ fontcolor = \"green\" ]");
+    do_dot_log(DOT_PREFIX "	\"S_RELEASE_DC\" [ fontcolor = \"green\" ]");
+    do_dot_log(DOT_PREFIX "	\"S_IDLE\" [ fontcolor = \"green\" ]");
+}

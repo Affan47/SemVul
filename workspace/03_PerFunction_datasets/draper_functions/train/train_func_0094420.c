@@ -1,0 +1,14 @@
+dse_search_set_new ()
+{
+	dse_search_set *ss;
+
+	ss = (dse_search_set *)slapi_ch_malloc (sizeof (*ss));
+
+	if (ss)
+	{
+		dl_init (&ss->dl, 0);
+		ss->current_entry = -1;
+	}
+
+	return ss;
+}

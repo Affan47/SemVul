@@ -1,0 +1,7 @@
+rb_reg_check(re)
+    VALUE re;
+{
+    if (!RREGEXP(re)->ptr || !RREGEXP(re)->str) {
+	rb_raise(rb_eTypeError, "uninitialized Regexp");
+    }
+}

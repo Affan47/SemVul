@@ -1,0 +1,47 @@
+ar9003_hw_bb_watchdog_config(struct ath_hw *ah)
+{
+	struct ath_common *common = ath9k_hw_common(ah);
+	u32 idle_tmo_ms = ah->bb_watchdog_timeout_ms;
+	u32 val, idle_count;
+
+	if (!idle_tmo_ms) {
+
+		REG_WRITE(ah, AR_PHY_WATCHDOG_CTL_2,
+			  REG_READ(ah, AR_PHY_WATCHDOG_CTL_2) &
+			  ~(AR_PHY_WATCHDOG_RST_ENABLE |
+			    AR_PHY_WATCHDOG_IRQ_ENABLE));
+
+
+		REG_WRITE(ah, AR_PHY_WATCHDOG_CTL_1,
+			  REG_READ(ah, AR_PHY_WATCHDOG_CTL_1) &
+			  ~(AR_PHY_WATCHDOG_NON_IDLE_ENABLE |
+			    AR_PHY_WATCHDOG_IDLE_ENABLE));
+
+		ath_dbg(common, RESET, "Disabled BB Watchdog\n");
+		return;
+	}
+
+
+	val = REG_READ(ah, AR_PHY_WATCHDOG_CTL_2) & AR_PHY_WATCHDOG_CNTL2_MASK;
+	REG_WRITE(ah, AR_PHY_WATCHDOG_CTL_2,
+		  (val | AR_PHY_WATCHDOG_IRQ_ENABLE) &
+		  ~AR_PHY_WATCHDOG_RST_ENABLE);
+
+
+	if (idle_tmo_ms > 10000)
+		idle_tmo_ms = 10000;
+
+
+	idle_count = (100 * idle_tmo_ms) / 74;
+	if (ah->curchan && IS_CHAN_HT40(ah->curchan))
+		idle_count = (100 * idle_tmo_ms) / 37;
+
+
+	REG_WRITE(ah, AR_PHY_WATCHDOG_CTL_1,
+		  AR_PHY_WATCHDOG_NON_IDLE_ENABLE |
+		  AR_PHY_WATCHDOG_IDLE_MASK |
+		  (AR_PHY_WATCHDOG_NON_IDLE_MASK & (idle_count << 2)));
+
+	ath_dbg(common, RESET, "Enabled BB Watchdog timeout (%u ms)\n",
+		idle_tmo_ms);
+}

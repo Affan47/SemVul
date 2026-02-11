@@ -1,0 +1,14 @@
+cxgbi_sock_act_open_req_arp_failure(void *handle, struct sk_buff *skb)
+{
+	struct cxgbi_sock *csk = (struct cxgbi_sock *)skb->sk;
+
+	log_debug(1 << CXGBI_DBG_SOCK, "csk 0x%p,%u,0x%lx,%u.\n",
+		csk, (csk)->state, (csk)->flags, (csk)->tid);
+	cxgbi_sock_get(csk);
+	spin_lock_bh(&csk->lock);
+	if (csk->state == CTP_ACTIVE_OPEN)
+		cxgbi_sock_fail_act_open(csk, -EHOSTUNREACH);
+	spin_unlock_bh(&csk->lock);
+	cxgbi_sock_put(csk);
+	__kfree_skb(skb);
+}

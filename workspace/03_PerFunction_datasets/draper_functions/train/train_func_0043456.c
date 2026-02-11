@@ -1,0 +1,6 @@
+comp_dir_attribute (dirname)
+     const char *dirname;
+{
+  ASM_OUTPUT_DWARF_ATTRIBUTE (asm_out_file, AT_comp_dir);
+  ASM_OUTPUT_DWARF_STRING_NEWLINE (asm_out_file, dirname);
+}

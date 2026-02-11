@@ -1,0 +1,20 @@
+ocrdma_srq_get_idx(struct ocrdma_srq *srq)
+{
+	int row = 0;
+	int indx = 0;
+
+	for (row = 0; row < srq->bit_fields_len; row++) {
+		if (srq->idx_bit_fields[row]) {
+			indx = ffs(srq->idx_bit_fields[row]);
+			indx = (row * 32) + (indx - 1);
+			if (indx >= srq->rq.max_cnt)
+				BUG();
+			ocrdma_srq_toggle_bit(srq, indx);
+			break;
+		}
+	}
+
+	if (row == srq->bit_fields_len)
+		BUG();
+	return indx + 1;
+}

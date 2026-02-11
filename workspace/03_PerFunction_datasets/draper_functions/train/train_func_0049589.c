@@ -1,0 +1,13 @@
+new_dvar(id, value, prev)
+    ID id;
+    VALUE value;
+    struct RVarmap *prev;
+{
+    NEWOBJ(vars, struct RVarmap);
+    OBJSETUP(vars, 0, T_VARMAP);
+    vars->id = id;
+    vars->val = value;
+    vars->next = prev;
+
+    return vars;
+}

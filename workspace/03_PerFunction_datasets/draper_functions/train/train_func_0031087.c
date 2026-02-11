@@ -1,0 +1,4 @@
+Destroy ()
+{
+   delete [] (Edist);
+}

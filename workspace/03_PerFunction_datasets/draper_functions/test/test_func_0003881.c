@@ -1,0 +1,15 @@
+rt2800usb_read_eeprom(struct rt2x00_dev *rt2x00dev)
+{
+	int retval;
+
+	retval = rt2800usb_efuse_detect(rt2x00dev);
+	if (retval < 0)
+		return retval;
+	if (retval)
+		retval = rt2800_read_eeprom_efuse(rt2x00dev);
+	else
+		retval = rt2x00usb_eeprom_read(rt2x00dev, rt2x00dev->eeprom,
+					       EEPROM_SIZE);
+
+	return retval;
+}

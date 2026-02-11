@@ -1,0 +1,13 @@
+_cpp_pop_context (pfile)
+     cpp_reader *pfile;
+{
+  cpp_context *context = pfile->context;
+
+  if (context->macro)
+    context->macro->flags &= ~NODE_DISABLED;
+
+  if (context->buff)
+    _cpp_release_buff (pfile, context->buff);
+
+  pfile->context = context->prev;
+}

@@ -1,0 +1,7 @@
+pst_rshift(st1, st2)
+    VALUE st1, st2;
+{
+    int status = NUM2INT(st1) >> NUM2INT(st2);
+
+    return INT2NUM(status);
+}

@@ -1,0 +1,24 @@
+process_return_queue (struct fs_dev *dev, struct queue *q)
+{
+	long rq;
+	struct FS_QENTRY *qe;
+	void *tc;
+
+	while (!((rq = read_fs (dev, Q_RP(q->offset))) & Q_EMPTY)) {
+		fs_dprintk (FS_DEBUG_QUEUE, "reaping return queue entry at %lx\n", rq);
+		qe = bus_to_virt (rq);
+
+		fs_dprintk (FS_DEBUG_QUEUE, "queue entry: %08x %08x %08x %08x. (%d)\n",
+			    qe->cmd, qe->p0, qe->p1, qe->p2, STATUS_CODE (qe));
+
+		switch (STATUS_CODE (qe)) {
+		case 5:
+			tc = bus_to_virt (qe->p0);
+			fs_dprintk (FS_DEBUG_ALLOC, "Free tc: %p\n", tc);
+			kfree (tc);
+			break;
+		}
+
+		write_fs (dev, Q_RP(q->offset), Q_INCWRAP);
+	}
+}

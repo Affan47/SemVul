@@ -1,0 +1,8 @@
+mime_hdr_cmp(const MIME_HEADER * const *a,
+			const MIME_HEADER * const *b)
+{
+	if (!(*a)->name || !(*b)->name)
+		return !!(*a)->name - !!(*b)->name;
+
+	return(strcmp((*a)->name, (*b)->name));
+}

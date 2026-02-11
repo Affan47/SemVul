@@ -1,0 +1,68 @@
+do_ext_keytab(krb5_principal principal, void *data)
+{
+    krb5_error_code ret;
+    kadm5_principal_ent_rec princ;
+    struct ext_keytab_data *e = data;
+    krb5_keytab_entry *keys = NULL;
+    krb5_keyblock *k = NULL;
+    int i, n_k;
+
+    ret = kadm5_get_principal(kadm_handle, principal, &princ,
+			      KADM5_PRINCIPAL|KADM5_KVNO|KADM5_KEY_DATA);
+    if(ret)
+	return ret;
+
+    if (princ.n_key_data) {
+	keys = malloc(sizeof(*keys) * princ.n_key_data);
+	if (keys == NULL) {
+	    kadm5_free_principal_ent(kadm_handle, &princ);
+	    krb5_clear_error_message(context);
+	    return ENOMEM;
+	}
+	for (i = 0; i < princ.n_key_data; i++) {
+	    krb5_key_data *kd = &princ.key_data[i];
+
+	    keys[i].principal = princ.principal;
+	    keys[i].vno = kd->key_data_kvno;
+	    keys[i].keyblock.keytype = kd->key_data_type[0];
+	    keys[i].keyblock.keyvalue.length = kd->key_data_length[0];
+	    keys[i].keyblock.keyvalue.data = kd->key_data_contents[0];
+	    keys[i].timestamp = time(NULL);
+	}
+
+	n_k = princ.n_key_data;
+    } else {
+	ret = kadm5_randkey_principal(kadm_handle, principal, &k, &n_k);
+	if (ret) {
+	    kadm5_free_principal_ent(kadm_handle, &princ);
+	    return ret;
+	}
+	keys = malloc(sizeof(*keys) * n_k);
+	if (keys == NULL) {
+	    kadm5_free_principal_ent(kadm_handle, &princ);
+	    krb5_clear_error_message(context);
+	    return ENOMEM;
+	}
+	for (i = 0; i < n_k; i++) {
+	    keys[i].principal = principal;
+	    keys[i].vno = princ.kvno + 1;
+	    keys[i].keyblock = k[i];
+	    keys[i].timestamp = time(NULL);
+	}
+    }
+
+    for(i = 0; i < n_k; i++) {
+	ret = krb5_kt_add_entry(context, e->keytab, &keys[i]);
+	if(ret)
+	    krb5_warn(context, ret, "krb5_kt_add_entry(%d)", i);
+    }
+
+    if (k) {
+	memset(k, 0, n_k * sizeof(*k));
+	free(k);
+    }
+    if (keys)
+	free(keys);
+    kadm5_free_principal_ent(kadm_handle, &princ);
+    return 0;
+}

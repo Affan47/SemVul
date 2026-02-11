@@ -1,0 +1,14 @@
+__ecereProp___ecereNameSpace__eda__TableEditor_Set_masterEditor(struct __ecereNameSpace__ecere__com__Instance * this, struct __ecereNameSpace__ecere__com__Instance * value)
+{
+struct __ecereNameSpace__eda__TableEditor * __ecerePointer___ecereNameSpace__eda__TableEditor = (struct __ecereNameSpace__eda__TableEditor *)(this ? (((char *)this) + __ecereClass___ecereNameSpace__eda__TableEditor->offset) : 0);
+
+if(value != __ecerePointer___ecereNameSpace__eda__TableEditor->masterEditor)
+{
+if(__ecerePointer___ecereNameSpace__eda__TableEditor->masterEditor)
+__ecereMethod___ecereNameSpace__eda__TableEditor_RemoveTableEditor(__ecerePointer___ecereNameSpace__eda__TableEditor->masterEditor, this);
+__ecerePointer___ecereNameSpace__eda__TableEditor->masterEditor = value;
+if(value)
+__ecereMethod___ecereNameSpace__eda__TableEditor_AddTableEditor(value, this);
+}
+__ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecereProp___ecereNameSpace__eda__TableEditor_masterEditor), __ecereNameSpace__ecere__com__eInstance_FireSelfWatchers(this, __ecerePropM___ecereNameSpace__eda__TableEditor_masterEditor);
+}

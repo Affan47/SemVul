@@ -1,0 +1,27 @@
+mobile_id_to_string(mobile_id_t mid, char *dst, size_t dst_sz)
+{
+	size_t output_length = 0;
+
+	if(!dst)
+		return -1;
+
+	char *s = base64_encode((const unsigned char *)&mid,
+	                    sizeof(mid),
+	                    &output_length);
+
+	if(!s)
+		return -1;
+
+	if(!output_length || (output_length+1 > dst_sz)) {
+		turn_free(s, output_length);
+		return -1;
+	}
+
+	ns_bcopy(s, dst, output_length);
+
+	turn_free(s, output_length);
+
+	dst[output_length] = 0;
+
+	return (int)output_length;
+}

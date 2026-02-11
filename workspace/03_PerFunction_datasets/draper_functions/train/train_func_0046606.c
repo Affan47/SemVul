@@ -1,0 +1,13 @@
+odev_release(struct inode *inode, struct file *file)
+{
+	struct seq_oss_devinfo *dp;
+
+	if ((dp = file->private_data) == NULL)
+		return 0;
+
+	mutex_lock(&register_mutex);
+	snd_seq_oss_release(dp);
+	mutex_unlock(&register_mutex);
+
+	return 0;
+}

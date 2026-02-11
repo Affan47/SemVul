@@ -1,0 +1,15 @@
+event_queue_remove_active(struct event_base *base, struct event_callback *evcb)
+{
+	EVENT_BASE_ASSERT_LOCKED(base);
+	if (EVUTIL_FAILURE_CHECK(!(evcb->evcb_flags & EVLIST_ACTIVE))) {
+		event_errx(1, "%s: %p not on queue %x", __func__,
+			   evcb, EVLIST_ACTIVE);
+		return;
+	}
+	DECR_EVENT_COUNT(base, evcb->evcb_flags);
+	evcb->evcb_flags &= ~EVLIST_ACTIVE;
+	base->event_count_active--;
+
+	TAILQ_REMOVE(&base->activequeues[evcb->evcb_pri],
+	    evcb, evcb_active_next);
+}

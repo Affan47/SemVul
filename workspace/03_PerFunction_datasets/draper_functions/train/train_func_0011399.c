@@ -1,0 +1,47 @@
+get_message(mailsession * session,
+    uint32_t num, mailmessage ** result)
+{
+  mailmessage * msg;
+  int r;
+  size_t size;
+  char key[PATH_MAX];
+  struct db_session_state_data * data;
+  struct mail_cache_db * maildb;
+  int res;
+
+  data = get_data(session);
+
+  r = mail_cache_db_open_lock(data->db_filename, &maildb);
+  if (r < 0) {
+    res = MAIL_ERROR_FILE;
+    goto err;
+  }
+
+  msg = mailmessage_new();
+  if (msg == NULL) {
+    res = MAIL_ERROR_MEMORY;
+    goto close_db;
+  }
+
+  size = 0;
+  snprintf(key, sizeof(key), "%lu", (unsigned long) num);
+  r = mail_cache_db_get_size(maildb, key, strlen(key), &size);
+
+
+  r = mailmessage_init(msg, session, db_message_driver,
+      num, size);
+  if (r != MAIL_NO_ERROR) {
+    mailmessage_free(msg);
+    res = r;
+    goto close_db;
+  }
+
+  mail_cache_db_close_unlock(data->db_filename, maildb);
+
+  return MAIL_NO_ERROR;
+
+ close_db:
+  mail_cache_db_close_unlock(data->db_filename, maildb);
+ err:
+  return res;
+}

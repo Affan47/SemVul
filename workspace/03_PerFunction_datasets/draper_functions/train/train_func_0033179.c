@@ -1,0 +1,18 @@
+kcode_reset_option()
+{
+    if (reg_kcode == curr_kcode) return;
+    switch (reg_kcode) {
+      case KCODE_NONE:
+	re_mbcinit(MBCTYPE_ASCII);
+	break;
+      case KCODE_EUC:
+	re_mbcinit(MBCTYPE_EUC);
+	break;
+      case KCODE_SJIS:
+	re_mbcinit(MBCTYPE_SJIS);
+	break;
+      case KCODE_UTF8:
+	re_mbcinit(MBCTYPE_UTF8);
+	break;
+    }
+}

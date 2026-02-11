@@ -1,0 +1,9 @@
+new_super(a)
+    NODE *a;
+{
+    if (a && nd_type(a) == NODE_BLOCK_PASS) {
+	a->nd_iter = NEW_SUPER(a->nd_head);
+	return a;
+    }
+    return NEW_SUPER(a);
+}

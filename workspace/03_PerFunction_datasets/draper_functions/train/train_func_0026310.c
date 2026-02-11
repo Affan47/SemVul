@@ -1,0 +1,16 @@
+__ecereConstructor_OldIDESettings(struct __ecereNameSpace__ecere__com__Instance * this)
+{
+struct OldIDESettings * __ecerePointer_OldIDESettings = (struct OldIDESettings *)(this ? (((char *)this) + __ecereClass_OldIDESettings->offset) : 0);
+
+__ecerePointer_OldIDESettings->compilerConfigs = __ecereNameSpace__ecere__com__eInstance_New(__ecereClass___ecereNameSpace__ecere__com__List_TPL_CompilerConfig_);
+__ecereNameSpace__ecere__com__eInstance_IncRef(__ecerePointer_OldIDESettings->compilerConfigs);
+__ecerePointer_OldIDESettings->recentFiles = __ecereNameSpace__ecere__com__eInstance_New(__ecereClass___ecereNameSpace__ecere__com__Array_TPL_String_);
+__ecereNameSpace__ecere__com__eInstance_IncRef(__ecerePointer_OldIDESettings->recentFiles);
+__ecerePointer_OldIDESettings->recentProjects = __ecereNameSpace__ecere__com__eInstance_New(__ecereClass___ecereNameSpace__ecere__com__Array_TPL_String_);
+__ecereNameSpace__ecere__com__eInstance_IncRef(__ecerePointer_OldIDESettings->recentProjects);
+__ecereProp___ecereNameSpace__ecere__sys__GlobalSettings_Set_settingsName(this, "ecereIDE");
+__ecerePointer_OldIDESettings->useFreeCaret = 0x0;
+__ecerePointer_OldIDESettings->showLineNumbers = 0x1;
+__ecerePointer_OldIDESettings->caretFollowsScrolling = 0x0;
+return 0x1;
+}

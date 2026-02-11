@@ -1,0 +1,19 @@
+yy_get_previous_state (void)
+{
+	register yy_state_type yy_current_state;
+	register char *yy_cp;
+
+	yy_current_state = yy_start_state_list[(yy_start)];
+
+	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
+		{
+		yy_current_state += yy_current_state[(*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1)].yy_nxt;
+		if ( yy_current_state[-1].yy_nxt )
+			{
+			(yy_last_accepting_state) = yy_current_state;
+			(yy_last_accepting_cpos) = yy_cp;
+			}
+		}
+
+	return yy_current_state;
+}

@@ -1,0 +1,17 @@
+new_evstr(node)
+    NODE *node;
+{
+    NODE *head = node;
+
+  again:
+    if (node) {
+	switch (nd_type(node)) {
+	  case NODE_STR: case NODE_DSTR: case NODE_EVSTR:
+	    return node;
+	  case NODE_NEWLINE:
+	    node = node->nd_next;
+	    goto again;
+	}
+    }
+    return NEW_EVSTR(head);
+}

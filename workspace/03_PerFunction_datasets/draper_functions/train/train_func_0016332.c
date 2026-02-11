@@ -1,0 +1,59 @@
+enlarge_buffer(struct st_buffer * STbuffer, int new_size, int need_dma)
+{
+	int segs, max_segs, b_size, order, got;
+	gfp_t priority;
+
+	if (new_size <= STbuffer->buffer_size)
+		return 1;
+
+	if (STbuffer->buffer_size <= PAGE_SIZE)
+		normalize_buffer(STbuffer);
+
+	max_segs = STbuffer->use_sg;
+
+	priority = GFP_KERNEL | __GFP_NOWARN;
+	if (need_dma)
+		priority |= GFP_DMA;
+
+	if (STbuffer->cleared)
+		priority |= __GFP_ZERO;
+
+	if (STbuffer->frp_segs) {
+		order = STbuffer->reserved_page_order;
+		b_size = PAGE_SIZE << order;
+	} else {
+		for (b_size = PAGE_SIZE, order = 0;
+		     order < ST_MAX_ORDER &&
+			     max_segs * (PAGE_SIZE << order) < new_size;
+		     order++, b_size *= 2)
+			;
+		STbuffer->reserved_page_order = order;
+	}
+	if (max_segs * (PAGE_SIZE << order) < new_size) {
+		if (order == ST_MAX_ORDER)
+			return 0;
+		normalize_buffer(STbuffer);
+		return enlarge_buffer(STbuffer, new_size, need_dma);
+	}
+
+	for (segs = STbuffer->frp_segs, got = STbuffer->buffer_size;
+	     segs < max_segs && got < new_size;) {
+		struct page *page;
+
+		page = alloc_pages(priority, order);
+		if (!page) {
+			DEB(STbuffer->buffer_size = got);
+			normalize_buffer(STbuffer);
+			return 0;
+		}
+
+		STbuffer->frp_segs += 1;
+		got += b_size;
+		STbuffer->buffer_size = got;
+		STbuffer->reserved_pages[segs] = page;
+		segs++;
+	}
+	STbuffer->b_data = page_address(STbuffer->reserved_pages[0]);
+
+	return 1;
+}

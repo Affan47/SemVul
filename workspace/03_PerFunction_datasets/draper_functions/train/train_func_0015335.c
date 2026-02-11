@@ -1,0 +1,55 @@
+__lambda70_ (Block7Data* _data7_) {
+	BuildToolsPreferences* self;
+	gint selected_row = 0;
+	GtkTreeView* _tmp0_ = NULL;
+	gint _tmp1_ = 0;
+	gint _tmp2_ = 0;
+	BuildTool* tool = NULL;
+	BuildTools* _tmp3_ = NULL;
+	gint _tmp4_ = 0;
+	BuildTool* _tmp5_ = NULL;
+	BuildTool* _tmp6_ = NULL;
+	BuildTool* _tmp7_ = NULL;
+	BuildTool* _tmp8_ = NULL;
+	const gchar* _tmp9_ = NULL;
+	BuildTool* _tmp10_ = NULL;
+	const gchar* _tmp11_ = NULL;
+	gchar* _tmp12_ = NULL;
+	PersonalBuildTools* personal_build_tools = NULL;
+	PersonalBuildTools* _tmp13_ = NULL;
+	PersonalBuildTools* _tmp14_ = NULL;
+	BuildTool* _tmp15_ = NULL;
+	BuildTool _tmp16_ = {0};
+	self = _data7_->self;
+	_tmp0_ = _data7_->view;
+	_tmp1_ = utils_get_selected_row (_tmp0_, NULL);
+	selected_row = _tmp1_;
+	_tmp2_ = selected_row;
+	if (_tmp2_ < 0) {
+		return;
+	}
+	_tmp3_ = _data7_->build_tools;
+	_tmp4_ = selected_row;
+	_tmp5_ = build_tools_get_build_tool (_tmp3_, _tmp4_);
+	tool = _tmp5_;
+	_tmp6_ = tool;
+	g_return_if_fail (_tmp6_ != NULL);
+	_tmp7_ = tool;
+	(*_tmp7_).enabled = FALSE;
+	_tmp8_ = tool;
+	_tmp9_ = _ ("%s [copy]");
+	_tmp10_ = tool;
+	_tmp11_ = (*_tmp10_).label;
+	_tmp12_ = g_strdup_printf (_tmp9_, _tmp11_);
+	_g_free0 ((*_tmp8_).label);
+	(*_tmp8_).label = _tmp12_;
+	_tmp13_ = personal_build_tools_get_default ();
+	personal_build_tools = _tmp13_;
+	_tmp14_ = personal_build_tools;
+	_tmp15_ = tool;
+	_tmp16_ = *_tmp15_;
+	personal_build_tools_add (_tmp14_, &_tmp16_);
+	build_tools_preferences_update_personal_store (self);
+	_g_object_unref0 (personal_build_tools);
+	_build_tool_free0 (tool);
+}

@@ -1,0 +1,12 @@
+read_rbu_packet_size(struct file *filp, struct kobject *kobj,
+				    struct bin_attribute *bin_attr,
+				    char *buffer, loff_t pos, size_t count)
+{
+	int size = 0;
+	if (!pos) {
+		spin_lock(&rbu_data.lock);
+		size = scnprintf(buffer, count, "%lu\n", rbu_data.packetsize);
+		spin_unlock(&rbu_data.lock);
+	}
+	return size;
+}

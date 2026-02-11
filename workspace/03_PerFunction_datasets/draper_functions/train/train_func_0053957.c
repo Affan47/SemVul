@@ -1,0 +1,36 @@
+b43legacy_set_all_gains(struct b43legacy_wldev *dev,
+				  s16 first, s16 second, s16 third)
+{
+	struct b43legacy_phy *phy = &dev->phy;
+	u16 i;
+	u16 start = 0x08;
+	u16 end = 0x18;
+	u16 offset = 0x0400;
+	u16 tmp;
+
+	if (phy->rev <= 1) {
+		offset = 0x5000;
+		start = 0x10;
+		end = 0x20;
+	}
+
+	for (i = 0; i < 4; i++)
+		b43legacy_ilt_write(dev, offset + i, first);
+
+	for (i = start; i < end; i++)
+		b43legacy_ilt_write(dev, offset + i, second);
+
+	if (third != -1) {
+		tmp = ((u16)third << 14) | ((u16)third << 6);
+		b43legacy_phy_write(dev, 0x04A0,
+				    (b43legacy_phy_read(dev, 0x04A0) & 0xBFBF)
+				    | tmp);
+		b43legacy_phy_write(dev, 0x04A1,
+				    (b43legacy_phy_read(dev, 0x04A1) & 0xBFBF)
+				    | tmp);
+		b43legacy_phy_write(dev, 0x04A2,
+				    (b43legacy_phy_read(dev, 0x04A2) & 0xBFBF)
+				    | tmp);
+	}
+	b43legacy_dummy_transmission(dev);
+}

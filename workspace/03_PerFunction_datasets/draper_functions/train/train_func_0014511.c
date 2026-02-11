@@ -1,0 +1,34 @@
+unity_internal_results_synchronizer_constructor (GType type, guint n_construct_properties, GObjectConstructParam * construct_properties) {
+	GObject * obj;
+	GObjectClass * parent_class;
+	UnityInternalResultsSynchronizer * self;
+	GHashTable* _tmp0_ = NULL;
+	GHashFunc _tmp1_ = NULL;
+	GEqualFunc _tmp2_ = NULL;
+	GHashTable* _tmp3_ = NULL;
+	GHashTable* _tmp4_ = NULL;
+	GHashTable* _tmp5_ = NULL;
+	GHashTable* _tmp6_ = NULL;
+	parent_class = G_OBJECT_CLASS (unity_internal_results_synchronizer_parent_class);
+	obj = parent_class->constructor (type, n_construct_properties, construct_properties);
+	self = G_TYPE_CHECK_INSTANCE_CAST (obj, UNITY_INTERNAL_TYPE_RESULTS_SYNCHRONIZER, UnityInternalResultsSynchronizer);
+	_tmp0_ = g_hash_table_new_full (NULL, NULL, _g_object_unref0_, NULL);
+	_g_hash_table_unref0 (self->priv->_providers);
+	self->priv->_providers = _tmp0_;
+	_tmp1_ = g_str_hash;
+	_tmp2_ = g_str_equal;
+	_tmp3_ = g_hash_table_new_full (_tmp1_, _tmp2_, _g_free0_, NULL);
+	_g_hash_table_unref0 (self->priv->_provider_ids);
+	self->priv->_provider_ids = _tmp3_;
+	_tmp4_ = g_hash_table_new_full (NULL, NULL, NULL, _unity_internal_results_synchronizer_signal_handlers_free0_);
+	_g_hash_table_unref0 (self->priv->_provider_signal_ids);
+	self->priv->_provider_signal_ids = _tmp4_;
+	_tmp5_ = g_hash_table_new_full (NULL, NULL, NULL, NULL);
+	_g_hash_table_unref0 (self->priv->_provider_tags);
+	self->priv->_provider_tags = _tmp5_;
+	_tmp6_ = g_hash_table_new_full (NULL, NULL, NULL, NULL);
+	_g_hash_table_unref0 (self->priv->_clear_seqnum_tags);
+	self->priv->_clear_seqnum_tags = _tmp6_;
+	unity_internal_results_synchronizer_set_merge_strategy (self, (UnityInternalMergeStrategy*) self);
+	return obj;
+}
