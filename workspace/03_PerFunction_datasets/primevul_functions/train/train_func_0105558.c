@@ -1,0 +1,16 @@
+PERL_STATIC_INLINE void
+S_invlist_set_len(pTHX_ SV* const invlist, const UV len, const bool offset)
+{
+
+
+    PERL_UNUSED_CONTEXT;
+    PERL_ARGS_ASSERT_INVLIST_SET_LEN;
+
+    assert(is_invlist(invlist));
+
+    SvCUR_set(invlist,
+              (len == 0)
+               ? 0
+               : TO_INTERNAL_SIZE(len + offset));
+    assert(SvLEN(invlist) == 0 || SvCUR(invlist) <= SvLEN(invlist));
+}

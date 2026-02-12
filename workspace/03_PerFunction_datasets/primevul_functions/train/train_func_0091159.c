@@ -1,0 +1,120 @@
+DNSResult DNS::GetResult()
+{
+
+	DNSHeader header;
+	DNSRequest *req;
+	unsigned char buffer[sizeof(DNSHeader)];
+	irc::sockets::sockaddrs from;
+	memset(&from, 0, sizeof(from));
+	socklen_t x = sizeof(from);
+
+	int length = ServerInstance->SE->RecvFrom(this, (char*)buffer, sizeof(DNSHeader), 0, &from.sa, &x);
+
+
+	if (length < 12)
+	{
+		ServerInstance->Logs->Log("RESOLVER",DEBUG,"GetResult didn't get a full packet (len=%d)", length);
+
+		return DNSResult(-1,"",0,"");
+	}
+
+
+	if (from != myserver)
+	{
+		std::string server1 = from.str();
+		std::string server2 = myserver.str();
+		ServerInstance->Logs->Log("RESOLVER",DEBUG,"Got a result from the wrong server! Bad NAT or DNS forging attempt? '%s' != '%s'",
+			server1.c_str(), server2.c_str());
+		return DNSResult(-1,"",0,"");
+	}
+
+
+	DNS::FillHeader(&header,buffer,length - 12);
+
+
+	unsigned long this_id = header.id[1] + (header.id[0] << 8);
+
+
+	if (!requests[this_id])
+	{
+
+		ServerInstance->Logs->Log("RESOLVER",DEBUG,"Hmm, got a result that we didn't ask for (id=%lx). Ignoring.", this_id);
+		return DNSResult(-1,"",0,"");
+	}
+	else
+	{
+
+		req = requests[this_id];
+		requests[this_id] = NULL;
+	}
+
+
+	DNSInfo data = req->ResultIsReady(header, length);
+	std::string resultstr;
+
+
+	if (data.first == NULL)
+	{
+
+
+		std::string ro = req->orig;
+		delete req;
+		return DNSResult(this_id | ERROR_MASK, data.second, 0, ro);
+	}
+	else
+	{
+		unsigned long ttl = req->ttl;
+		char formatted[128];
+
+
+		switch (req->type)
+		{
+			case DNS_QUERY_A:
+				snprintf(formatted,16,"%u.%u.%u.%u",data.first[0],data.first[1],data.first[2],data.first[3]);
+				resultstr = formatted;
+			break;
+
+			case DNS_QUERY_AAAA:
+			{
+				if (!inet_ntop(AF_INET6, data.first, formatted, sizeof(formatted)))
+				{
+					std::string ro = req->orig;
+					delete req;
+					return DNSResult(this_id | ERROR_MASK, "inet_ntop() failed", 0, ro);
+				}
+
+				resultstr = formatted;
+
+
+				if (*formatted == ':')
+					resultstr.insert(0, "0");
+			}
+			break;
+
+			case DNS_QUERY_CNAME:
+
+
+			case DNS_QUERY_PTR:
+			{
+
+				resultstr = std::string((const char*)data.first);
+				if (resultstr.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-") != std::string::npos)
+				{
+					std::string ro = req->orig;
+					delete req;
+					return DNSResult(this_id | ERROR_MASK, "Invalid char(s) in reply", 0, ro);
+				}
+			}
+			break;
+
+			default:
+			break;
+		}
+
+
+		std::string ro = req->orig;
+		DNSResult result = DNSResult(this_id,resultstr,ttl,ro,req->type);
+		delete req;
+		return result;
+	}
+}

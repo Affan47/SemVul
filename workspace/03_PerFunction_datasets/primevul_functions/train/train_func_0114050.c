@@ -1,0 +1,2 @@
+template<> struct type<cimg_int64> {
+}

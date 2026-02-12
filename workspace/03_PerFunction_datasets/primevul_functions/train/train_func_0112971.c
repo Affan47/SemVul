@@ -1,0 +1,4 @@
+**/
+    CImgDisplay& assign() {
+      return flush();
+}

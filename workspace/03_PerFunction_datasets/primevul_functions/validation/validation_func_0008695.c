@@ -1,0 +1,26 @@
+static tjhandle _tjInitCompress(tjinstance *this)
+{
+	static unsigned char buffer[1];
+	unsigned char *buf=buffer;  unsigned long size=1;
+
+
+	this->cinfo.err=jpeg_std_error(&this->jerr.pub);
+	this->jerr.pub.error_exit=my_error_exit;
+	this->jerr.pub.output_message=my_output_message;
+	this->jerr.emit_message=this->jerr.pub.emit_message;
+	this->jerr.pub.emit_message=my_emit_message;
+
+	if(setjmp(this->jerr.setjmp_buffer))
+	{
+
+		if(this) free(this);
+		return NULL;
+	}
+
+	jpeg_create_compress(&this->cinfo);
+
+	jpeg_mem_dest_tj(&this->cinfo, &buf, &size, 0);
+
+	this->init|=COMPRESS;
+	return (tjhandle)this;
+}

@@ -1,0 +1,272 @@
+CallResult<bool> JSObject::putComputedWithReceiver_RJS(
+    Handle<JSObject> selfHandle,
+    Runtime *runtime,
+    Handle<> nameValHandle,
+    Handle<> valueHandle,
+    Handle<> receiver,
+    PropOpFlags opFlags) {
+  assert(
+      !opFlags.getMustExist() &&
+      "mustExist flag cannot be used with computed properties");
+
+
+  if (selfHandle->flags_.fastIndexProperties) {
+    if (auto arrayIndex = toArrayIndexFastPath(*nameValHandle)) {
+      if (selfHandle.getHermesValue().getRaw() == receiver->getRaw()) {
+        if (haveOwnIndexed(selfHandle.get(), runtime, *arrayIndex)) {
+          auto result =
+              setOwnIndexed(selfHandle, runtime, *arrayIndex, valueHandle);
+          if (LLVM_UNLIKELY(result == ExecutionStatus::EXCEPTION))
+            return ExecutionStatus::EXCEPTION;
+          if (LLVM_LIKELY(*result))
+            return true;
+          if (opFlags.getThrowOnError()) {
+
+            return runtime->raiseTypeError(
+                "Cannot assign to read-only property");
+          }
+          return false;
+        }
+      }
+    }
+  }
+
+
+  auto converted = toPropertyKeyIfObject(runtime, nameValHandle);
+  if (LLVM_UNLIKELY(converted == ExecutionStatus::EXCEPTION)) {
+    return ExecutionStatus::EXCEPTION;
+  }
+  auto nameValPrimitiveHandle = *converted;
+
+  ComputedPropertyDescriptor desc;
+
+
+  MutableHandle<JSObject> propObj{runtime};
+  if (LLVM_UNLIKELY(
+          getComputedPrimitiveDescriptor(
+              selfHandle, runtime, nameValPrimitiveHandle, propObj, desc) ==
+          ExecutionStatus::EXCEPTION)) {
+    return ExecutionStatus::EXCEPTION;
+  }
+
+
+  if (propObj) {
+
+
+    if (LLVM_LIKELY(
+            selfHandle == propObj &&
+            selfHandle.getHermesValue().getRaw() == receiver->getRaw() &&
+            !desc.flags.accessor && !desc.flags.internalSetter &&
+            !desc.flags.hostObject && !desc.flags.proxyObject &&
+            desc.flags.writable)) {
+      if (LLVM_UNLIKELY(
+              setComputedSlotValue(selfHandle, runtime, desc, valueHandle) ==
+              ExecutionStatus::EXCEPTION)) {
+        return ExecutionStatus::EXCEPTION;
+      }
+      return true;
+    }
+
+
+    if (LLVM_UNLIKELY(desc.flags.accessor)) {
+      auto *accessor = vmcast<PropertyAccessor>(
+          getComputedSlotValue(propObj.get(), runtime, desc));
+
+
+      if (!accessor->setter) {
+        if (opFlags.getThrowOnError()) {
+          return runtime->raiseTypeErrorForValue(
+              "Cannot assign to property ",
+              nameValPrimitiveHandle,
+              " which has only a getter");
+        }
+        return false;
+      }
+
+
+      if (accessor->setter.get(runtime)->executeCall1(
+              runtime->makeHandle(accessor->setter),
+              runtime,
+              receiver,
+              valueHandle.get()) == ExecutionStatus::EXCEPTION) {
+        return ExecutionStatus::EXCEPTION;
+      }
+      return true;
+    }
+
+    if (LLVM_UNLIKELY(desc.flags.proxyObject)) {
+      assert(
+          !opFlags.getMustExist() &&
+          "MustExist cannot be used with Proxy objects");
+      CallResult<Handle<>> key = toPropertyKey(runtime, nameValPrimitiveHandle);
+      if (key == ExecutionStatus::EXCEPTION)
+        return ExecutionStatus::EXCEPTION;
+      CallResult<bool> setRes =
+          JSProxy::setComputed(propObj, runtime, *key, valueHandle, receiver);
+      if (LLVM_UNLIKELY(setRes == ExecutionStatus::EXCEPTION)) {
+        return ExecutionStatus::EXCEPTION;
+      }
+      if (!*setRes && opFlags.getThrowOnError()) {
+
+        return runtime->raiseTypeError(
+            TwineChar16("Proxy trap returned false for property"));
+      }
+      return setRes;
+    }
+
+    if (LLVM_UNLIKELY(!desc.flags.writable)) {
+      if (desc.flags.staticBuiltin) {
+        SymbolID id{};
+        LAZY_TO_IDENTIFIER(runtime, nameValPrimitiveHandle, id);
+        return raiseErrorForOverridingStaticBuiltin(
+            selfHandle, runtime, runtime->makeHandle(id));
+      }
+      if (opFlags.getThrowOnError()) {
+        return runtime->raiseTypeErrorForValue(
+            "Cannot assign to read-only property ", nameValPrimitiveHandle, "");
+      }
+      return false;
+    }
+
+    if (selfHandle == propObj && desc.flags.internalSetter) {
+      SymbolID id{};
+      LAZY_TO_IDENTIFIER(runtime, nameValPrimitiveHandle, id);
+      return internalSetter(
+          selfHandle,
+          runtime,
+          id,
+          desc.castToNamedPropertyDescriptorRef(),
+          valueHandle,
+          opFlags);
+    }
+  }
+
+
+  MutableHandle<JSObject> receiverHandle{runtime, *selfHandle};
+  if (selfHandle.getHermesValue().getRaw() != receiver->getRaw() ||
+      receiverHandle->isHostObject() || receiverHandle->isProxyObject()) {
+    if (selfHandle.getHermesValue().getRaw() != receiver->getRaw()) {
+      receiverHandle = dyn_vmcast<JSObject>(*receiver);
+    }
+    if (!receiverHandle) {
+      return false;
+    }
+    CallResult<bool> descDefinedRes = getOwnComputedPrimitiveDescriptor(
+        receiverHandle, runtime, nameValPrimitiveHandle, IgnoreProxy::No, desc);
+    if (LLVM_UNLIKELY(descDefinedRes == ExecutionStatus::EXCEPTION)) {
+      return ExecutionStatus::EXCEPTION;
+    }
+    DefinePropertyFlags dpf;
+    if (*descDefinedRes) {
+      if (LLVM_UNLIKELY(desc.flags.accessor || !desc.flags.writable)) {
+        return false;
+      }
+
+      if (LLVM_LIKELY(
+              !desc.flags.internalSetter && !receiverHandle->isHostObject() &&
+              !receiverHandle->isProxyObject())) {
+        if (LLVM_UNLIKELY(
+                setComputedSlotValue(
+                    receiverHandle, runtime, desc, valueHandle) ==
+                ExecutionStatus::EXCEPTION)) {
+          return ExecutionStatus::EXCEPTION;
+        }
+        return true;
+      }
+    }
+
+    if (LLVM_UNLIKELY(
+            desc.flags.internalSetter || receiverHandle->isHostObject() ||
+            receiverHandle->isProxyObject())) {
+
+
+      if (receiverHandle->isProxyObject()) {
+        if (*descDefinedRes) {
+          dpf.setValue = 1;
+        } else {
+          dpf = DefinePropertyFlags::getDefaultNewPropertyFlags();
+        }
+        return JSProxy::defineOwnProperty(
+            receiverHandle,
+            runtime,
+            nameValPrimitiveHandle,
+            dpf,
+            valueHandle,
+            opFlags);
+      }
+      SymbolID id{};
+      LAZY_TO_IDENTIFIER(runtime, nameValPrimitiveHandle, id);
+      if (desc.flags.internalSetter) {
+        return internalSetter(
+            receiverHandle,
+            runtime,
+            id,
+            desc.castToNamedPropertyDescriptorRef(),
+            valueHandle,
+            opFlags);
+      }
+      assert(
+          receiverHandle->isHostObject() && "descriptor flags are impossible");
+      return vmcast<HostObject>(receiverHandle.get())->set(id, *valueHandle);
+    }
+  }
+
+
+  if (LLVM_UNLIKELY(!receiverHandle->isExtensible())) {
+    if (opFlags.getThrowOnError()) {
+      return runtime->raiseTypeError(
+          "cannot add a new property");
+    }
+    return false;
+  }
+
+
+  if (receiverHandle->flags_.indexedStorage) {
+    OptValue<uint32_t> arrayIndex;
+    MutableHandle<StringPrimitive> strPrim{runtime};
+    TO_ARRAY_INDEX(runtime, nameValPrimitiveHandle, strPrim, arrayIndex);
+    if (arrayIndex) {
+
+      if (auto *array = dyn_vmcast<JSArray>(receiverHandle.get())) {
+        if (LLVM_UNLIKELY(*arrayIndex >= JSArray::getLength(array))) {
+          auto cr = putNamed_RJS(
+              receiverHandle,
+              runtime,
+              Predefined::getSymbolID(Predefined::length),
+              runtime->makeHandle(
+                  HermesValue::encodeNumberValue(*arrayIndex + 1)),
+              opFlags);
+          if (LLVM_UNLIKELY(cr == ExecutionStatus::EXCEPTION))
+            return ExecutionStatus::EXCEPTION;
+          if (LLVM_UNLIKELY(!*cr))
+            return false;
+        }
+      }
+
+      auto result =
+          setOwnIndexed(receiverHandle, runtime, *arrayIndex, valueHandle);
+      if (LLVM_UNLIKELY(result == ExecutionStatus::EXCEPTION))
+        return ExecutionStatus::EXCEPTION;
+      if (LLVM_LIKELY(*result))
+        return true;
+
+      if (opFlags.getThrowOnError()) {
+
+        return runtime->raiseTypeError("Cannot assign to read-only property");
+      }
+      return false;
+    }
+  }
+
+  SymbolID id{};
+  LAZY_TO_IDENTIFIER(runtime, nameValPrimitiveHandle, id);
+
+
+  return addOwnProperty(
+      receiverHandle,
+      runtime,
+      id,
+      DefinePropertyFlags::getDefaultNewPropertyFlags(),
+      valueHandle,
+      opFlags);
+}

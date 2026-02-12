@@ -1,0 +1,104 @@
+cin_isfuncdecl(
+    char_u	**sp,
+    linenr_T	first_lnum,
+    linenr_T	min_lnum)
+{
+    char_u	*s;
+    linenr_T	lnum = first_lnum;
+    linenr_T	save_lnum = curwin->w_cursor.lnum;
+    int		retval = FALSE;
+    pos_T	*trypos;
+    int		just_started = TRUE;
+
+    if (sp == NULL)
+	s = ml_get(lnum);
+    else
+	s = *sp;
+
+    curwin->w_cursor.lnum = lnum;
+    if (find_last_paren(s, '(', ')')
+	&& (trypos = find_match_paren(curbuf->b_ind_maxparen)) != NULL)
+    {
+	lnum = trypos->lnum;
+	if (lnum < min_lnum)
+	{
+	    curwin->w_cursor.lnum = save_lnum;
+	    return FALSE;
+	}
+
+	s = ml_get(lnum);
+    }
+    curwin->w_cursor.lnum = save_lnum;
+
+
+    if (cin_ispreproc(s))
+	return FALSE;
+
+    while (*s && *s != '(' && *s != ';' && *s != '\'' && *s != '"')
+    {
+	if (cin_iscomment(s))
+	    s = cin_skipcomment(s);
+	else if (*s == ':')
+	{
+	    if (*(s + 1) == ':')
+		s += 2;
+	    else
+
+
+		return FALSE;
+	}
+	else
+	    ++s;
+    }
+    if (*s != '(')
+	return FALSE;
+
+    while (*s && *s != ';' && *s != '\'' && *s != '"')
+    {
+	if (*s == ')' && cin_nocode(s + 1))
+	{
+
+
+	    lnum = first_lnum - 1;
+	    s = ml_get(lnum);
+	    if (*s == NUL || s[STRLEN(s) - 1] != '\\')
+		retval = TRUE;
+	    goto done;
+	}
+	if ((*s == ',' && cin_nocode(s + 1)) || s[1] == NUL || cin_nocode(s))
+	{
+	    int comma = (*s == ',');
+
+
+	    for (;;)
+	    {
+		if (lnum >= curbuf->b_ml.ml_line_count)
+		    break;
+		s = ml_get(++lnum);
+		if (!cin_ispreproc(s))
+		    break;
+	    }
+	    if (lnum >= curbuf->b_ml.ml_line_count)
+		break;
+
+
+	    s = skipwhite(s);
+	    if (!just_started && (!comma && *s != ',' && *s != ')'))
+		break;
+	    just_started = FALSE;
+	}
+	else if (cin_iscomment(s))
+	    s = cin_skipcomment(s);
+	else
+	{
+	    ++s;
+	    just_started = FALSE;
+	}
+    }
+
+done:
+    if (lnum != first_lnum && sp != NULL)
+	*sp = ml_get(first_lnum);
+
+    return retval;
+}

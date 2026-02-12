@@ -1,0 +1,129 @@
+ex_global(exarg_T *eap)
+{
+    linenr_T	lnum;
+    int		ndone = 0;
+    int		type;
+    char_u	*cmd;
+
+    char_u	delim;
+    char_u	*pat;
+    regmmatch_T	regmatch;
+    int		match;
+    int		which_pat;
+
+
+    if (global_busy && (eap->line1 != 1
+				  || eap->line2 != curbuf->b_ml.ml_line_count))
+    {
+
+	emsg(_(e_cannot_do_global_recursive_with_range));
+	return;
+    }
+
+    if (eap->forceit)
+	type = 'v';
+    else
+	type = *eap->cmd;
+    cmd = eap->arg;
+    which_pat = RE_LAST;
+
+#ifdef FEAT_EVAL
+    if (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg) == FAIL)
+	return;
+#endif
+
+
+    if (*cmd == '\\')
+    {
+	++cmd;
+	if (vim_strchr((char_u *)"/?&", *cmd) == NULL)
+	{
+	    emsg(_(e_backslash_should_be_followed_by));
+	    return;
+	}
+	if (*cmd == '&')
+	    which_pat = RE_SUBST;
+	else
+	    which_pat = RE_SEARCH;
+	++cmd;
+	pat = (char_u *)"";
+    }
+    else if (*cmd == NUL)
+    {
+	emsg(_(e_regular_expression_missing_from_global));
+	return;
+    }
+    else if (check_regexp_delim(*cmd) == FAIL)
+    {
+	return;
+    }
+    else
+    {
+	delim = *cmd;
+	if (delim)
+	    ++cmd;
+	pat = cmd;
+	cmd = skip_regexp_ex(cmd, delim, magic_isset(), &eap->arg, NULL, NULL);
+	if (cmd[0] == delim)
+	    *cmd++ = NUL;
+    }
+
+    if (search_regcomp(pat, RE_BOTH, which_pat, SEARCH_HIS, &regmatch) == FAIL)
+    {
+	emsg(_(e_invalid_command));
+	return;
+    }
+
+    if (global_busy)
+    {
+	lnum = curwin->w_cursor.lnum;
+	match = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
+						       (colnr_T)0, NULL, NULL);
+	if ((type == 'g' && match) || (type == 'v' && !match))
+	    global_exe_one(cmd, lnum);
+    }
+    else
+    {
+
+
+	for (lnum = eap->line1; lnum <= eap->line2 && !got_int; ++lnum)
+	{
+
+	    match = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
+						       (colnr_T)0, NULL, NULL);
+	    if (regmatch.regprog == NULL)
+		break;
+	    if ((type == 'g' && match) || (type == 'v' && !match))
+	    {
+		ml_setmarked(lnum);
+		ndone++;
+	    }
+	    line_breakcheck();
+	}
+
+
+	if (got_int)
+	    msg(_(e_interrupted));
+	else if (ndone == 0)
+	{
+	    if (type == 'v')
+		smsg(_("Pattern found in every line: %s"), pat);
+	    else
+		smsg(_("Pattern not found: %s"), pat);
+	}
+	else
+	{
+#ifdef FEAT_CLIPBOARD
+	    start_global_changes();
+#endif
+	    global_exe(cmd);
+#ifdef FEAT_CLIPBOARD
+	    end_global_changes();
+#endif
+	}
+
+	ml_clearmarked();
+    }
+
+    vim_regfree(regmatch.regprog);
+}

@@ -1,0 +1,4 @@
+**/
+    CImgDisplay& paint() {
+      return assign();
+}

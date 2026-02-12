@@ -1,0 +1,47 @@
+replace_substring_in_place(PyStringObject *self,
+                           const char *from_s, Py_ssize_t from_len,
+                           const char *to_s, Py_ssize_t to_len,
+                           Py_ssize_t maxcount)
+{
+    char *result_s, *start, *end;
+    char *self_s;
+    Py_ssize_t self_len, offset;
+    PyStringObject *result;
+
+
+    self_s = PyString_AS_STRING(self);
+    self_len = PyString_GET_SIZE(self);
+
+    offset = stringlib_find(self_s, self_len,
+                            from_s, from_len,
+                            0);
+    if (offset == -1) {
+
+        return return_self(self);
+    }
+
+
+    result = (PyStringObject *) PyString_FromStringAndSize(NULL, self_len);
+    if (result == NULL)
+        return NULL;
+    result_s = PyString_AS_STRING(result);
+    Py_MEMCPY(result_s, self_s, self_len);
+
+
+    start =  result_s + offset;
+    Py_MEMCPY(start, to_s, from_len);
+    start += from_len;
+    end = result_s + self_len;
+
+    while ( --maxcount > 0) {
+        offset = stringlib_find(start, end-start,
+                                from_s, from_len,
+                                0);
+        if (offset==-1)
+            break;
+        Py_MEMCPY(start+offset, to_s, from_len);
+        start += offset+from_len;
+    }
+
+    return result;
+}

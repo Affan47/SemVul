@@ -1,0 +1,25 @@
+static bool __kthread_cancel_work(struct kthread_work *work, bool is_dwork,
+				  unsigned long *flags)
+{
+
+	if (is_dwork) {
+		struct kthread_delayed_work *dwork =
+			container_of(work, struct kthread_delayed_work, work);
+		struct kthread_worker *worker = work->worker;
+
+
+		work->canceling++;
+		spin_unlock_irqrestore(&worker->lock, *flags);
+		del_timer_sync(&dwork->timer);
+		spin_lock_irqsave(&worker->lock, *flags);
+		work->canceling--;
+	}
+
+
+	if (!list_empty(&work->node)) {
+		list_del_init(&work->node);
+		return true;
+	}
+
+	return false;
+}

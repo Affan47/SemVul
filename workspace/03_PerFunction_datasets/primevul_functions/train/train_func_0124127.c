@@ -1,0 +1,74 @@
+int normalize_path_copy_len(char *dst, const char *src, int *prefix_len)
+{
+	char *dst0;
+	const char *end;
+
+
+	end = src + offset_1st_component(src);
+	while (src < end) {
+		char c = *src++;
+		if (is_dir_sep(c))
+			c = '/';
+		*dst++ = c;
+	}
+	dst0 = dst;
+
+	while (is_dir_sep(*src))
+		src++;
+
+	for (;;) {
+		char c = *src;
+
+
+		if (c == '.') {
+			if (!src[1]) {
+
+				src++;
+			} else if (is_dir_sep(src[1])) {
+
+				src += 2;
+				while (is_dir_sep(*src))
+					src++;
+				continue;
+			} else if (src[1] == '.') {
+				if (!src[2]) {
+
+					src += 2;
+					goto up_one;
+				} else if (is_dir_sep(src[2])) {
+
+					src += 3;
+					while (is_dir_sep(*src))
+						src++;
+					goto up_one;
+				}
+			}
+		}
+
+
+		while ((c = *src++) != '\0' && !is_dir_sep(c))
+			*dst++ = c;
+		if (is_dir_sep(c)) {
+			*dst++ = '/';
+			while (is_dir_sep(c))
+				c = *src++;
+			src--;
+		} else if (!c)
+			break;
+		continue;
+
+	up_one:
+
+
+		dst--;
+		if (dst <= dst0)
+			return -1;
+
+		while (dst0 < dst && dst[-1] != '/')
+			dst--;
+		if (prefix_len && *prefix_len > dst - dst0)
+			*prefix_len = dst - dst0;
+	}
+	*dst = '\0';
+	return 0;
+}

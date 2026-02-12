@@ -1,0 +1,75 @@
+png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
+{
+   png_fixed_point red_inverse, green_inverse, blue_scale;
+   png_fixed_point left, right, denominator;
+
+
+   if (xy->redx   < 0 || xy->redx > PNG_FP_1) return 1;
+   if (xy->redy   < 0 || xy->redy > PNG_FP_1-xy->redx) return 1;
+   if (xy->greenx < 0 || xy->greenx > PNG_FP_1) return 1;
+   if (xy->greeny < 0 || xy->greeny > PNG_FP_1-xy->greenx) return 1;
+   if (xy->bluex  < 0 || xy->bluex > PNG_FP_1) return 1;
+   if (xy->bluey  < 0 || xy->bluey > PNG_FP_1-xy->bluex) return 1;
+   if (xy->whitex < 0 || xy->whitex > PNG_FP_1) return 1;
+   if (xy->whitey < 5 || xy->whitey > PNG_FP_1-xy->whitex) return 1;
+
+
+   if (png_muldiv(&left, xy->greenx-xy->bluex, xy->redy - xy->bluey, 7) == 0)
+      return 2;
+   if (png_muldiv(&right, xy->greeny-xy->bluey, xy->redx - xy->bluex, 7) == 0)
+      return 2;
+   denominator = left - right;
+
+
+   if (png_muldiv(&left, xy->greenx-xy->bluex, xy->whitey-xy->bluey, 7) == 0)
+      return 2;
+   if (png_muldiv(&right, xy->greeny-xy->bluey, xy->whitex-xy->bluex, 7) == 0)
+      return 2;
+
+
+   if (png_muldiv(&red_inverse, xy->whitey, denominator, left-right) == 0 ||
+       red_inverse <= xy->whitey )
+      return 1;
+
+
+   if (png_muldiv(&left, xy->redy-xy->bluey, xy->whitex-xy->bluex, 7) == 0)
+      return 2;
+   if (png_muldiv(&right, xy->redx-xy->bluex, xy->whitey-xy->bluey, 7) == 0)
+      return 2;
+   if (png_muldiv(&green_inverse, xy->whitey, denominator, left-right) == 0 ||
+       green_inverse <= xy->whitey)
+      return 1;
+
+
+   blue_scale = png_reciprocal(xy->whitey) - png_reciprocal(red_inverse) -
+       png_reciprocal(green_inverse);
+   if (blue_scale <= 0)
+      return 1;
+
+
+   if (png_muldiv(&XYZ->red_X, xy->redx, PNG_FP_1, red_inverse) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->red_Y, xy->redy, PNG_FP_1, red_inverse) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->red_Z, PNG_FP_1 - xy->redx - xy->redy, PNG_FP_1,
+       red_inverse) == 0)
+      return 1;
+
+   if (png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->green_Z, PNG_FP_1 - xy->greenx - xy->greeny, PNG_FP_1,
+       green_inverse) == 0)
+      return 1;
+
+   if (png_muldiv(&XYZ->blue_X, xy->bluex, blue_scale, PNG_FP_1) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->blue_Y, xy->bluey, blue_scale, PNG_FP_1) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->blue_Z, PNG_FP_1 - xy->bluex - xy->bluey, blue_scale,
+       PNG_FP_1) == 0)
+      return 1;
+
+   return 0;
+}

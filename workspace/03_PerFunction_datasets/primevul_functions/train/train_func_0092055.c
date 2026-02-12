@@ -1,0 +1,11 @@
+void CSteamNetworkListenSocketDirectUDP::Received_ConnectionClosed( const CMsgSteamSockets_UDP_ConnectionClosed &msg, const netadr_t &adrFrom, SteamNetworkingMicroseconds usecNow )
+{
+
+
+	CMsgSteamSockets_UDP_NoConnection msgReply;
+	if ( msg.from_connection_id() )
+		msgReply.set_to_connection_id( msg.from_connection_id() );
+	if ( msg.to_connection_id() )
+		msgReply.set_from_connection_id( msg.to_connection_id() );
+	SendMsg( k_ESteamNetworkingUDPMsg_NoConnection, msgReply, adrFrom );
+}

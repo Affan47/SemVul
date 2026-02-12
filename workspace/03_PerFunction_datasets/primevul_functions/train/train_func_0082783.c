@@ -1,0 +1,289 @@
+int tcp_emu(struct socket *so, struct mbuf *m)
+{
+    Slirp *slirp = so->slirp;
+    unsigned n1, n2, n3, n4, n5, n6;
+    char buff[257];
+    uint32_t laddr;
+    unsigned lport;
+    char *bptr;
+
+    DEBUG_CALL("tcp_emu");
+    DEBUG_ARG("so = %p", so);
+    DEBUG_ARG("m = %p", m);
+
+    switch (so->so_emu) {
+        int x, i;
+
+
+    case EMU_IDENT:
+
+
+        {
+            struct socket *tmpso;
+            struct sockaddr_in addr;
+            socklen_t addrlen = sizeof(struct sockaddr_in);
+            char *eol = g_strstr_len(m->m_data, m->m_len, "\r\n");
+
+            if (!eol) {
+                return 1;
+            }
+
+            *eol = '\0';
+            if (sscanf(m->m_data, "%u%*[ ,]%u", &n1, &n2) == 2) {
+                HTONS(n1);
+                HTONS(n2);
+
+                for (tmpso = slirp->tcb.so_next; tmpso != &slirp->tcb;
+                     tmpso = tmpso->so_next) {
+                    if (tmpso->so_laddr.s_addr == so->so_laddr.s_addr &&
+                        tmpso->so_lport == n2 &&
+                        tmpso->so_faddr.s_addr == so->so_faddr.s_addr &&
+                        tmpso->so_fport == n1) {
+                        if (getsockname(tmpso->s, (struct sockaddr *)&addr,
+                                        &addrlen) == 0)
+                            n2 = addr.sin_port;
+                        break;
+                    }
+                }
+                NTOHS(n1);
+                NTOHS(n2);
+                m_inc(m, snprintf(NULL, 0, "%d,%d\r\n", n1, n2) + 1);
+                m->m_len = snprintf(m->m_data, M_ROOM(m), "%d,%d\r\n", n1, n2);
+                assert(m->m_len < M_ROOM(m));
+            } else {
+                *eol = '\r';
+            }
+
+            return 1;
+        }
+
+    case EMU_FTP:
+        m_inc(m, m->m_len + 1);
+        *(m->m_data + m->m_len) = 0;
+        if ((bptr = (char *)strstr(m->m_data, "ORT")) != NULL) {
+
+
+            x = sscanf(bptr, "ORT %u,%u,%u,%u,%u,%u\r\n%256[^\177]", &n1, &n2,
+                       &n3, &n4, &n5, &n6, buff);
+            if (x < 6)
+                return 1;
+
+            laddr = htonl((n1 << 24) | (n2 << 16) | (n3 << 8) | (n4));
+            lport = htons((n5 << 8) | (n6));
+
+            if ((so = tcp_listen(slirp, INADDR_ANY, 0, laddr, lport,
+                                 SS_FACCEPTONCE)) == NULL) {
+                return 1;
+            }
+            n6 = ntohs(so->so_fport);
+
+            n5 = (n6 >> 8) & 0xff;
+            n6 &= 0xff;
+
+            laddr = ntohl(so->so_faddr.s_addr);
+
+            n1 = ((laddr >> 24) & 0xff);
+            n2 = ((laddr >> 16) & 0xff);
+            n3 = ((laddr >> 8) & 0xff);
+            n4 = (laddr & 0xff);
+
+            m->m_len = bptr - m->m_data;
+            m->m_len += snprintf(bptr, M_FREEROOM(m),
+                                 "ORT %d,%d,%d,%d,%d,%d\r\n%s", n1, n2, n3, n4,
+                                 n5, n6, x == 7 ? buff : "");
+            return 1;
+        } else if ((bptr = (char *)strstr(m->m_data, "27 Entering")) != NULL) {
+
+
+            x = sscanf(
+                bptr,
+                "27 Entering Passive Mode (%u,%u,%u,%u,%u,%u)\r\n%256[^\177]",
+                &n1, &n2, &n3, &n4, &n5, &n6, buff);
+            if (x < 6)
+                return 1;
+
+            laddr = htonl((n1 << 24) | (n2 << 16) | (n3 << 8) | (n4));
+            lport = htons((n5 << 8) | (n6));
+
+            if ((so = tcp_listen(slirp, INADDR_ANY, 0, laddr, lport,
+                                 SS_FACCEPTONCE)) == NULL) {
+                return 1;
+            }
+            n6 = ntohs(so->so_fport);
+
+            n5 = (n6 >> 8) & 0xff;
+            n6 &= 0xff;
+
+            laddr = ntohl(so->so_faddr.s_addr);
+
+            n1 = ((laddr >> 24) & 0xff);
+            n2 = ((laddr >> 16) & 0xff);
+            n3 = ((laddr >> 8) & 0xff);
+            n4 = (laddr & 0xff);
+
+            m->m_len = bptr - m->m_data;
+            m->m_len += snprintf(bptr, M_FREEROOM(m),
+                         "27 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\r\n%s",
+                         n1, n2, n3, n4, n5, n6, x == 7 ? buff : "");
+
+            return 1;
+        }
+
+        return 1;
+
+    case EMU_KSH:
+
+
+        so->so_emu = 0;
+        for (lport = 0, i = 0; i < m->m_len - 1; ++i) {
+            if (m->m_data[i] < '0' || m->m_data[i] > '9')
+                return 1;
+            lport *= 10;
+            lport += m->m_data[i] - '0';
+        }
+        if (m->m_data[m->m_len - 1] == '\0' && lport != 0 &&
+            (so = tcp_listen(slirp, INADDR_ANY, 0, so->so_laddr.s_addr,
+                             htons(lport), SS_FACCEPTONCE)) != NULL)
+            m->m_len = snprintf(m->m_data, M_ROOM(m),
+                                "%d", ntohs(so->so_fport)) + 1;
+        return 1;
+
+    case EMU_IRC:
+
+
+        m_inc(m, m->m_len + 1);
+        *(m->m_data + m->m_len) = 0;
+        if ((bptr = (char *)strstr(m->m_data, "DCC")) == NULL)
+            return 1;
+
+
+        if (sscanf(bptr, "DCC CHAT %256s %u %u", buff, &laddr, &lport) == 3) {
+            if ((so = tcp_listen(slirp, INADDR_ANY, 0, htonl(laddr),
+                                 htons(lport), SS_FACCEPTONCE)) == NULL) {
+                return 1;
+            }
+            m->m_len = bptr - m->m_data;
+            m->m_len += snprintf(bptr, M_FREEROOM(m),
+                                 "DCC CHAT chat %lu %u%c\n",
+                                 (unsigned long)ntohl(so->so_faddr.s_addr),
+                                 ntohs(so->so_fport), 1);
+        } else if (sscanf(bptr, "DCC SEND %256s %u %u %u", buff, &laddr, &lport,
+                          &n1) == 4) {
+            if ((so = tcp_listen(slirp, INADDR_ANY, 0, htonl(laddr),
+                                 htons(lport), SS_FACCEPTONCE)) == NULL) {
+                return 1;
+            }
+            m->m_len = bptr - m->m_data;
+            m->m_len += snprintf(bptr, M_FREEROOM(m),
+                         "DCC SEND %s %lu %u %u%c\n", buff,
+                         (unsigned long)ntohl(so->so_faddr.s_addr),
+                         ntohs(so->so_fport), n1, 1);
+        } else if (sscanf(bptr, "DCC MOVE %256s %u %u %u", buff, &laddr, &lport,
+                          &n1) == 4) {
+            if ((so = tcp_listen(slirp, INADDR_ANY, 0, htonl(laddr),
+                                 htons(lport), SS_FACCEPTONCE)) == NULL) {
+                return 1;
+            }
+            m->m_len = bptr - m->m_data;
+            m->m_len += snprintf(bptr, M_FREEROOM(m),
+                         "DCC MOVE %s %lu %u %u%c\n", buff,
+                         (unsigned long)ntohl(so->so_faddr.s_addr),
+                         ntohs(so->so_fport), n1, 1);
+        }
+        return 1;
+
+    case EMU_REALAUDIO:
+
+
+        bptr = m->m_data;
+        while (bptr < m->m_data + m->m_len) {
+            uint16_t p;
+            static int ra = 0;
+            char ra_tbl[4];
+
+            ra_tbl[0] = 0x50;
+            ra_tbl[1] = 0x4e;
+            ra_tbl[2] = 0x41;
+            ra_tbl[3] = 0;
+
+            switch (ra) {
+            case 0:
+            case 2:
+            case 3:
+                if (*bptr++ != ra_tbl[ra]) {
+                    ra = 0;
+                    continue;
+                }
+                break;
+
+            case 1:
+
+
+                if (*bptr == 0x50) {
+                    ra = 1;
+                    bptr++;
+                    continue;
+                } else if (*bptr++ != ra_tbl[ra]) {
+                    ra = 0;
+                    continue;
+                }
+                break;
+
+            case 4:
+
+
+                bptr++;
+                break;
+
+            case 5:
+                if (bptr == m->m_data + m->m_len - 1)
+                        return 1;
+
+
+                if (*(bptr + 1) == 0x02)
+                    bptr += 8;
+                else
+                    bptr += 4;
+                break;
+
+            case 6:
+
+
+                if (bptr == m->m_data + m->m_len - 1)
+                        return 1;
+
+                lport = (((uint8_t *)bptr)[0] << 8) + ((uint8_t *)bptr)[1];
+                if (lport < 6970)
+                    lport += 256;
+                if (lport < 6970 || lport > 7170)
+                    return 1;
+
+
+                for (p = 6970; p < 7071; p++) {
+                    if (udp_listen(slirp, INADDR_ANY, htons(p),
+                                   so->so_laddr.s_addr, htons(lport),
+                                   SS_FACCEPTONCE)) {
+                        break;
+                    }
+                }
+                if (p == 7071)
+                    p = 0;
+                *(uint8_t *)bptr++ = (p >> 8) & 0xff;
+                *(uint8_t *)bptr = p & 0xff;
+                ra = 0;
+                return 1;
+                break;
+
+            default:
+                ra = 0;
+            }
+            ra++;
+        }
+        return 1;
+
+    default:
+
+        so->so_emu = 0;
+        return 1;
+    }
+}

@@ -1,0 +1,61 @@
+end_unique_update(JOIN *join, JOIN_TAB *join_tab __attribute__((unused)),
+		  bool end_of_records)
+{
+  TABLE *table= join_tab->table;
+  int	  error;
+  DBUG_ENTER("end_unique_update");
+
+  if (end_of_records)
+    DBUG_RETURN(NESTED_LOOP_OK);
+
+  init_tmptable_sum_functions(join->sum_funcs);
+  copy_fields(join_tab->tmp_table_param);
+  if (copy_funcs(join_tab->tmp_table_param->items_to_copy, join->thd))
+    DBUG_RETURN(NESTED_LOOP_ERROR);
+
+  if (!(error= table->file->ha_write_tmp_row(table->record[0])))
+    join_tab->send_records++;
+  else
+  {
+    if ((int) table->file->get_dup_key(error) < 0)
+    {
+      table->file->print_error(error,MYF(0));
+      DBUG_RETURN(NESTED_LOOP_ERROR);
+    }
+
+    bool rnd_inited= (table->file->inited == handler::RND);
+    if (!rnd_inited &&
+        ((error= table->file->ha_index_end()) ||
+         (error= table->file->ha_rnd_init(0))))
+    {
+      table->file->print_error(error, MYF(0));
+      DBUG_RETURN(NESTED_LOOP_ERROR);
+    }
+    if (table->file->ha_rnd_pos(table->record[1],table->file->dup_ref))
+    {
+      table->file->print_error(error,MYF(0));
+      DBUG_RETURN(NESTED_LOOP_ERROR);
+    }
+    restore_record(table,record[1]);
+    update_tmptable_sum_func(join->sum_funcs,table);
+    if ((error= table->file->ha_update_tmp_row(table->record[1],
+                                               table->record[0])))
+    {
+      table->file->print_error(error,MYF(0));
+      DBUG_RETURN(NESTED_LOOP_ERROR);
+    }
+    if (!rnd_inited &&
+        ((error= table->file->ha_rnd_end()) ||
+         (error= table->file->ha_index_init(0, 0))))
+    {
+      table->file->print_error(error, MYF(0));
+      DBUG_RETURN(NESTED_LOOP_ERROR);
+    }
+  }
+  if (join->thd->check_killed())
+  {
+    join->thd->send_kill_message();
+    DBUG_RETURN(NESTED_LOOP_KILLED);
+  }
+  DBUG_RETURN(NESTED_LOOP_OK);
+}

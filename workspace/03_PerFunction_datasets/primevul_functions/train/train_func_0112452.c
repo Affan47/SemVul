@@ -1,0 +1,2 @@
+struct CImgWarningException : public CImgException {
+}

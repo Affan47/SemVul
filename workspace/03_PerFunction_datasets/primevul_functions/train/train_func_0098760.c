@@ -1,0 +1,18 @@
+static void amd_e400_idle(void)
+{
+
+
+	if (!boot_cpu_has_bug(X86_BUG_AMD_APIC_C1E)) {
+		default_idle();
+		return;
+	}
+
+	tick_broadcast_enter();
+
+	default_idle();
+
+
+	local_irq_disable();
+	tick_broadcast_exit();
+	local_irq_enable();
+}

@@ -1,0 +1,2 @@
+struct CImgArgumentException : public CImgException {
+}

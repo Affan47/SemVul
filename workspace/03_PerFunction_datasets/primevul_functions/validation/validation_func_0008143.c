@@ -1,0 +1,110 @@
+xmlParseEntityValue(xmlParserCtxtPtr ctxt, xmlChar **orig) {
+    xmlChar *buf = NULL;
+    int len = 0;
+    int size = XML_PARSER_BUFFER_SIZE;
+    int c, l;
+    xmlChar stop;
+    xmlChar *ret = NULL;
+    const xmlChar *cur = NULL;
+    xmlParserInputPtr input;
+
+    if (RAW == '"') stop = '"';
+    else if (RAW == '\'') stop = '\'';
+    else {
+	xmlFatalErr(ctxt, XML_ERR_ENTITY_NOT_STARTED, NULL);
+	return(NULL);
+    }
+    buf = (xmlChar *) xmlMallocAtomic(size * sizeof(xmlChar));
+    if (buf == NULL) {
+	xmlErrMemory(ctxt, NULL);
+	return(NULL);
+    }
+
+
+    ctxt->instate = XML_PARSER_ENTITY_VALUE;
+    input = ctxt->input;
+    GROW;
+    if (ctxt->instate == XML_PARSER_EOF)
+        goto error;
+    NEXT;
+    c = CUR_CHAR(l);
+
+
+    while (((IS_CHAR(c)) && ((c != stop) ||
+	    (ctxt->input != input))) && (ctxt->instate != XML_PARSER_EOF)) {
+	if (len + 5 >= size) {
+	    xmlChar *tmp;
+
+	    size *= 2;
+	    tmp = (xmlChar *) xmlRealloc(buf, size * sizeof(xmlChar));
+	    if (tmp == NULL) {
+		xmlErrMemory(ctxt, NULL);
+                goto error;
+	    }
+	    buf = tmp;
+	}
+	COPY_BUF(l,buf,len,c);
+	NEXTL(l);
+
+	GROW;
+	c = CUR_CHAR(l);
+	if (c == 0) {
+	    GROW;
+	    c = CUR_CHAR(l);
+	}
+    }
+    buf[len] = 0;
+    if (ctxt->instate == XML_PARSER_EOF)
+        goto error;
+    if (c != stop) {
+        xmlFatalErr(ctxt, XML_ERR_ENTITY_NOT_FINISHED, NULL);
+        goto error;
+    }
+    NEXT;
+
+
+    cur = buf;
+    while (*cur != 0) {
+	if ((*cur == '%') || ((*cur == '&') && (cur[1] != '#'))) {
+	    xmlChar *name;
+	    xmlChar tmp = *cur;
+            int nameOk = 0;
+
+	    cur++;
+	    name = xmlParseStringName(ctxt, &cur);
+            if (name != NULL) {
+                nameOk = 1;
+                xmlFree(name);
+            }
+            if ((nameOk == 0) || (*cur != ';')) {
+		xmlFatalErrMsgInt(ctxt, XML_ERR_ENTITY_CHAR_ERROR,
+	    "EntityValue: '%c' forbidden except for entities references\n",
+	                          tmp);
+                goto error;
+	    }
+	    if ((tmp == '%') && (ctxt->inSubset == 1) &&
+		(ctxt->inputNr == 1)) {
+		xmlFatalErr(ctxt, XML_ERR_ENTITY_PE_INTERNAL, NULL);
+                goto error;
+	    }
+	    if (*cur == 0)
+	        break;
+	}
+	cur++;
+    }
+
+
+    ++ctxt->depth;
+    ret = xmlStringDecodeEntities(ctxt, buf, XML_SUBSTITUTE_PEREF,
+                                  0, 0, 0);
+    --ctxt->depth;
+    if (orig != NULL) {
+        *orig = buf;
+        buf = NULL;
+    }
+
+error:
+    if (buf != NULL)
+        xmlFree(buf);
+    return(ret);
+}

@@ -1,0 +1,15 @@
+daemonized(void)
+{
+	int fd;
+
+	if ((fd = open(_PATH_TTY, O_RDONLY | O_NOCTTY)) >= 0) {
+		close(fd);
+		return 0;
+	}
+	if (getppid() != 1)
+		return 0;
+	if (getsid(0) != getpid())
+		return 0;
+	debug3("already daemonized");
+	return 1;
+}

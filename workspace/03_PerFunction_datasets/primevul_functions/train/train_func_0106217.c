@@ -1,0 +1,87 @@
+static struct commit *get_revision_internal(struct rev_info *revs)
+{
+	struct commit *c = NULL;
+	struct commit_list *l;
+
+	if (revs->boundary == 2) {
+
+
+		c = pop_commit(&revs->commits);
+		if (c)
+			c->object.flags |= SHOWN;
+		return c;
+	}
+
+	if (revs->reverse) {
+		int limit = -1;
+
+		if (0 <= revs->max_count) {
+			limit = revs->max_count;
+			if (0 < revs->skip_count)
+				limit += revs->skip_count;
+		}
+		l = NULL;
+		while ((c = get_revision_1(revs))) {
+			commit_list_insert(c, &l);
+			if ((0 < limit) && !--limit)
+				break;
+		}
+		revs->commits = l;
+		revs->reverse = 0;
+		revs->max_count = -1;
+		c = NULL;
+	}
+
+
+	c = get_revision_1(revs);
+	if (c) {
+		while (0 < revs->skip_count) {
+			revs->skip_count--;
+			c = get_revision_1(revs);
+			if (!c)
+				break;
+		}
+	}
+
+
+	switch (revs->max_count) {
+	case -1:
+		break;
+	case 0:
+		c = NULL;
+		break;
+	default:
+		revs->max_count--;
+	}
+
+	if (c)
+		c->object.flags |= SHOWN;
+
+	if (!revs->boundary) {
+		return c;
+	}
+
+	if (!c) {
+
+
+		revs->boundary = 2;
+
+
+		create_boundary_commit_list(revs);
+
+		return get_revision_internal(revs);
+	}
+
+
+	for (l = c->parents; l; l = l->next) {
+		struct object *p;
+		p = &(l->item->object);
+		if (p->flags & (CHILD_SHOWN | SHOWN))
+			continue;
+		p->flags |= CHILD_SHOWN;
+		gc_boundary(&revs->boundary_commits);
+		add_object_array(p, NULL, &revs->boundary_commits);
+	}
+
+	return c;
+}

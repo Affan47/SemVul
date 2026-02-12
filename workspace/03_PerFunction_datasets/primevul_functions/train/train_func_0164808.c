@@ -1,0 +1,8 @@
+static int open_will_write_to_fs(int flag, struct inode *inode)
+{
+
+
+	if (special_file(inode->i_mode))
+		return 0;
+	return (flag & O_TRUNC);
+}

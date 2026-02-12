@@ -1,0 +1,107 @@
+int apply_filter_to_req_headers(struct session *t, struct buffer *req, struct hdr_exp *exp)
+{
+	char term;
+	char *cur_ptr, *cur_end, *cur_next;
+	int cur_idx, old_idx, last_hdr;
+	struct http_txn *txn = &t->txn;
+	struct hdr_idx_elem *cur_hdr;
+	int len, delta;
+
+	last_hdr = 0;
+
+	cur_next = txn->req.sol + hdr_idx_first_pos(&txn->hdr_idx);
+	old_idx = 0;
+
+	while (!last_hdr) {
+		if (unlikely(txn->flags & (TX_CLDENY | TX_CLTARPIT)))
+			return 1;
+		else if (unlikely(txn->flags & TX_CLALLOW) &&
+			 (exp->action == ACT_ALLOW ||
+			  exp->action == ACT_DENY ||
+			  exp->action == ACT_TARPIT))
+			return 0;
+
+		cur_idx = txn->hdr_idx.v[old_idx].next;
+		if (!cur_idx)
+			break;
+
+		cur_hdr  = &txn->hdr_idx.v[cur_idx];
+		cur_ptr  = cur_next;
+		cur_end  = cur_ptr + cur_hdr->len;
+		cur_next = cur_end + cur_hdr->cr + 1;
+
+
+		term = *cur_end;
+		*cur_end = '\0';
+
+		if (regexec(exp->preg, cur_ptr, MAX_MATCH, pmatch, 0) == 0) {
+			switch (exp->action) {
+			case ACT_SETBE:
+
+
+				if (t->be != t->fe)
+					break;
+
+
+				session_set_backend(t, (struct proxy *)exp->replace);
+				last_hdr = 1;
+				break;
+
+			case ACT_ALLOW:
+				txn->flags |= TX_CLALLOW;
+				last_hdr = 1;
+				break;
+
+			case ACT_DENY:
+				txn->flags |= TX_CLDENY;
+				last_hdr = 1;
+
+				t->be->counters.denied_req++;
+				if (t->listener->counters)
+					t->listener->counters->denied_req++;
+
+				break;
+
+			case ACT_TARPIT:
+				txn->flags |= TX_CLTARPIT;
+				last_hdr = 1;
+
+				t->be->counters.denied_req++;
+				if (t->listener->counters)
+					t->listener->counters->denied_req++;
+
+				break;
+
+			case ACT_REPLACE:
+				len = exp_replace(trash, cur_ptr, exp->replace, pmatch);
+				delta = buffer_replace2(req, cur_ptr, cur_end, trash, len);
+
+
+				cur_end += delta;
+				cur_next += delta;
+				cur_hdr->len += delta;
+				http_msg_move_end(&txn->req, delta);
+				break;
+
+			case ACT_REMOVE:
+				delta = buffer_replace2(req, cur_ptr, cur_next, NULL, 0);
+				cur_next += delta;
+
+				http_msg_move_end(&txn->req, delta);
+				txn->hdr_idx.v[old_idx].next = cur_hdr->next;
+				txn->hdr_idx.used--;
+				cur_hdr->len = 0;
+				cur_end = NULL;
+				cur_idx = old_idx;
+				break;
+
+			}
+		}
+		if (cur_end)
+			*cur_end = term;
+
+
+		old_idx = cur_idx;
+	}
+	return 0;
+}

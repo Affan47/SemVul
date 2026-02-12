@@ -1,0 +1,3 @@
+void StreamResource::ClearError() {
+
+}

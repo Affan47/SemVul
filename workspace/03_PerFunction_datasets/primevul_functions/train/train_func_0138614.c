@@ -1,0 +1,40 @@
+static char* winbind_upn_to_username(struct pwb_context *ctx,
+				     const char *upn)
+{
+	char sep;
+	wbcErr wbc_status = WBC_ERR_UNKNOWN_FAILURE;
+	struct wbcDomainSid sid;
+	enum wbcSidType type;
+	char *domain;
+	char *name;
+	char *p;
+
+
+	sep = winbind_get_separator(ctx);
+	if (!sep || sep == '@') {
+		return NULL;
+	}
+
+	name = talloc_strdup(ctx, upn);
+	if (!name) {
+		return NULL;
+	}
+	if ((p = strchr(name, '@')) != NULL) {
+		*p = 0;
+		domain = p + 1;
+	}
+
+
+	wbc_status = wbcLookupName(domain, name, &sid, &type);
+	if (!WBC_ERROR_IS_OK(wbc_status)) {
+		return NULL;
+	}
+
+
+	wbc_status = wbcLookupSid(&sid, &domain, &name, &type);
+	if (!WBC_ERROR_IS_OK(wbc_status)) {
+		return NULL;
+	}
+
+	return talloc_asprintf(ctx, "%s\\%s", domain, name);
+}

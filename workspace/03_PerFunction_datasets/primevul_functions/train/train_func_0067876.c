@@ -1,0 +1,5 @@
+PPB_URLLoader_Impl::~PPB_URLLoader_Impl() {
+
+
+  scoped_ptr<WebKit::WebURLLoader> for_destruction_only(loader_.release());
+ }

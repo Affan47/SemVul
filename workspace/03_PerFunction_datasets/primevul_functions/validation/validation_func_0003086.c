@@ -1,0 +1,22 @@
+ff_layout_ntop6_noscopeid(const struct sockaddr *sap, char *buf,
+			  const int buflen)
+{
+	const struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)sap;
+	const struct in6_addr *addr = &sin6->sin6_addr;
+
+
+	if (ipv6_addr_any(addr))
+		return snprintf(buf, buflen, "::");
+
+
+	if (ipv6_addr_loopback(addr))
+		return snprintf(buf, buflen, "::1");
+
+
+	if (ipv6_addr_v4mapped(addr))
+		return snprintf(buf, buflen, "::ffff:%pI4",
+					&addr->s6_addr32[3]);
+
+
+	return snprintf(buf, buflen, "%pI6c", addr);
+}

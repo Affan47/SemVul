@@ -1,0 +1,3 @@
+if(pIf->ifVersion != parserCURR_IF_VERSION) {
+		ABORT_FINALIZE(RS_RET_INTERFACE_NOT_SUPPORTED);
+	}

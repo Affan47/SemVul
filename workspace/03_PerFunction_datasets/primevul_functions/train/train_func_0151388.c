@@ -1,0 +1,16 @@
+static int me_huge_page(struct page *p, unsigned long pfn)
+{
+	int res = 0;
+	struct page *hpage = compound_head(p);
+
+	if (!PageHuge(hpage))
+		return MF_DELAYED;
+
+
+	if (!(page_mapping(hpage) || PageAnon(hpage))) {
+		res = dequeue_hwpoisoned_huge_page(hpage);
+		if (!res)
+			return MF_RECOVERED;
+	}
+	return MF_DELAYED;
+}

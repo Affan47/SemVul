@@ -1,0 +1,235 @@
+void LibRaw::parse_exif(int base)
+{
+  unsigned entries, tag, type, len, save, c;
+  double expo, ape;
+
+  unsigned kodak = !strncmp(make, "EASTMAN", 7) && tiff_nifds < 3;
+
+  entries = get2();
+  if (!strncmp(make, "Hasselblad", 10) && (tiff_nifds > 3) && (entries > 512))
+    return;
+  INT64 fsize = ifp->size();
+  while (entries--)
+  {
+    tiff_get(base, &tag, &type, &len, &save);
+
+    INT64 savepos = ftell(ifp);
+    if (len > 8 && savepos + len > fsize * 2)
+    {
+      fseek(ifp, save, SEEK_SET);
+      continue;
+    }
+    if (callbacks.exif_cb)
+    {
+      callbacks.exif_cb(callbacks.exifparser_data, tag, type, len, order, ifp,
+                        base);
+      fseek(ifp, savepos, SEEK_SET);
+    }
+
+    switch (tag)
+    {
+
+    case 0x9400:
+      imgdata.makernotes.common.exifAmbientTemperature = getreal(type);
+      if ((imgdata.makernotes.common.CameraTemperature > -273.15f) &&
+          ((OlyID == 0x4434353933ULL) ||
+           (OlyID == 0x4434363033ULL))
+      )
+        imgdata.makernotes.common.CameraTemperature += imgdata.makernotes.common.exifAmbientTemperature;
+      break;
+    case 0x9401:
+      imgdata.makernotes.common.exifHumidity = getreal(type);
+      break;
+    case 0x9402:
+      imgdata.makernotes.common.exifPressure = getreal(type);
+      break;
+    case 0x9403:
+      imgdata.makernotes.common.exifWaterDepth = getreal(type);
+      break;
+    case 0x9404:
+      imgdata.makernotes.common.exifAcceleration = getreal(type);
+      break;
+    case 0x9405:
+      imgdata.makernotes.common.exifCameraElevationAngle = getreal(type);
+      break;
+
+    case 0xa405:
+      imgdata.lens.FocalLengthIn35mmFormat = get2();
+      break;
+    case 0xa431:
+      stmread(imgdata.shootinginfo.BodySerial, len, ifp);
+      break;
+    case 0xa432:
+      imgdata.lens.MinFocal = getreal(type);
+      imgdata.lens.MaxFocal = getreal(type);
+      imgdata.lens.MaxAp4MinFocal = getreal(type);
+      imgdata.lens.MaxAp4MaxFocal = getreal(type);
+      break;
+    case 0xa435:
+      stmread(imgdata.lens.LensSerial, len, ifp);
+      if (!strncmp(imgdata.lens.LensSerial, "----", 4))
+        imgdata.lens.LensSerial[0] = '\0';
+      break;
+    case 0xa420:
+      stmread(imgdata.color.ImageUniqueID, len, ifp);
+      break;
+    case 0xc65d:
+      imgdata.color.RawDataUniqueID[16] = 0;
+      fread(imgdata.color.RawDataUniqueID, 1, 16, ifp);
+      break;
+    case 0xc630:
+      imgdata.lens.dng.MinFocal = getreal(type);
+      imgdata.lens.dng.MaxFocal = getreal(type);
+      imgdata.lens.dng.MaxAp4MinFocal = getreal(type);
+      imgdata.lens.dng.MaxAp4MaxFocal = getreal(type);
+      break;
+    case 0xc68b:
+      stmread(imgdata.color.OriginalRawFileName, len, ifp);
+      break;
+    case 0xa433:
+      stmread(imgdata.lens.LensMake, len, ifp);
+      break;
+    case 0xa434:
+      stmread(imgdata.lens.Lens, len, ifp);
+      if (!strncmp(imgdata.lens.Lens, "----", 4))
+        imgdata.lens.Lens[0] = '\0';
+      break;
+    case 0x9205:
+      imgdata.lens.EXIF_MaxAp = libraw_powf64l(2.0f, (getreal(type) / 2.0f));
+      break;
+    case 0x829a:
+      tiff_ifd[tiff_nifds - 1].t_shutter = shutter = getreal(type);
+      break;
+    case 0x829d:
+      aperture = getreal(type);
+      break;
+    case 0x8827:
+      iso_speed = get2();
+      break;
+    case 0x8831:
+      if (iso_speed == 0xffff && !strncasecmp(make, "FUJI", 4))
+        iso_speed = getreal(type);
+      break;
+    case 0x8832:
+      if (iso_speed == 0xffff &&
+          (!strncasecmp(make, "SONY", 4) || !strncasecmp(make, "CANON", 5)))
+        iso_speed = getreal(type);
+      break;
+    case 0x9003:
+    case 0x9004:
+      get_timestamp(0);
+      break;
+    case 0x9201:
+      if ((expo = -getreal(type)) < 128 && shutter == 0.)
+        tiff_ifd[tiff_nifds - 1].t_shutter = shutter =
+            libraw_powf64l(2.0, expo);
+      break;
+    case 0x9202:
+      if ((fabs(ape = getreal(type)) < 256.0) && (!aperture))
+        aperture = libraw_powf64l(2.0, ape / 2);
+      break;
+    case 0x9209:
+      flash_used = getreal(type);
+      break;
+    case 0x920a:
+      focal_len = getreal(type);
+      break;
+    case 0x927c:
+      if (((make[0] == '\0') && !strncmp(model, "ov5647", 6)) ||
+          (!strncmp(make, "RaspberryPi", 11) &&
+           (!strncmp(model, "RP_OV5647", 9) ||
+            !strncmp(model, "RP_imx219", 9))))
+      {
+        char mn_text[512];
+        char *pos;
+        char ccms[512];
+        ushort l;
+        float num;
+
+        fgets(mn_text, MIN(len, 511), ifp);
+        mn_text[511] = 0;
+
+        pos = strstr(mn_text, "gain_r=");
+        if (pos)
+          cam_mul[0] = atof(pos + 7);
+        pos = strstr(mn_text, "gain_b=");
+        if (pos)
+          cam_mul[2] = atof(pos + 7);
+        if ((cam_mul[0] > 0.001f) && (cam_mul[2] > 0.001f))
+          cam_mul[1] = cam_mul[3] = 1.0f;
+        else
+          cam_mul[0] = cam_mul[2] = 0.0f;
+
+        pos = strstr(mn_text, "ccm=");
+        if (pos)
+        {
+          pos += 4;
+          char *pos2 = strstr(pos, " ");
+          if (pos2)
+          {
+            l = pos2 - pos;
+            memcpy(ccms, pos, l);
+            ccms[l] = '\0';
+#ifdef LIBRAW_WIN32_CALLS
+
+            pos = strtok(ccms, ",");
+#else
+            char *last = 0;
+            pos = strtok_r(ccms, ",", &last);
+#endif
+            if (pos)
+            {
+              for (l = 0; l < 4; l++)
+              {
+                num = 0.0;
+                for (c = 0; c < 3; c++)
+                {
+                  imgdata.color.ccm[l][c] = (float)atoi(pos);
+                  num += imgdata.color.ccm[l][c];
+#ifdef LIBRAW_WIN32_CALLS
+                  pos = strtok(NULL, ",");
+#else
+                  pos = strtok_r(NULL, ",", &last);
+#endif
+                  if (!pos)
+                    goto end;
+                }
+                if (num > 0.01)
+                  FORC3 imgdata.color.ccm[l][c] = imgdata.color.ccm[l][c] / num;
+              }
+            }
+          }
+        }
+      end:;
+      }
+      else if (!strncmp(make, "SONY", 4) &&
+               (!strncmp(model, "DSC-V3", 6) || !strncmp(model, "DSC-F828", 8)))
+      {
+        parseSonySRF(len);
+        break;
+      }
+      else if ((len == 1) && !strncmp(make, "NIKON", 5))
+      {
+        c = get4();
+        if (c)
+          fseek(ifp, c, SEEK_SET);
+        is_NikonTransfer = 1;
+      }
+      parse_makernote(base, 0);
+      break;
+    case 0xa002:
+      if (kodak)
+        raw_width = get4();
+      break;
+    case 0xa003:
+      if (kodak)
+        raw_height = get4();
+      break;
+    case 0xa302:
+      if (get4() == 0x20002)
+        for (exif_cfa = c = 0; c < 8; c += 2)
+          exif_cfa |= fgetc(ifp) * 0x01010101U << c;
+    }
+    fseek(ifp, save, SEEK_SET);
+  }
+}

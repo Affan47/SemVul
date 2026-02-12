@@ -1,0 +1,42 @@
+static void foo (short zz_datatype) {
+    switch (zz_datatype) {
+    case 0x0001:
+    case 0x0007:
+    case 0x0008:
+    case 0x0009:
+    case 0x000a:
+    case 0x000c:
+    case 0x000d:
+    case 0x000e:
+    case 0x000f:
+    case 0x0014:
+    case 0x0015:
+    case 0x0016:
+    case 0x0017:
+    case 0x0018:
+    case 0x0019:
+    case 0x0065:
+    case 0x0066:
+    case 0x07c8:
+    case 0x2605:
+    case 0x2705:
+    case 0x2805:
+    case 0x334d:
+    case 0x4341:
+    case 0x4453:
+    case 0x4704:
+    case 0x470f:
+    case 0x4b46:
+    case 0x4c41:
+    case 0x4d49:
+    case 0x4f4c:
+    case 0x5356:
+    case 0x5455:
+    case 0x554e:
+    case 0x5855:
+    case 0x6542:
+    case 0x756e:
+    case 0x7855:
+    case 0xfd4a:
+    }
+}

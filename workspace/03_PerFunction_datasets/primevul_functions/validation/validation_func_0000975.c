@@ -1,0 +1,1 @@
+ String(String&& str) noexcept : m_str(std::move(str.m_str)) {}

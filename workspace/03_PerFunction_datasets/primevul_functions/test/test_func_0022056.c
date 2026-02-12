@@ -1,0 +1,34 @@
+static int writeout(struct address_space *mapping, struct page *page)
+{
+	struct writeback_control wbc = {
+		.sync_mode = WB_SYNC_NONE,
+		.nr_to_write = 1,
+		.range_start = 0,
+		.range_end = LLONG_MAX,
+		.nonblocking = 1,
+		.for_reclaim = 1
+	};
+	int rc;
+
+	if (!mapping->a_ops->writepage)
+
+		return -EINVAL;
+
+	if (!clear_page_dirty_for_io(page))
+
+		return -EAGAIN;
+
+
+	remove_migration_ptes(page, page);
+
+	rc = mapping->a_ops->writepage(page, &wbc);
+	if (rc < 0)
+
+		return -EIO;
+
+	if (rc != AOP_WRITEPAGE_ACTIVATE)
+
+		lock_page(page);
+
+	return -EAGAIN;
+}

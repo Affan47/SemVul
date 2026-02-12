@@ -1,0 +1,44 @@
+int hashbin_delete( hashbin_t* hashbin, FREE_FUNC free_func)
+ {
+ 	irda_queue_t* queue;
+	unsigned long flags = 0;
+	int i;
+
+	IRDA_ASSERT(hashbin != NULL, return -1;);
+ 	IRDA_ASSERT(hashbin->magic == HB_MAGIC, return -1;);
+
+
+	if (hashbin->hb_type & HB_LOCK)
+		spin_lock_irqsave(&hashbin->hb_spinlock, flags);
+
+
+ 	for (i = 0; i < HASHBIN_SIZE; i ++ ) {
+		while (1) {
+			queue = dequeue_first((irda_queue_t**) &hashbin->hb_queue[i]);
+
+			if (!queue)
+				break;
+
+			if (free_func) {
+				if (hashbin->hb_type & HB_LOCK)
+					spin_unlock_irqrestore(&hashbin->hb_spinlock, flags);
+				free_func(queue);
+				if (hashbin->hb_type & HB_LOCK)
+					spin_lock_irqsave(&hashbin->hb_spinlock, flags);
+			}
+ 		}
+ 	}
+
+
+	hashbin->hb_current = NULL;
+ 	hashbin->magic = ~HB_MAGIC;
+
+
+	if (hashbin->hb_type & HB_LOCK)
+ 		spin_unlock_irqrestore(&hashbin->hb_spinlock, flags);
+
+
+	kfree(hashbin);
+
+	return 0;
+}

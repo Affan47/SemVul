@@ -1,0 +1,33 @@
+int Http2Session::OnStreamClose(nghttp2_session* handle,
+                                int32_t id,
+                                uint32_t code,
+                                void* user_data) {
+  Http2Session* session = static_cast<Http2Session*>(user_data);
+  Environment* env = session->env();
+  Isolate* isolate = env->isolate();
+  HandleScope scope(isolate);
+  Local<Context> context = env->context();
+  Context::Scope context_scope(context);
+  Debug(session, "stream %d closed with code: %d", id, code);
+  Http2Stream* stream = session->FindStream(id);
+
+
+  if (stream == nullptr || stream->IsDestroyed())
+    return 0;
+
+  stream->Close(code);
+
+
+  Local<Value> fn =
+      stream->object()->Get(context, env->onstreamclose_string())
+          .ToLocalChecked();
+
+  if (!fn->IsFunction()) {
+    stream->Destroy();
+    return 0;
+  }
+
+  Local<Value> arg = Integer::NewFromUnsigned(isolate, code);
+  stream->MakeCallback(fn.As<Function>(), 1, &arg);
+  return 0;
+}

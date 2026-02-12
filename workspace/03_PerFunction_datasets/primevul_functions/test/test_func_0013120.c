@@ -1,0 +1,14 @@
+struct sctp_chunk *sctp_make_shutdown_ack(const struct sctp_association *asoc,
+					  const struct sctp_chunk *chunk)
+{
+	struct sctp_chunk *retval;
+
+	retval = sctp_make_control(asoc, SCTP_CID_SHUTDOWN_ACK, 0, 0,
+				   GFP_ATOMIC);
+
+
+	if (retval && chunk)
+		retval->transport = chunk->transport;
+
+	return retval;
+}

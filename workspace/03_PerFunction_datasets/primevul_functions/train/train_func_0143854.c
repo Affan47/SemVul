@@ -1,0 +1,23 @@
+static int kill_proc(struct to_kill *tk, unsigned long pfn, int flags)
+{
+	struct task_struct *t = tk->tsk;
+	short addr_lsb = tk->size_shift;
+	int ret;
+
+	pr_err("Memory failure: %#lx: Killing %s:%d due to hardware memory corruption\n",
+		pfn, t->comm, t->pid);
+
+	if ((flags & MF_ACTION_REQUIRED) && t->mm == current->mm) {
+		ret = force_sig_mceerr(BUS_MCEERR_AR, (void __user *)tk->addr,
+				       addr_lsb, current);
+	} else {
+
+
+		ret = send_sig_mceerr(BUS_MCEERR_AO, (void __user *)tk->addr,
+				      addr_lsb, t);
+	}
+	if (ret < 0)
+		pr_info("Memory failure: Error sending signal to %s:%d: %d\n",
+			t->comm, t->pid, ret);
+	return ret;
+}

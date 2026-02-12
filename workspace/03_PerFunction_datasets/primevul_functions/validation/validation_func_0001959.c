@@ -1,0 +1,5 @@
+void* Init(TfLiteContext* context, const char* buffer, size_t length) {
+
+
+  return new OpData;
+}

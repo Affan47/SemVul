@@ -1,0 +1,5 @@
+PHP_FUNCTION(ldap_add)
+{
+
+	php_ldap_do_modify(INTERNAL_FUNCTION_PARAM_PASSTHRU, PHP_LD_FULL_ADD);
+}

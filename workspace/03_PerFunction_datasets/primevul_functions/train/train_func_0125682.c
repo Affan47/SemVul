@@ -1,0 +1,122 @@
+int jbd2_journal_dirty_metadata(handle_t *handle, struct buffer_head *bh)
+{
+	transaction_t *transaction = handle->h_transaction;
+	journal_t *journal;
+	struct journal_head *jh;
+	int ret = 0;
+
+	if (is_handle_aborted(handle))
+		return -EROFS;
+	if (!buffer_jbd(bh))
+		return -EUCLEAN;
+
+
+	jh = bh2jh(bh);
+	jbd_debug(5, "journal_head %p\n", jh);
+	JBUFFER_TRACE(jh, "entry");
+
+
+	if (data_race(jh->b_transaction != transaction &&
+	    jh->b_next_transaction != transaction)) {
+		spin_lock(&jh->b_state_lock);
+		J_ASSERT_JH(jh, jh->b_transaction == transaction ||
+				jh->b_next_transaction == transaction);
+		spin_unlock(&jh->b_state_lock);
+	}
+	if (jh->b_modified == 1) {
+
+		if (data_race(jh->b_transaction == transaction &&
+		    jh->b_jlist != BJ_Metadata)) {
+			spin_lock(&jh->b_state_lock);
+			if (jh->b_transaction == transaction &&
+			    jh->b_jlist != BJ_Metadata)
+				pr_err("JBD2: assertion failure: h_type=%u "
+				       "h_line_no=%u block_no=%llu jlist=%u\n",
+				       handle->h_type, handle->h_line_no,
+				       (unsigned long long) bh->b_blocknr,
+				       jh->b_jlist);
+			J_ASSERT_JH(jh, jh->b_transaction != transaction ||
+					jh->b_jlist == BJ_Metadata);
+			spin_unlock(&jh->b_state_lock);
+		}
+		goto out;
+	}
+
+	journal = transaction->t_journal;
+	spin_lock(&jh->b_state_lock);
+
+	if (jh->b_modified == 0) {
+
+
+		if (WARN_ON_ONCE(jbd2_handle_buffer_credits(handle) <= 0)) {
+			ret = -ENOSPC;
+			goto out_unlock_bh;
+		}
+		jh->b_modified = 1;
+		handle->h_total_credits--;
+	}
+
+
+	if (jh->b_transaction == transaction && jh->b_jlist == BJ_Metadata) {
+		JBUFFER_TRACE(jh, "fastpath");
+		if (unlikely(jh->b_transaction !=
+			     journal->j_running_transaction)) {
+			printk(KERN_ERR "JBD2: %s: "
+			       "jh->b_transaction (%llu, %p, %u) != "
+			       "journal->j_running_transaction (%p, %u)\n",
+			       journal->j_devname,
+			       (unsigned long long) bh->b_blocknr,
+			       jh->b_transaction,
+			       jh->b_transaction ? jh->b_transaction->t_tid : 0,
+			       journal->j_running_transaction,
+			       journal->j_running_transaction ?
+			       journal->j_running_transaction->t_tid : 0);
+			ret = -EINVAL;
+		}
+		goto out_unlock_bh;
+	}
+
+	set_buffer_jbddirty(bh);
+
+
+	if (jh->b_transaction != transaction) {
+		JBUFFER_TRACE(jh, "already on other transaction");
+		if (unlikely(((jh->b_transaction !=
+			       journal->j_committing_transaction)) ||
+			     (jh->b_next_transaction != transaction))) {
+			printk(KERN_ERR "jbd2_journal_dirty_metadata: %s: "
+			       "bad jh for block %llu: "
+			       "transaction (%p, %u), "
+			       "jh->b_transaction (%p, %u), "
+			       "jh->b_next_transaction (%p, %u), jlist %u\n",
+			       journal->j_devname,
+			       (unsigned long long) bh->b_blocknr,
+			       transaction, transaction->t_tid,
+			       jh->b_transaction,
+			       jh->b_transaction ?
+			       jh->b_transaction->t_tid : 0,
+			       jh->b_next_transaction,
+			       jh->b_next_transaction ?
+			       jh->b_next_transaction->t_tid : 0,
+			       jh->b_jlist);
+			WARN_ON(1);
+			ret = -EINVAL;
+		}
+
+
+		goto out_unlock_bh;
+	}
+
+
+	J_ASSERT_JH(jh, jh->b_frozen_data == NULL);
+
+	JBUFFER_TRACE(jh, "file as BJ_Metadata");
+	spin_lock(&journal->j_list_lock);
+	__jbd2_journal_file_buffer(jh, transaction, BJ_Metadata);
+	spin_unlock(&journal->j_list_lock);
+out_unlock_bh:
+	spin_unlock(&jh->b_state_lock);
+out:
+	JBUFFER_TRACE(jh, "exit");
+	return ret;
+}

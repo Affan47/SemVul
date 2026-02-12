@@ -1,0 +1,16 @@
+TEST_METHOD(5) {
+
+
+		string path, path2;
+		makeDirTree(parentDir + "/passenger-test.1234");
+		makeDirTree(parentDir + "/passenger-test.5678");
+		{
+			ServerInstanceDir dir(parentDir + "/passenger-test.1234", false);
+			ServerInstanceDir dir2(parentDir + "/passenger-test.5678", false);
+			dir2.detach();
+			path = dir.getPath();
+			path2 = dir2.getPath();
+		}
+		ensure_equals(getFileType(path), FT_DIRECTORY);
+		ensure_equals(getFileType(path2), FT_DIRECTORY);
+	}

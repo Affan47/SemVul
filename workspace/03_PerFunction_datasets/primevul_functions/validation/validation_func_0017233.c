@@ -1,0 +1,64 @@
+TEST(BitTestMatchExpression, DoesNotMatchOther) {
+    std::vector<uint32_t> bitPositions;
+
+    BSONObj notMatch1 = fromjson("{a: {}}");
+    BSONObj notMatch2 = fromjson("{a: null}");
+    BSONObj notMatch3 = fromjson("{a: []}");
+    BSONObj notMatch4 = fromjson("{a: true}");
+    BSONObj notMatch5 = fromjson("{a: ''}");
+    BSONObj notMatch6 = fromjson("{a: 5.5}");
+    BSONObj notMatch7 = fromjson("{a: NaN}");
+    BSONObj notMatch8 = fromjson("{a: 1e100}");
+    BSONObj notMatch9 = fromjson("{a: ObjectId('000000000000000000000000')}");
+    BSONObj notMatch10 = fromjson("{a: Date(54)}");
+
+    BitsAllSetMatchExpression balls("a", bitPositions);
+    BitsAllClearMatchExpression ballc("a", bitPositions);
+    BitsAnySetMatchExpression banys("a", bitPositions);
+    BitsAnyClearMatchExpression banyc("a", bitPositions);
+
+    ASSERT_EQ((size_t)0, balls.numBitPositions());
+    ASSERT_EQ((size_t)0, ballc.numBitPositions());
+    ASSERT_EQ((size_t)0, banys.numBitPositions());
+    ASSERT_EQ((size_t)0, banyc.numBitPositions());
+    ASSERT(!balls.matchesSingleElement(notMatch1["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch2["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch3["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch4["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch5["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch6["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch7["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch8["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch9["a"]));
+    ASSERT(!balls.matchesSingleElement(notMatch10["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch1["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch2["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch3["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch4["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch5["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch6["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch7["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch8["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch9["a"]));
+    ASSERT(!ballc.matchesSingleElement(notMatch10["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch1["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch2["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch3["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch4["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch5["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch6["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch7["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch8["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch9["a"]));
+    ASSERT(!banys.matchesSingleElement(notMatch10["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch1["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch2["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch3["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch4["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch5["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch6["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch7["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch8["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch9["a"]));
+    ASSERT(!banyc.matchesSingleElement(notMatch10["a"]));
+}

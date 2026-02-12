@@ -1,0 +1,20 @@
+ins_compl_delete(void)
+{
+    int	    col;
+
+
+    col = compl_col + (compl_status_adding() ? compl_length : 0);
+    if ((int)curwin->w_cursor.col > col)
+    {
+	if (stop_arrow() == FAIL)
+	    return;
+	backspace_until_column(col);
+    }
+
+
+    changed_cline_bef_curs();
+#ifdef FEAT_EVAL
+
+    set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
+#endif
+}

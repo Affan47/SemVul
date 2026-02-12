@@ -1,0 +1,31 @@
+static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
+		int write)
+{
+	struct page *page;
+	int ret;
+
+#ifdef CONFIG_STACK_GROWSUP
+	if (write) {
+		ret = expand_stack_downwards(bprm->vma, pos);
+		if (ret < 0)
+			return NULL;
+	}
+#endif
+	ret = get_user_pages(current, bprm->mm, pos,
+			1, write, 1, &page, NULL);
+	if (ret <= 0)
+		return NULL;
+
+	if (write) {
+		struct rlimit *rlim = current->signal->rlim;
+		unsigned long size = bprm->vma->vm_end - bprm->vma->vm_start;
+
+
+		if (size > rlim[RLIMIT_STACK].rlim_cur / 4) {
+			put_page(page);
+			return NULL;
+		}
+	}
+
+	return page;
+}

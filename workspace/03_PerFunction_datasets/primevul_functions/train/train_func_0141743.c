@@ -1,0 +1,22 @@
+static size_t key_attr_size(void)
+{
+	return    nla_total_size(4)
+		+ nla_total_size(0)
+		  + nla_total_size(8)
+		  + nla_total_size(4)
+		  + nla_total_size(4)
+		  + nla_total_size(1)
+		  + nla_total_size(1)
+		  + nla_total_size(0)
+		  + nla_total_size(0)
+		+ nla_total_size(4)
+		+ nla_total_size(4)
+		+ nla_total_size(12)
+		+ nla_total_size(2)
+		+ nla_total_size(4)
+		+ nla_total_size(0)
+		+ nla_total_size(2)
+		+ nla_total_size(40)
+		+ nla_total_size(2)
+		+ nla_total_size(28);
+}

@@ -1,0 +1,109 @@
+setspec(struct tbl *vp)
+{
+	mksh_ari_u num;
+	char *s;
+	int st;
+
+	switch ((st = special(vp->name))) {
+#if HAVE_PERSISTENT_HISTORY
+	case V_HISTFILE:
+		sethistfile(str_val(vp));
+		return;
+#endif
+	case V_IFS:
+		setctypes(s = str_val(vp), C_IFS);
+		ifs0 = *s;
+		return;
+	case V_PATH:
+		if (path)
+			afree(path, APERM);
+		s = str_val(vp);
+		strdupx(path, s, APERM);
+
+		flushcom(true);
+		return;
+	case V_TMPDIR:
+		if (tmpdir) {
+			afree(tmpdir, APERM);
+			tmpdir = NULL;
+		}
+
+
+		{
+			struct stat statb;
+
+			s = str_val(vp);
+
+			if (s[0] == '/' && access(s, W_OK|X_OK) == 0 &&
+			    stat(s, &statb) == 0 && S_ISDIR(statb.st_mode))
+				strdupx(tmpdir, s, APERM);
+		}
+		return;
+
+	case V_COLUMNS:
+	case V_LINES:
+		if (vp->flag & IMPORT) {
+
+			unspecial(vp->name);
+			vp->flag &= ~SPECIAL;
+			return;
+		}
+
+	case V_HISTSIZE:
+	case V_LINENO:
+	case V_OPTIND:
+	case V_RANDOM:
+	case V_SECONDS:
+	case V_TMOUT:
+		vp->flag &= ~SPECIAL;
+		if (getint(vp, &num, false) == -1) {
+			s = str_val(vp);
+			if (st != V_RANDOM)
+				errorf("%s: %s: %s", vp->name, "bad number", s);
+			num.u = hash(s);
+		}
+		vp->flag |= SPECIAL;
+		break;
+	default:
+
+		return;
+	}
+
+
+	switch (st) {
+	case V_COLUMNS:
+		if (num.i >= MIN_COLS)
+			x_cols = num.i;
+		break;
+	case V_HISTSIZE:
+		sethistsize(num.i);
+		break;
+	case V_LINENO:
+
+		user_lineno = num.u - current_lineno - 1;
+		break;
+	case V_LINES:
+		if (num.i >= MIN_LINS)
+			x_lins = num.i;
+		break;
+	case V_OPTIND:
+		getopts_reset((int)num.i);
+		break;
+	case V_RANDOM:
+
+
+		rndset((unsigned long)num.u);
+		break;
+	case V_SECONDS:
+		{
+			struct timeval tv;
+
+			mksh_TIME(tv);
+			seconds = tv.tv_sec - num.i;
+		}
+		break;
+	case V_TMOUT:
+		ksh_tmout = num.i >= 0 ? num.i : 0;
+		break;
+	}
+}

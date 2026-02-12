@@ -1,0 +1,15 @@
+plain_vgetc(void)
+{
+    int c;
+
+    do
+	c = safe_vgetc();
+    while (c == K_IGNORE || c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR);
+
+    if (c == K_PS)
+
+
+	c = bracketed_paste(PASTE_ONE_CHAR, FALSE, NULL);
+
+    return c;
+}

@@ -1,0 +1,48 @@
+ut64 MACH0_(get_main)(struct MACH0_(obj_t) *bin) {
+	ut64 addr = UT64_MAX;
+	int i;
+
+
+	if (bin->main_addr == UT64_MAX) {
+#if FEATURE_SYMLIST
+		 (void)MACH0_(get_symbols_list) (bin);
+#else
+		 (void)MACH0_(get_symbols) (bin);
+#endif
+	}
+	if (bin->main_addr != 0 && bin->main_addr != UT64_MAX) {
+		return bin->main_addr;
+	}
+
+	free (MACH0_(get_entrypoint)(bin));
+
+	bin->main_addr = 0;
+
+	if (addr == UT64_MAX && bin->main_cmd.cmd == LC_MAIN) {
+		addr = bin->entry + bin->baddr;
+	}
+
+	if (!addr) {
+		ut8 b[128];
+		ut64 entry = addr_to_offset (bin, bin->entry);
+
+		if (entry > bin->size || entry + sizeof (b) > bin->size) {
+			return UT64_MAX;
+		}
+		i = r_buf_read_at (bin->b, entry, b, sizeof (b));
+		if (i < 80) {
+			return UT64_MAX;
+		}
+		for (i = 0; i < 64; i++) {
+			if (b[i] == 0xe8 && !b[i + 3] && !b[i + 4]) {
+				int delta = b[i + 1] | (b[i + 2] << 8) | (b[i + 3] << 16) | (b[i + 4] << 24);
+				addr = bin->entry + i + 5 + delta;
+				break;
+			}
+		}
+		if (!addr) {
+			addr = entry;
+		}
+	}
+	return bin->main_addr = addr;
+}

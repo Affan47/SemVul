@@ -1,0 +1,15 @@
+void HTMLImportsController::Dispose() {
+
+
+  LoaderList list;
+  list.swap(loaders_);
+  for (const auto& loader : list) {
+    if (loader)
+      loader->Dispose();
+  }
+
+   if (root_) {
+     root_->Dispose();
+    root_.Clear();
+  }
+}

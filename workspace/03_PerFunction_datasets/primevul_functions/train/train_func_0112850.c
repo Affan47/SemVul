@@ -1,0 +1,4 @@
+**/
+    CImgDisplay& show() {
+      return assign();
+}

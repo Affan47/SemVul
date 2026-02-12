@@ -1,0 +1,17 @@
+TEST_F(QueryPlannerTest, MaxMinSort) {
+    addIndex(BSON("a" << 1));
+
+
+    runQueryFull(BSONObj(),
+                 fromjson("{a: 1}"),
+                 BSONObj(),
+                 0,
+                 0,
+                 BSONObj(),
+                 fromjson("{a: 2}"),
+                 fromjson("{a: 8}"),
+                 false);
+
+    assertNumSolutions(1);
+    assertSolutionExists("{fetch: {node: {ixscan: {filter: null, pattern: {a: 1}}}}}");
+}

@@ -1,0 +1,19 @@
+int datecmp(struct tm *rectime, struct tstamp *tse, int cross_day)
+{
+	int tm_hour = rectime->tm_hour;
+
+	if (cross_day) {
+
+
+		tm_hour += 24;
+	}
+
+	if (tm_hour == tse->tm_hour) {
+		if (rectime->tm_min == tse->tm_min)
+			return (rectime->tm_sec - tse->tm_sec);
+		else
+			return (rectime->tm_min - tse->tm_min);
+	}
+	else
+		return (tm_hour - tse->tm_hour);
+}

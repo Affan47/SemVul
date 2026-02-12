@@ -1,0 +1,4 @@
+void TiffEncoder::visitDirectory(TiffDirectory* )
+    {
+
+    }

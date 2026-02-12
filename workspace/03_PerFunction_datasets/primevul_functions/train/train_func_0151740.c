@@ -1,0 +1,11 @@
+void PngChunk::decodeIHDRChunk(const DataBuf& data,
+                                   int*           outWidth,
+                                   int*           outHeight)
+    {
+        assert(data.size_ >= 8);
+
+
+        *outWidth  = getLong((const byte*)data.pData_,     bigEndian);
+        *outHeight = getLong((const byte*)data.pData_ + 4, bigEndian);
+
+    }

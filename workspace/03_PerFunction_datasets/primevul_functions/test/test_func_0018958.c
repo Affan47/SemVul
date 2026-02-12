@@ -1,0 +1,41 @@
+static int io_do_iopoll(struct io_ring_ctx *ctx, unsigned int *nr_events,
+			long min)
+{
+	struct io_kiocb *req, *tmp;
+	LIST_HEAD(done);
+	bool spin;
+	int ret;
+
+
+	spin = !ctx->poll_multi_queue && *nr_events < min;
+
+	ret = 0;
+	list_for_each_entry_safe(req, tmp, &ctx->iopoll_list, inflight_entry) {
+		struct kiocb *kiocb = &req->rw.kiocb;
+
+
+		if (READ_ONCE(req->iopoll_completed)) {
+			list_move_tail(&req->inflight_entry, &done);
+			continue;
+		}
+		if (!list_empty(&done))
+			break;
+
+		ret = kiocb->ki_filp->f_op->iopoll(kiocb, spin);
+		if (ret < 0)
+			break;
+
+
+		if (READ_ONCE(req->iopoll_completed))
+			list_move_tail(&req->inflight_entry, &done);
+
+		if (ret && spin)
+			spin = false;
+		ret = 0;
+	}
+
+	if (!list_empty(&done))
+		io_iopoll_complete(ctx, nr_events, &done);
+
+	return ret;
+}

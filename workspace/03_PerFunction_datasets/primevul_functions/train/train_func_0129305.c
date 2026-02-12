@@ -1,0 +1,19 @@
+__acquires(timer->base->lock)
+{
+	for (;;) {
+		struct timer_base *base;
+		u32 tf;
+
+
+		tf = READ_ONCE(timer->flags);
+
+		if (!(tf & TIMER_MIGRATING)) {
+			base = get_timer_base(tf);
+			spin_lock_irqsave(&base->lock, *flags);
+			if (timer->flags == tf)
+				return base;
+			spin_unlock_irqrestore(&base->lock, *flags);
+		}
+		cpu_relax();
+	}
+}

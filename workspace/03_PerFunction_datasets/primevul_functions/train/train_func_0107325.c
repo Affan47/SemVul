@@ -1,0 +1,120 @@
+ProcXkbSetNames(ClientPtr client)
+{
+    DeviceIntPtr dev;
+    CARD32 *tmp;
+    Atom bad;
+    int rc;
+
+    REQUEST(xkbSetNamesReq);
+    REQUEST_AT_LEAST_SIZE(xkbSetNamesReq);
+
+    if (!(client->xkbClientFlags & _XkbClientInitialized))
+        return BadAccess;
+
+    CHK_KBD_DEVICE(dev, stuff->deviceSpec, client, DixManageAccess);
+    CHK_MASK_LEGAL(0x01, stuff->which, XkbAllNamesMask);
+
+
+    tmp = (CARD32 *) &stuff[1];
+
+    if (!_XkbCheckRequestBounds(client, stuff, tmp, tmp + 1))
+        return BadLength;
+    if (stuff->which & XkbKeycodesNameMask) {
+        tmp = _XkbCheckAtoms(tmp, 1, client->swapped, &bad);
+        if (!tmp) {
+            client->errorValue = bad;
+            return BadAtom;
+        }
+    }
+    if (!_XkbCheckRequestBounds(client, stuff, tmp, tmp + 1))
+        return BadLength;
+    if (stuff->which & XkbGeometryNameMask) {
+        tmp = _XkbCheckAtoms(tmp, 1, client->swapped, &bad);
+        if (!tmp) {
+            client->errorValue = bad;
+            return BadAtom;
+        }
+    }
+    if (!_XkbCheckRequestBounds(client, stuff, tmp, tmp + 1))
+        return BadLength;
+    if (stuff->which & XkbSymbolsNameMask) {
+        tmp = _XkbCheckAtoms(tmp, 1, client->swapped, &bad);
+        if (!tmp) {
+            client->errorValue = bad;
+            return BadAtom;
+        }
+    }
+    if (!_XkbCheckRequestBounds(client, stuff, tmp, tmp + 1))
+        return BadLength;
+    if (stuff->which & XkbPhysSymbolsNameMask) {
+        tmp = _XkbCheckAtoms(tmp, 1, client->swapped, &bad);
+        if (!tmp) {
+            client->errorValue = bad;
+            return BadAtom;
+        }
+    }
+    if (!_XkbCheckRequestBounds(client, stuff, tmp, tmp + 1))
+        return BadLength;
+    if (stuff->which & XkbTypesNameMask) {
+        tmp = _XkbCheckAtoms(tmp, 1, client->swapped, &bad);
+        if (!tmp) {
+            client->errorValue = bad;
+            return BadAtom;
+        }
+    }
+    if (!_XkbCheckRequestBounds(client, stuff, tmp, tmp + 1))
+        return BadLength;
+    if (stuff->which & XkbCompatNameMask) {
+        tmp = _XkbCheckAtoms(tmp, 1, client->swapped, &bad);
+        if (!tmp) {
+            client->errorValue = bad;
+            return BadAtom;
+        }
+    }
+
+
+    rc = _XkbSetNamesCheck(client, dev, stuff, tmp);
+    if (rc != Success)
+        return rc;
+
+    if (stuff->deviceSpec == XkbUseCoreKbd) {
+        DeviceIntPtr other;
+
+        for (other = inputInfo.devices; other; other = other->next) {
+            if ((other != dev) && other->key && !IsMaster(other) &&
+                GetMaster(other, MASTER_KEYBOARD) == dev) {
+
+                rc = XaceHook(XACE_DEVICE_ACCESS, client, other,
+                              DixManageAccess);
+                if (rc == Success) {
+                    rc = _XkbSetNamesCheck(client, other, stuff, tmp);
+                    if (rc != Success)
+                        return rc;
+                }
+            }
+        }
+    }
+
+
+    rc = _XkbSetNames(client, dev, stuff);
+    if (rc != Success)
+        return rc;
+
+    if (stuff->deviceSpec == XkbUseCoreKbd) {
+        DeviceIntPtr other;
+
+        for (other = inputInfo.devices; other; other = other->next) {
+            if ((other != dev) && other->key && !IsMaster(other) &&
+                GetMaster(other, MASTER_KEYBOARD) == dev) {
+
+                rc = XaceHook(XACE_DEVICE_ACCESS, client, other,
+                              DixManageAccess);
+                if (rc == Success)
+                    _XkbSetNames(client, other, stuff);
+            }
+        }
+    }
+
+
+    return Success;
+}

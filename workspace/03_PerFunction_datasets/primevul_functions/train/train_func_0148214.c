@@ -1,0 +1,42 @@
+MagickExport MagickBooleanType XQueryColorDatabase(const char *target,
+  XColor *color)
+{
+  Colormap
+    colormap;
+
+  static Display
+    *display = (Display *) NULL;
+
+  Status
+    status;
+
+  XColor
+    xcolor;
+
+
+  assert(color != (XColor *) NULL);
+  color->red=0;
+  color->green=0;
+  color->blue=0;
+  color->flags=(char) (DoRed | DoGreen | DoBlue);
+  if ((target == (char *) NULL) || (*target == '\0'))
+    target="#ffffffffffff";
+
+
+  if (display == (Display *) NULL)
+    display=XOpenDisplay((char *) NULL);
+  if (display == (Display *) NULL)
+    ThrowXWindowFatalException(XServerError,"ColorIsNotKnownToServer",target);
+  colormap=XDefaultColormap(display,XDefaultScreen(display));
+  status=XParseColor(display,colormap,(char *) target,&xcolor);
+  if (status == False)
+    ThrowXWindowException(XServerError,"ColorIsNotKnownToServer",target)
+  else
+    {
+      color->red=xcolor.red;
+      color->green=xcolor.green;
+      color->blue=xcolor.blue;
+      color->flags=xcolor.flags;
+    }
+  return(status != False ? MagickTrue : MagickFalse);
+}

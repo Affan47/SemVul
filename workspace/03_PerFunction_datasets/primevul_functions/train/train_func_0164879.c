@@ -1,0 +1,57 @@
+static int sctp_getsockopt_delayed_ack(struct sock *sk, int len,
+					    char __user *optval,
+					    int __user *optlen)
+{
+	struct sctp_sack_info    params;
+	struct sctp_association *asoc = NULL;
+	struct sctp_sock        *sp = sctp_sk(sk);
+
+	if (len >= sizeof(struct sctp_sack_info)) {
+		len = sizeof(struct sctp_sack_info);
+
+		if (copy_from_user(&params, optval, len))
+			return -EFAULT;
+	} else if (len == sizeof(struct sctp_assoc_value)) {
+		printk(KERN_WARNING "SCTP: Use of struct sctp_sack_info "
+		       "in delayed_ack socket option deprecated\n");
+		printk(KERN_WARNING "SCTP: struct sctp_sack_info instead\n");
+		if (copy_from_user(&params, optval, len))
+			return -EFAULT;
+	} else
+		return - EINVAL;
+
+
+	asoc = sctp_id2assoc(sk, params.sack_assoc_id);
+	if (!asoc && params.sack_assoc_id && sctp_style(sk, UDP))
+		return -EINVAL;
+
+	if (asoc) {
+
+		if (asoc->param_flags & SPP_SACKDELAY_ENABLE) {
+			params.sack_delay = jiffies_to_msecs(
+				asoc->sackdelay);
+			params.sack_freq = asoc->sackfreq;
+
+		} else {
+			params.sack_delay = 0;
+			params.sack_freq = 1;
+		}
+	} else {
+
+		if (sp->param_flags & SPP_SACKDELAY_ENABLE) {
+			params.sack_delay  = sp->sackdelay;
+			params.sack_freq = sp->sackfreq;
+		} else {
+			params.sack_delay  = 0;
+			params.sack_freq = 1;
+		}
+	}
+
+	if (copy_to_user(optval, &params, len))
+		return -EFAULT;
+
+	if (put_user(len, optlen))
+		return -EFAULT;
+
+	return 0;
+}
