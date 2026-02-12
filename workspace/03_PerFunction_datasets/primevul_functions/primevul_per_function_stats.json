@@ -1,10 +1,10 @@
 {
   "generated_at": "2026-01-19T17:27:00.163693",
-  "output_base": "./workspace/03_PerFunction_datasets/primevul_functions",
+  "output_base": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/03_PerFunction_datasets/primevul_functions",
   "inputs": {
-    "train": "./datasets/primevul_raw/train.json",
-    "validation": "./datasets/primevul_raw/validation.json",
-    "test": "./datasets/primevul_raw/test.json"
+    "train": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/01_Datasets/PrimeVul_HF/train.json",
+    "validation": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/01_Datasets/PrimeVul_HF/validation.json",
+    "test": "/home/ayounas/CFG_Data_Models/Shiva_NAS_CPG/01_Datasets/PrimeVul_HF/test.json"
   },
   "splits": [
     {
